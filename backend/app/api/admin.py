@@ -4,11 +4,12 @@ from app.core.database import get_db
 from app.services.publish import PublishService
 from app.models.models import Episode
 from app.services.validation import ValidationService
+from app.api.auth import get_current_user, get_current_admin
 
 router = APIRouter(prefix="/admin")
 
 @router.get("/validation-report")
-def get_validation_report(db: Session = Depends(get_db)):
+def get_validation_report(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     episodes = db.query(Episode).filter(Episode.status == 'published').all()
     all_issues = []
     blocked_count = 0
@@ -26,9 +27,8 @@ def get_validation_report(db: Session = Depends(get_db)):
     }
 
 @router.post("/catalog/publish")
-def publish_catalog(db: Session = Depends(get_db)):
+def publish_catalog(db: Session = Depends(get_db), admin_user: dict = Depends(get_current_admin)):
     try:
-        # In a real app we'd verify admin role here
         run = PublishService.publish_catalogue(db)
         if run.status == "failed":
             raise HTTPException(status_code=500, detail="Publish Failed")

@@ -1,13 +1,24 @@
 from fastapi import FastAPI, Depends, Response, status
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.core.database import get_db
+from app.core.config import settings
 from app.core.exceptions import ValidationErrorException, validation_exception_handler
-from app.api import admin, catalog
+from app.api import admin, catalog, auth, crud, artwork
+import os
 
 app = FastAPI(title="Peblo TV Mini Backend")
 
+# Ensure DATA_DIR exists
+os.makedirs(settings.DATA_DIR, exist_ok=True)
+# Mount assets directory for serving uploaded artwork
+app.mount("/assets", StaticFiles(directory=settings.DATA_DIR), name="assets")
+
+app.include_router(auth.router)
 app.include_router(admin.router)
+app.include_router(crud.router)
+app.include_router(artwork.router)
 app.include_router(catalog.router)
 
 app.add_exception_handler(ValidationErrorException, validation_exception_handler)
