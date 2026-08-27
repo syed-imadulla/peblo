@@ -28,6 +28,7 @@ class Show(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     
     seasons = relationship("Season", back_populates="show", cascade="all, delete-orphan")
+    artwork = relationship("Artwork", cascade="all, delete-orphan", primaryjoin="Show.id == Artwork.show_id")
 
 
 class Season(Base):
@@ -45,6 +46,7 @@ class Season(Base):
 
     show = relationship("Show", back_populates="seasons")
     episodes = relationship("Episode", back_populates="season", cascade="all, delete-orphan")
+    artwork = relationship("Artwork", cascade="all, delete-orphan", primaryjoin="Season.id == Artwork.season_id")
 
 
 class Episode(Base):
@@ -66,6 +68,7 @@ class Episode(Base):
     )
 
     season = relationship("Season", back_populates="episodes")
+    artwork = relationship("Artwork", cascade="all, delete-orphan", primaryjoin="Episode.id == Artwork.episode_id")
 
 
 class Artwork(Base):

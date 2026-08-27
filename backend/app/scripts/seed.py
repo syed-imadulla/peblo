@@ -10,6 +10,11 @@ from app.models.models import Show, Season, Episode, Artwork
 def seed_db(seed_file_path: str):
     db = SessionLocal()
     try:
+        from sqlalchemy import text
+        # Truncate tables to ensure idempotency
+        db.execute(text("TRUNCATE TABLE artwork, episodes, seasons, shows CASCADE;"))
+        db.commit()
+
         with open(seed_file_path, 'r') as f:
             data = json.load(f)
 

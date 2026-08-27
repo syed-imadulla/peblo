@@ -16,6 +16,13 @@ class LocalStorageProvider(StorageProvider):
         with open(os.path.join(self.base_path, filename), "w") as f:
             f.write(content)
 
+    def read(self, filename: str) -> str:
+        filepath = os.path.join(self.base_path, filename)
+        if not os.path.exists(filepath):
+            return None
+        with open(filepath, "r") as f:
+            return f.read()
+
     def rename(self, old_name: str, new_name: str):
         old_path = os.path.join(self.base_path, old_name)
         new_path = os.path.join(self.base_path, new_name)

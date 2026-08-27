@@ -1,0 +1,158 @@
+import json
+import uuid
+import os
+from typing import Dict, Any, List
+from sqlalchemy.orm import Session
+from sqlalchemy.orm import joinedload
+from app.models.models import Show, Season, Episode, PublishRun
+from app.services.validation import ValidationService
+from app.services.storage import storage
+
+class PublishService:
+    @staticmethod
+    def publish_catalogue(db: Session, triggered_by: str = None) -> PublishRun:
+        # 1. Fetch all published records with relationships eagerly loaded
+        episodes = db.query(Episode).options(
+            joinedload(Episode.season).joinedload(Season.show)
+        ).filter(Episode.status == 'published').all()
+        
+        total_processed = len(episodes)
+        
+        valid_episodes = []
+        blocked = 0
+        error_log = []
+        
+        # 2. Validation
+        for ep in episodes:
+            errors = ValidationService.validate_for_publish(db, ep)
+            if errors.has_blocking_errors():
+                blocked += 1
+                for issue in errors.issues:
+                    error_log.append(issue.model_dump())
+            else:
+                valid_episodes.append(ep)
+                
+        published_records = len(valid_episodes)
+        
+        status = "failed"
+        if published_records > 0:
+            catalogue = PublishService._generate_catalogue(valid_episodes)
+            catalogue_json = json.dumps(catalogue, indent=2, sort_keys=True)
+            
+            # Atomic publish
+            temp_name = f"catalogue_temp_{uuid.uuid4().hex}.json"
+            final_name = "catalogue.json"
+            storage.write(temp_name, catalogue_json)
+            storage.rename(temp_name, final_name)
+            
+            status = "success"
+        else:
+            error_log.append({"type": "empty_catalogue", "description": "No valid records to publish"})
+
+        # Record run
+        run = PublishRun(
+            id=str(uuid.uuid4()),
+            status=status,
+            total_records_processed=total_processed,
+            published_records=published_records,
+            blocked_records=blocked,
+            error_log=error_log
+        )
+        if triggered_by:
+            run.triggered_by = triggered_by
+            
+        db.add(run)
+        db.commit()
+        
+        return run
+
+    @staticmethod
+    def _generate_catalogue(episodes: List[Episode]) -> Dict[str, Any]:
+        catalogue = {
+            "featured": [],
+            "series": [],
+            "minisodes": [],
+            "songs": []
+        }
+        
+        # First, aggregate episodes by content_group
+        cg_map = {}
+        for ep in episodes:
+            cg = ep.content_group
+            if cg not in cg_map:
+                artworks = {}
+                for art in ep.artwork:
+                    artworks[art.type] = art.url
+                    
+                cg_map[cg] = {
+                    "content_group": cg,
+                    "title": ep.episode_title,
+                    "duration_seconds": ep.duration_seconds,
+                    "languages": set(),
+                    "artwork": artworks,
+                    "_show": ep.season.show,
+                    "_season_number": ep.season.season_number
+                }
+            cg_map[cg]["languages"].add(ep.language)
+            
+        # Second, structure into shows and seasons
+        shows_map = {}
+        for cg, data in cg_map.items():
+            show = data["_show"]
+            s_num = data["_season_number"]
+            
+            if show.id not in shows_map:
+                shows_map[show.id] = {
+                    "show_id": str(show.id),
+                    "title": show.title,
+                    "slug": show.slug,
+                    "synopsis": show.synopsis,
+                    "categories": show.categories,
+                    "seasons": {},
+                    "trailers": [],
+                    "_section": show.section
+                }
+                
+            # clean episode output
+            ep_out = {
+                "content_group": data["content_group"],
+                "title": data["title"],
+                "duration_seconds": data["duration_seconds"],
+                "languages": sorted(list(data["languages"])),
+                "artwork": data["artwork"]
+            }
+            
+            if s_num == 0:
+                shows_map[show.id]["trailers"].append(ep_out)
+            else:
+                if s_num not in shows_map[show.id]["seasons"]:
+                    shows_map[show.id]["seasons"][s_num] = {
+                        "season_number": s_num,
+                        "episodes": []
+                    }
+                shows_map[show.id]["seasons"][s_num]["episodes"].append(ep_out)
+
+        # Third, format and sort the tree
+        for show_id, s_data in shows_map.items():
+            section = s_data["_section"]
+            
+            # format seasons to array
+            sorted_seasons = []
+            for s_num in sorted(s_data["seasons"].keys()):
+                season_obj = s_data["seasons"][s_num]
+                season_obj["episodes"] = sorted(season_obj["episodes"], key=lambda x: x["content_group"])
+                sorted_seasons.append(season_obj)
+                
+            s_data["seasons"] = sorted_seasons
+            s_data["trailers"] = sorted(s_data["trailers"], key=lambda x: x["content_group"])
+            
+            del s_data["_section"]
+            
+            if section in catalogue:
+                catalogue[section].append(s_data)
+                
+        # Sort shows within sections
+        for section in catalogue:
+            catalogue[section] = sorted(catalogue[section], key=lambda x: x["title"])
+            
+        return catalogue
