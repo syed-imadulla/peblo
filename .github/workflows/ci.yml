@@ -22,6 +22,8 @@ jobs:
           pip install -r requirements.txt
           pip install pytest
       - name: Run tests
+        env:
+          PYTHONPATH: .
         run: |
           cd backend
           pytest tests/
@@ -30,10 +32,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 20
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: 'npm'
           cache-dependency-path: viewer/package-lock.json
       - name: Install dependencies
@@ -49,10 +51,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 20
+      - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: 'npm'
           cache-dependency-path: cms/package-lock.json
       - name: Install dependencies

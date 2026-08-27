@@ -1,5 +1,6 @@
 import jwt
-from datetime import datetime, timedelta
+import os
+from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
@@ -8,7 +9,7 @@ from typing import Optional
 router = APIRouter(prefix="/auth")
 security = HTTPBearer()
 
-SECRET_KEY = "peblo_secret_do_not_use_in_prod"
+SECRET_KEY = os.environ.get("JWT_SECRET", "peblo_secret_do_not_use_in_prod_123")
 ALGORITHM = "HS256"
 
 class LoginRequest(BaseModel):
@@ -21,7 +22,7 @@ class TokenResponse(BaseModel):
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(days=1)
+    expire = datetime.now(timezone.utc) + timedelta(days=1)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
