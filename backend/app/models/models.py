@@ -1,0 +1,102 @@
+import uuid
+from datetime import datetime
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Index, CheckConstraint, UniqueConstraint
+from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy.orm import relationship
+from app.core.database import Base
+
+class User(Base):
+    __tablename__ = "users"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    email = Column(String, unique=True, nullable=False)
+    role = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+
+class Show(Base):
+    __tablename__ = "shows"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    title = Column(String, nullable=False)
+    slug = Column(String, unique=True, nullable=False)
+    section = Column(String, nullable=True)
+    categories = Column(JSONB, nullable=False, default=list)
+    synopsis = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    
+    seasons = relationship("Season", back_populates="show", cascade="all, delete-orphan")
+
+
+class Season(Base):
+    __tablename__ = "seasons"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    show_id = Column(UUID(as_uuid=True), ForeignKey("shows.id", ondelete="CASCADE"), nullable=False)
+    season_number = Column(Integer, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint('show_id', 'season_number', name='uq_show_season'),
+    )
+
+    show = relationship("Show", back_populates="seasons")
+    episodes = relationship("Episode", back_populates="season", cascade="all, delete-orphan")
+
+
+class Episode(Base):
+    __tablename__ = "episodes"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    season_id = Column(UUID(as_uuid=True), ForeignKey("seasons.id", ondelete="CASCADE"), nullable=False)
+    episode_title = Column(String, nullable=False)
+    status = Column(String, nullable=False) # 'draft' or 'published'
+    duration_seconds = Column(Integer, nullable=True)
+    language = Column(String, nullable=True)
+    content_group = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    __table_args__ = (
+        Index('ix_episodes_content_group', 'content_group'),
+        Index('ix_episodes_status', 'status'),
+    )
+
+    season = relationship("Season", back_populates="episodes")
+
+
+class Artwork(Base):
+    __tablename__ = "artwork"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    show_id = Column(UUID(as_uuid=True), ForeignKey("shows.id", ondelete="CASCADE"), nullable=True)
+    season_id = Column(UUID(as_uuid=True), ForeignKey("seasons.id", ondelete="CASCADE"), nullable=True)
+    episode_id = Column(UUID(as_uuid=True), ForeignKey("episodes.id", ondelete="CASCADE"), nullable=True)
+    type = Column(String, nullable=False) # 'banner', 'thumbnail', etc
+    url = Column(String, nullable=False)
+    size_bytes = Column(Integer, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    __table_args__ = (
+        CheckConstraint(
+            "(show_id IS NOT NULL)::int + (season_id IS NOT NULL)::int + (episode_id IS NOT NULL)::int = 1",
+            name="check_artwork_single_entity"
+        ),
+    )
+
+
+class PublishRun(Base):
+    __tablename__ = "publish_runs"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    triggered_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    status = Column(String, nullable=False) # 'success', 'failed'
+    total_records_processed = Column(Integer, nullable=False)
+    published_records = Column(Integer, nullable=False)
+    blocked_records = Column(Integer, nullable=False)
+    error_log = Column(JSONB, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
