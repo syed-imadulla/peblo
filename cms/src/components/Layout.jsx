@@ -55,7 +55,7 @@ const Layout = () => {
       {/* Sidebar */}
       <div 
         style={{ 
-          width: '260px', 
+          width: '250px', 
           backgroundColor: '#FFFFFF',
           padding: '24px 0', 
           display: 'flex', 
@@ -74,16 +74,10 @@ const Layout = () => {
         className="sidebar"
       >
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '32px', padding: '0 24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', margin: 0, flexDirection: 'column', textAlign: 'center' }}>
-            <div style={{ fontSize: '32px', fontWeight: '900', letterSpacing: '-1px', lineHeight: '1.2' }}>
-              <span style={{ color: 'var(--purple-700)' }}>P</span>
-              <span style={{ color: '#A881E6' }}>e</span>
-              <span style={{ color: '#4B63D6' }}>B</span>
-              <span style={{ color: '#E8669F' }}>L</span>
-              <span style={{ color: '#F2994A' }}>o</span>
-            </div>
-            <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '700', letterSpacing: '2px' }}>CMS</span>
-          </div>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, flexDirection: 'column' }}>
+            <img src="/assets/eoEf12a30xBVz5Q1VMqOk8gbgs.avif" alt="Peblo Logo" style={{ width: '80px', objectFit: 'contain' }} />
+            <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600', letterSpacing: '1px' }}>CMS</span>
+          </h2>
           <button className="mobile-only" onClick={() => setSidebarOpen(false)} style={{ color: 'var(--text-muted)', position: 'absolute', right: '16px', top: '24px' }}>
             <X size={24} />
           </button>
@@ -127,7 +121,7 @@ const Layout = () => {
       <style>{`
         .sidebar { left: 0 !important; }
         .mobile-only { display: none !important; }
-        .main-content { margin-left: 260px; }
+        .main-content { margin-left: 250px; }
         @media (max-width: 1024px) {
           .sidebar { left: -100% !important; }
           .main-content { margin-left: 0; }
@@ -137,7 +131,7 @@ const Layout = () => {
 
       {/* Main Content */}
       <div className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', transition: 'margin-left 0.3s ease' }}>
-        <header style={{ height: '88px', display: 'flex', alignItems: 'center', padding: '0 40px', gap: '16px', position: 'sticky', top: 0, zIndex: 30, backgroundColor: 'var(--background)' }}>
+        <header style={{ height: '88px', display: 'flex', alignItems: 'center', padding: '0 32px', gap: '16px', position: 'sticky', top: 0, zIndex: 30, backgroundColor: 'var(--background)' }}>
           <button className="mobile-only" onClick={() => setSidebarOpen(true)} style={{ color: 'var(--text-main)', display: 'none' }}>
             <Menu size={24} />
           </button>
@@ -156,12 +150,12 @@ const Layout = () => {
               <Bell size={20} />
               <span style={{ position: 'absolute', top: '0px', right: '0px', backgroundColor: 'var(--purple-700)', color: 'white', fontSize: '10px', fontWeight: 'bold', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid white' }}>3</span>
             </div>
-            <button className="btn btn-primary" style={{ padding: '12px 24px', borderRadius: '12px' }}>
+            <button className="btn btn-primary" style={{ padding: '12px 24px', borderRadius: '12px', height: '48px' }}>
               <Plus size={18} /> Create New
             </button>
           </div>
         </header>
-        <main style={{ flex: 1, padding: '0 40px 40px 40px', maxWidth: '1400px', width: '100%' }}>
+        <main style={{ flex: 1, padding: '32px', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
           <Outlet />
         </main>
       </div>
