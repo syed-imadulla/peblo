@@ -6,10 +6,13 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/auth': 'http://localhost:8000',
-      '/admin': 'http://localhost:8000',
-      '/catalog': 'http://localhost:8000',
-      '/assets': 'http://localhost:8000'
+      // All CMS API calls use /api/* prefix; rewrite strips it before forwarding.
+      '/api': {
+        target: 'http://localhost:8000',
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+      '/assets': 'http://localhost:8000',
     }
   }
 })
+
