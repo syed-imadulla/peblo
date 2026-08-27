@@ -74,10 +74,16 @@ const Layout = () => {
         className="sidebar"
       >
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '32px', padding: '0 24px' }}>
-          <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, flexDirection: 'column' }}>
-            <img src="/assets/eoEf12a30xBVz5Q1VMqOk8gbgs.avif" alt="Peblo Logo" style={{ width: '80px', objectFit: 'contain' }} />
-            <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600', letterSpacing: '1px' }}>CMS</span>
-          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', margin: 0, flexDirection: 'column', textAlign: 'center' }}>
+            <div style={{ fontSize: '32px', fontWeight: '900', letterSpacing: '-1px', lineHeight: '1.2' }}>
+              <span style={{ color: 'var(--purple-700)' }}>P</span>
+              <span style={{ color: '#A881E6' }}>e</span>
+              <span style={{ color: '#4B63D6' }}>B</span>
+              <span style={{ color: '#E8669F' }}>L</span>
+              <span style={{ color: '#F2994A' }}>o</span>
+            </div>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '700', letterSpacing: '2px' }}>CMS</span>
+          </div>
           <button className="mobile-only" onClick={() => setSidebarOpen(false)} style={{ color: 'var(--text-muted)', position: 'absolute', right: '16px', top: '24px' }}>
             <X size={24} />
           </button>
@@ -98,21 +104,21 @@ const Layout = () => {
         </nav>
 
         <div style={{ marginTop: 'auto', padding: '16px 24px 0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(255,255,255,0.9)', padding: '12px', borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(255,255,255,0.9)', padding: '12px', borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', cursor: 'pointer' }} onClick={logout} title="Logout">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--purple-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-700)', fontWeight: 'bold' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--purple-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-700)', fontWeight: 'bold', overflow: 'hidden' }}>
                 <img src="/assets/eoEf12a30xBVz5Q1VMqOk8gbgs.avif" alt="avatar" style={{width: '24px'}} />
               </div>
               <div>
-                <div style={{ fontWeight: '700', fontSize: '14px', color: 'var(--navy-900)' }}>
+                <div style={{ fontWeight: '700', fontSize: '13px', color: 'var(--navy-900)' }}>
                   {user?.role === 'admin' ? 'Admin User' : 'Editor User'}
                 </div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'capitalize' }}>{user?.role === 'admin' ? 'Administrator' : 'Editor'}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'capitalize' }}>{user?.role === 'admin' ? 'Administrator' : 'Editor'}</div>
               </div>
             </div>
-            <button onClick={logout} style={{ padding: '8px', color: 'var(--text-muted)' }} title="Logout">
-              <LogOut size={16} />
-            </button>
+            <div style={{ color: 'var(--purple-700)' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
           </div>
         </div>
       </div>
