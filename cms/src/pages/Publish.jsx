@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../components/AuthProvider';
-import { AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, UploadCloud, ChevronRight, FileText } from 'lucide-react';
 
 const fetchValidationReport = async () => {
   const { data } = await axios.get('/api/admin/validation-report');
@@ -37,7 +38,11 @@ const Publish = () => {
     },
   });
 
-  if (isLoading) return <div>Loading validation report...</div>;
+  if (isLoading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '400px', color: 'var(--text-muted)' }}>
+      Loading validation report...
+    </div>
+  );
   if (error) return <div className="badge badge-error">Error loading validation report: {error.message}</div>;
 
   const isBlocked = report.blocked_records_count > 0;
@@ -52,91 +57,86 @@ const Publish = () => {
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-        <div>
-          <h1 style={{ marginBottom: '8px' }}>Publish Catalogue</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Review validation issues and publish changes to the Viewer.</p>
-        </div>
-        <div>
-          <button 
-            className="btn-primary" 
-            onClick={() => publishMutation.mutate()}
-            disabled={!isAdmin || isBlocked || publishMutation.isPending}
-            style={{ padding: '12px 24px', fontSize: '16px', display: 'flex', gap: '8px', alignItems: 'center' }}
-          >
-            {publishMutation.isPending ? 'Publishing...' : 'Publish Catalogue'}
-          </button>
-        </div>
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{ marginBottom: '8px' }}>Publish Catalogue</h1>
+        <p className="text-muted">Review validation issues and publish your changes to the live Viewer.</p>
       </div>
 
       {publishDisabledReason && (
-        <div style={{ backgroundColor: 'var(--red-100)', color: 'var(--red-500)', padding: '16px', borderRadius: 'var(--radius-md)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ backgroundColor: 'var(--amber-100)', color: 'var(--amber-500)', padding: '16px 20px', borderRadius: 'var(--radius-md)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid #FCD34D' }}>
           <Info size={24} />
-          <strong>{publishDisabledReason}</strong>
+          <div>
+            <strong style={{ display: 'block', marginBottom: '4px' }}>Publishing Disabled</strong>
+            <span style={{ fontSize: '14px', color: '#B45309' }}>{publishDisabledReason}</span>
+          </div>
         </div>
       )}
 
       {publishResult?.type === 'success' && (
-        <div style={{ backgroundColor: 'var(--green-100)', color: 'var(--green-500)', padding: '16px', borderRadius: 'var(--radius-md)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ backgroundColor: 'var(--green-100)', color: 'var(--green-500)', padding: '16px 20px', borderRadius: 'var(--radius-md)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid #86EFAC' }}>
           <CheckCircle size={24} />
           <div>
-            <strong>Successfully Published!</strong>
-            <div>Published {publishResult.data.published_records} records.</div>
+            <strong style={{ display: 'block', marginBottom: '4px' }}>Successfully Published!</strong>
+            <span style={{ fontSize: '14px', color: '#166534' }}>Published {publishResult.data.published_records} records to the live catalogue.</span>
           </div>
         </div>
       )}
 
       {publishResult?.type === 'error' && (
-        <div style={{ backgroundColor: 'var(--red-100)', color: 'var(--red-500)', padding: '16px', borderRadius: 'var(--radius-md)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ backgroundColor: 'var(--red-100)', color: 'var(--red-500)', padding: '16px 20px', borderRadius: 'var(--radius-md)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid #FCA5A5' }}>
           <AlertTriangle size={24} />
           <div>
-            <strong>Publish Failed</strong>
-            <div>{publishResult.message}</div>
+            <strong style={{ display: 'block', marginBottom: '4px' }}>Publish Failed</strong>
+            <span style={{ fontSize: '14px', color: '#991B1B' }}>{publishResult.message}</span>
           </div>
         </div>
       )}
 
-      <div className="card">
-        <h2 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          Current Status
+      <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '32px' }}>
+        <div>
+          <h2 style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            Current Status
+            {isBlocked ? (
+               <span className="badge badge-error">Blocked</span>
+            ) : (
+               <span className="badge badge-success">Ready</span>
+            )}
+          </h2>
           {isBlocked ? (
-             <span className="badge badge-error">Blocked</span>
+            <p className="text-muted">{report.blocked_records_count} record(s) have blocking issues.</p>
           ) : (
-             <span className="badge badge-published">Ready</span>
+            <p className="text-muted">No blocking issues found. The catalogue is ready to be published.</p>
           )}
-        </h2>
-        
-        {isBlocked ? (
-          <p>{report.blocked_records_count} record(s) have blocking issues.</p>
-        ) : (
-          <p>No blocking issues found. The catalogue is ready to be published.</p>
-        )}
+        </div>
+
+        <button 
+          className="btn btn-primary" 
+          onClick={() => publishMutation.mutate()}
+          disabled={!isAdmin || isBlocked || publishMutation.isPending}
+          style={{ padding: '14px 28px', fontSize: '16px' }}
+        >
+          {publishMutation.isPending ? 'Publishing...' : (
+            <>
+              <UploadCloud size={20} /> Publish Now
+            </>
+          )}
+        </button>
       </div>
 
-      {isBlocked && (
-        <div className="card">
-          <h2 style={{ marginBottom: '24px' }}>Validation Report</h2>
-          <div className="grid">
-            {report.issues.map((issue, idx) => (
-              <div key={idx} style={{ padding: '16px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <strong>{issue.issue_type}</strong>
-                  <span className="badge badge-error">{issue.severity}</span>
-                </div>
-                <p style={{ color: 'var(--text-muted)', marginBottom: '8px' }}>{issue.message}</p>
-                <div style={{ fontSize: '13px', backgroundColor: 'var(--background)', padding: '8px', borderRadius: '4px' }}>
-                  <div><strong>Entity:</strong> {issue.entity_type} {issue.entity_id && `(${issue.entity_id})`}</div>
-                  {issue.context && Object.keys(issue.context).length > 0 && (
-                    <div style={{ marginTop: '4px' }}>
-                      <strong>Context:</strong> {JSON.stringify(issue.context)}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+      <Link to="/validation" className="card" style={{ display: 'block', textDecoration: 'none', transition: 'box-shadow 0.2s', ':hover': { boxShadow: 'var(--shadow-md)' } }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ padding: '12px', borderRadius: '12px', backgroundColor: isBlocked ? 'var(--red-100)' : 'var(--green-100)', color: isBlocked ? 'var(--red-500)' : 'var(--green-500)' }}>
+              {isBlocked ? <AlertTriangle size={24} /> : <CheckCircle size={24} />}
+            </div>
+            <div>
+              <h3 style={{ color: 'var(--navy-900)', marginBottom: '4px' }}>Validation Report</h3>
+              <p className="text-muted" style={{ fontSize: '14px', margin: 0 }}>View detailed information about {report.blocked_records_count} validation issues.</p>
+            </div>
           </div>
+          <ChevronRight size={24} style={{ color: 'var(--text-muted)' }} />
         </div>
-      )}
+      </Link>
     </div>
   );
 };

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { Search, Plus, Edit2 } from 'lucide-react';
+import { Search, Edit2 } from 'lucide-react';
 
 const fetchShows = async () => {
   const { data } = await axios.get('/api/admin/shows');
   return data;
 };
 
-const ShowsList = () => {
+const EpisodesList = () => {
   const [search, setSearch] = useState('');
   
   const { data: shows, isLoading, error } = useQuery({
@@ -18,26 +18,37 @@ const ShowsList = () => {
 
   if (isLoading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '400px', color: 'var(--text-muted)' }}>
-      Loading shows...
+      Loading episodes...
     </div>
   );
-  if (error) return <div className="badge badge-error">Error loading shows: {error.message}</div>;
+  if (error) return <div className="badge badge-error">Error loading episodes: {error.message}</div>;
 
-  const filteredShows = shows.filter(s => 
-    s.title.toLowerCase().includes(search.toLowerCase()) || 
-    (s.section && s.section.toLowerCase().includes(search.toLowerCase()))
+  // Flatten all episodes from all shows and seasons
+  const allEpisodes = [];
+  shows?.forEach(show => {
+    show.seasons?.forEach(season => {
+      season.episodes?.forEach(episode => {
+        allEpisodes.push({
+          ...episode,
+          showTitle: show.title,
+          seasonNumber: season.season_number
+        });
+      });
+    });
+  });
+
+  const filteredEpisodes = allEpisodes.filter(ep => 
+    ep.episode_title.toLowerCase().includes(search.toLowerCase()) || 
+    ep.showTitle.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
         <div>
-          <h1 style={{ marginBottom: '8px' }}>Shows</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Manage your content library and series.</p>
+          <h1 style={{ marginBottom: '8px' }}>Episodes</h1>
+          <p style={{ color: 'var(--text-muted)' }}>Manage individual episodes and their metadata.</p>
         </div>
-        <button className="btn btn-primary">
-          <Plus size={18} /> Add New Show
-        </button>
       </div>
 
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -46,7 +57,7 @@ const ShowsList = () => {
             <Search size={18} style={{ position: 'absolute', left: '12px', top: '11px', color: 'var(--text-muted)' }} />
             <input 
               type="text" 
-              placeholder="Search shows by title or section..." 
+              placeholder="Search by episode or show title..." 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{ paddingLeft: '40px' }}
@@ -54,12 +65,12 @@ const ShowsList = () => {
           </div>
         </div>
 
-        {filteredShows.length === 0 ? (
+        {filteredEpisodes.length === 0 ? (
           <div style={{ padding: '64px 24px', textAlign: 'center', color: 'var(--text-muted)' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'var(--purple-100)', color: 'var(--purple-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               <Search size={24} />
             </div>
-            <h3 style={{ color: 'var(--navy-900)', marginBottom: '8px' }}>No shows found</h3>
+            <h3 style={{ color: 'var(--navy-900)', marginBottom: '8px' }}>No episodes found</h3>
             <p>Try adjusting your search criteria.</p>
           </div>
         ) : (
@@ -67,31 +78,28 @@ const ShowsList = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th style={{ paddingLeft: '24px' }}>Title</th>
-                  <th>Section</th>
-                  <th>Categories</th>
-                  <th>Seasons</th>
-                  <th>Artwork</th>
+                  <th style={{ paddingLeft: '24px' }}>Episode Title</th>
+                  <th>Show</th>
+                  <th>Season</th>
+                  <th>Language</th>
+                  <th>Duration</th>
+                  <th>Status</th>
                   <th style={{ paddingRight: '24px', textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredShows.map((show) => (
-                  <tr key={show.id}>
-                    <td style={{ fontWeight: '600', paddingLeft: '24px', color: 'var(--navy-900)' }}>{show.title}</td>
-                    <td>{show.section || <span className="text-muted">-</span>}</td>
+                {filteredEpisodes.map((ep) => (
+                  <tr key={ep.id}>
+                    <td style={{ fontWeight: '600', paddingLeft: '24px', color: 'var(--navy-900)' }}>{ep.episode_title}</td>
+                    <td>{ep.showTitle}</td>
+                    <td>S{ep.seasonNumber}</td>
+                    <td>{ep.language || <span className="text-muted">-</span>}</td>
+                    <td>{ep.duration_seconds ? `${Math.floor(ep.duration_seconds / 60)}m ${ep.duration_seconds % 60}s` : <span className="text-muted">-</span>}</td>
                     <td>
-                      {show.categories.length > 0 
-                        ? show.categories.join(', ') 
-                        : <span className="text-muted">None</span>
-                      }
-                    </td>
-                    <td>{show.seasons?.length || 0}</td>
-                    <td>
-                      {show.artwork?.length > 0 ? (
-                        <span className="badge badge-success">{show.artwork.length} files</span>
+                      {ep.status === 'published' ? (
+                        <span className="badge badge-success">Published</span>
                       ) : (
-                        <span className="badge badge-error">Missing</span>
+                        <span className="badge badge-draft">Draft</span>
                       )}
                     </td>
                     <td style={{ paddingRight: '24px', textAlign: 'right' }}>
@@ -110,4 +118,4 @@ const ShowsList = () => {
   );
 };
 
-export default ShowsList;
+export default EpisodesList;

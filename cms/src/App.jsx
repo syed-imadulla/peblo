@@ -3,8 +3,12 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './components/AuthProvider';
 import Layout from './components/Layout';
 import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
 import ShowsList from './pages/ShowsList';
+import EpisodesList from './pages/EpisodesList';
+import Validation from './pages/Validation';
 import Publish from './pages/Publish';
+import PublishHistory from './pages/PublishHistory';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -19,9 +23,13 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-        <Route index element={<Navigate to="/shows" replace />} />
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="dashboard" element={<Dashboard />} />
         <Route path="shows" element={<ShowsList />} />
+        <Route path="episodes" element={<EpisodesList />} />
+        <Route path="validation" element={<Validation />} />
         <Route path="publish" element={<Publish />} />
+        <Route path="publish-history" element={<PublishHistory />} />
       </Route>
     </Routes>
   );

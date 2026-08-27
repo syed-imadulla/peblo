@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.services.publish import PublishService
-from app.models.models import Episode
 from app.services.validation import ValidationService
+from app.models.models import Episode, PublishRun
 from app.api.auth import get_current_user, get_current_admin
 
 router = APIRouter(prefix="/admin")
@@ -43,3 +43,22 @@ def publish_catalog(db: Session = Depends(get_db), admin_user: dict = Depends(ge
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/publish-history")
+def get_publish_history(db: Session = Depends(get_db), admin_user: dict = Depends(get_current_admin)):
+    runs = db.query(PublishRun).order_by(PublishRun.created_at.desc()).limit(50).all()
+    
+    # Format them for the frontend
+    history = []
+    for run in runs:
+        history.append({
+            "id": str(run.id),
+            "status": run.status,
+            "total_records_processed": run.total_records_processed,
+            "published_records": run.published_records,
+            "blocked_records": run.blocked_records,
+            "created_at": run.created_at.isoformat(),
+            "triggered_by": str(run.triggered_by) if run.triggered_by else None
+        })
+        
+    return history
