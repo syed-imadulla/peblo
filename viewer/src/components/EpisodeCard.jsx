@@ -2,7 +2,7 @@ import React from 'react';
 import { FallbackImage } from './ShowCard';
 
 export const EpisodeCard = ({ episode }) => {
-  const thumbnail = episode.artwork?.find(a => a.type === 'thumbnail')?.url;
+  const thumbnail = episode.artwork?.thumbnail;
 
   return (
     <div style={{ width: '280px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

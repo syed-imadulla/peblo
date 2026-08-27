@@ -28,7 +28,19 @@ const ShowDetails = () => {
 
   if (!show) return <EmptyState message="Show not found." />;
 
-  const banner = show.artwork?.find(a => a.type === 'banner')?.url;
+  // Find the first available banner in trailers or seasons
+  let banner = null;
+  const allEpisodes = [
+    ...(show.trailers || []),
+    ...(show.seasons?.flatMap(s => s.episodes) || [])
+  ];
+  
+  for (const ep of allEpisodes) {
+    if (ep.artwork?.banner) {
+      banner = ep.artwork.banner;
+      break;
+    }
+  }
 
   return (
     <div>

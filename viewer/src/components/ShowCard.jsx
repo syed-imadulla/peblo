@@ -18,8 +18,19 @@ export const FallbackImage = ({ aspect = '16/9' }) => (
 );
 
 export const ShowCard = ({ show }) => {
-  const poster = show.artwork?.find(a => a.type === 'poster')?.url;
+  // Find the first available poster in trailers or seasons
+  let poster = null;
+  const allEpisodes = [
+    ...(show.trailers || []),
+    ...(show.seasons?.flatMap(s => s.episodes) || [])
+  ];
   
+  for (const ep of allEpisodes) {
+    if (ep.artwork?.poster) {
+      poster = ep.artwork.poster;
+      break;
+    }
+  }
   return (
     <Link to={`/show/${show.slug}`} style={{ display: 'block', width: '200px', flexShrink: 0 }}>
       <div style={{
