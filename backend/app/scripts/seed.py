@@ -96,7 +96,7 @@ def seed_db(seed_file_path: str):
                     id=str(uuid.uuid4()),
                     episode_id=episode.id,
                     type=art_type,
-                    url=url,
+                    url=f"/assets/{url}",
                     size_bytes=size_bytes
                 )
                 db.add(art)
