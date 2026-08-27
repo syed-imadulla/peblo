@@ -9,6 +9,20 @@ on:
 jobs:
   backend-test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: peblo_user
+          POSTGRES_PASSWORD: peblo_password
+          POSTGRES_DB: peblo_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.11
@@ -24,8 +38,10 @@ jobs:
       - name: Run tests
         env:
           PYTHONPATH: .
+          DATABASE_URL: postgresql://peblo_user:peblo_password@localhost:5432/peblo_db
         run: |
           cd backend
+          alembic upgrade head
           pytest tests/
 
   viewer-test:
@@ -45,7 +61,7 @@ jobs:
       - name: Run tests
         run: |
           cd viewer
-          npm run test -- --run
+          npm run test -- src/
 
   cms-build:
     runs-on: ubuntu-latest
