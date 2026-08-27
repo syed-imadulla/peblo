@@ -20,6 +20,14 @@ def isolated_storage():
         yield
         storage.base_path = original_base
 
+@pytest.fixture(scope="session", autouse=True)
+def seed_test_database():
+    """Ensure the database has the required challenge seed data before tests run."""
+    from app.scripts.seed import seed_db
+    seed_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "docs", "challenge", "seed_shows.json")
+    if os.path.exists(seed_file):
+        seed_db(seed_file)
+
 @pytest.fixture(scope="module")
 def db_session():
     connection = engine.connect()
