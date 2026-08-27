@@ -7,6 +7,7 @@ from PIL import Image
 import io
 
 from app.core.database import get_db
+from app.core.config import settings
 from app.models.models import Artwork, Show, Season, Episode
 from app.api.auth import get_current_user
 from app.services.storage import storage
@@ -78,8 +79,8 @@ async def upload_artwork(
     # But storage provider write() takes string... wait, let's write as binary directly
     # Wait, storage provider doesn't have a binary write method. We might need to add one.
     
-    # Let's save it directly using storage.base_path for now
-    filepath = os.path.join(storage.base_path, filename)
+    # Save to ASSETS_DIR so it is served from the /assets static mount
+    filepath = os.path.join(settings.ASSETS_DIR, filename)
     with open(filepath, "wb") as f:
         f.write(contents)
         

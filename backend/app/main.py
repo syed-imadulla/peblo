@@ -10,10 +10,11 @@ import os
 
 app = FastAPI(title="Peblo TV Mini Backend")
 
-# Ensure DATA_DIR exists
+# Ensure DATA_DIR and ASSETS_DIR exist
 os.makedirs(settings.DATA_DIR, exist_ok=True)
-# Mount assets directory for serving uploaded artwork
-app.mount("/assets", StaticFiles(directory=settings.DATA_DIR), name="assets")
+os.makedirs(settings.ASSETS_DIR, exist_ok=True)
+# Mount assets directory for serving artwork (challenge fixtures + uploaded files)
+app.mount("/assets", StaticFiles(directory=settings.ASSETS_DIR), name="assets")
 
 app.include_router(auth.router)
 app.include_router(admin.router)

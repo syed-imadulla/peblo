@@ -24,10 +24,12 @@ services:
       - DATABASE_URL=postgresql://peblo_user:peblo_password@db/peblo_db
       - JWT_SECRET=super_secret_for_development_only_123
       - DATA_DIR=/app/data
+      - ASSETS_DIR=/app/assets
     ports:
       - "8000:8000"
     volumes:
       - api_data:/app/data
+      - ./docs/challenge/assets:/app/assets
     depends_on:
       db:
         condition: service_healthy
