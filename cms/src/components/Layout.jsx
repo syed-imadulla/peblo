@@ -66,10 +66,8 @@ const Layout = () => {
           left: sidebarOpen ? 0 : '-100%',
           zIndex: 50,
           transition: 'left 0.3s ease',
-          backgroundImage: 'linear-gradient(to bottom, rgba(255,255,255,1) 60%, rgba(255,255,255,0.7) 80%), url(/sidebar_bg.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'bottom center',
-          boxShadow: '4px 0 24px rgba(0,0,0,0.02)'
+          boxShadow: '4px 0 24px rgba(0,0,0,0.02)',
+          borderRight: '1px solid var(--border)'
         }}
         className="sidebar"
       >
@@ -137,7 +135,7 @@ const Layout = () => {
           </button>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ fontWeight: '800', fontSize: '24px', color: 'var(--navy-900)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {getPageTitle()} {location.pathname === '/dashboard' && '👋'}
+              {location.pathname === '/dashboard' ? 'Good morning, Admin! 👋' : getPageTitle()}
             </div>
             {location.pathname === '/dashboard' && (
               <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>

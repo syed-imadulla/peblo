@@ -191,23 +191,7 @@ const Dashboard = () => {
         }
       `}</style>
 
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
-        <div>
-          <h1 style={{ margin: '0 0 8px 0', fontSize: '28px', fontWeight: '800', color: 'var(--navy-900)' }}>Good morning, Admin! 👋</h1>
-          <p style={{ margin: 0, fontSize: '15px', color: 'var(--text-muted)' }}>Here's what's happening with your content today.</p>
-        </div>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <button style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-            <Bell size={18} color="var(--navy-700)" />
-          </button>
-          <div style={{ position: 'relative' }}>
-            <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'var(--purple-700)', padding: '10px 16px', borderRadius: '8px' }}>
-              <Plus size={16} /> Create New <ChevronDown size={16} />
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Header handled by Layout */}
       
       {/* 5 KPI Cards */}
       <div className="kpi-row">
