@@ -1,0 +1,999 @@
+{
+  "featured": [
+    {
+      "categories": [
+        "adventure",
+        "india",
+        "friendship"
+      ],
+      "seasons": [
+        {
+          "episodes": [
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "motis-many-lives-s01e01",
+              "duration_seconds": 510,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "The Lost Kite"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "motis-many-lives-s01e02",
+              "duration_seconds": 540,
+              "languages": [
+                "en"
+              ],
+              "title": "Rain on the Roof"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "motis-many-lives-s01e03",
+              "duration_seconds": 420,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "A Bridge of Stones"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "motis-many-lives-s01e04",
+              "duration_seconds": 600,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "The Midnight Market"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "motis-many-lives-s01e05",
+              "duration_seconds": 510,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "Footprints in Flour"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "motis-many-lives-s01e06",
+              "duration_seconds": 420,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "The Whistling Well"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "motis-many-lives-s01e07",
+              "duration_seconds": 480,
+              "languages": [
+                "en"
+              ],
+              "title": "Grandmother's Map"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "motis-many-lives-s01e08",
+              "duration_seconds": 420,
+              "languages": [
+                "en"
+              ],
+              "title": "The Runaway Cart"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "motis-many-lives-s01e09",
+              "duration_seconds": 420,
+              "languages": [
+                "en"
+              ],
+              "title": "Songs of the Sea"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "motis-many-lives-s01e10",
+              "duration_seconds": 540,
+              "languages": [
+                "en"
+              ],
+              "title": "The Paper Boat"
+            }
+          ],
+          "season_number": 1
+        }
+      ],
+      "show_id": "aa7726ff-3dc1-492f-a1f3-9b94a537ac88",
+      "slug": "motis-many-lives",
+      "synopsis": "Moti the dog is reborn across India, making new friends in every state.",
+      "title": "Moti's Many Lives",
+      "trailers": [
+        {
+          "artwork": {
+            "thumbnail": "thumbnail_valid.jpg"
+          },
+          "content_group": "motis-many-lives-s00e01",
+          "duration_seconds": 75,
+          "languages": [
+            "en"
+          ],
+          "title": "Trailer"
+        }
+      ]
+    }
+  ],
+  "minisodes": [
+    {
+      "categories": [
+        "travel",
+        "india",
+        "learning"
+      ],
+      "seasons": [
+        {
+          "episodes": [
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "discover-india-with-moti-s01e01",
+              "duration_seconds": 540,
+              "languages": [
+                "en"
+              ],
+              "title": "The Lost Kite"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "discover-india-with-moti-s01e02",
+              "duration_seconds": 420,
+              "languages": [
+                "en"
+              ],
+              "title": "Rain on the Roof"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "discover-india-with-moti-s01e03",
+              "duration_seconds": 480,
+              "languages": [
+                "en"
+              ],
+              "title": "A Bridge of Stones"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "discover-india-with-moti-s01e05",
+              "duration_seconds": 600,
+              "languages": [
+                "en"
+              ],
+              "title": "Footprints in Flour"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "discover-india-with-moti-s01e06",
+              "duration_seconds": 480,
+              "languages": [
+                "en"
+              ],
+              "title": "The Whistling Well"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "discover-india-with-moti-s01e07",
+              "duration_seconds": 510,
+              "languages": [
+                "en"
+              ],
+              "title": "Grandmother's Map"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "discover-india-with-moti-s01e08",
+              "duration_seconds": 540,
+              "languages": [
+                "en"
+              ],
+              "title": "The Runaway Cart"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "discover-india-with-moti-s01e09",
+              "duration_seconds": 480,
+              "languages": [
+                "en"
+              ],
+              "title": "Songs of the Sea"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "discover-india-with-moti-s01e10",
+              "duration_seconds": 600,
+              "languages": [
+                "en"
+              ],
+              "title": "The Paper Boat"
+            }
+          ],
+          "season_number": 1
+        }
+      ],
+      "show_id": "8936f575-d4ca-4dc2-83be-ff0571e7f716",
+      "slug": "discover-india-with-moti",
+      "synopsis": "Quick hops across Indian states with Moti as your guide.",
+      "title": "Discover India with Moti",
+      "trailers": []
+    }
+  ],
+  "series": [
+    {
+      "categories": [
+        "science",
+        "nature"
+      ],
+      "seasons": [
+        {
+          "episodes": [
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "curious-cubs-s01e01",
+              "duration_seconds": 600,
+              "languages": [
+                "en"
+              ],
+              "title": "The Lost Kite"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "curious-cubs-s01e02",
+              "duration_seconds": 540,
+              "languages": [
+                "en"
+              ],
+              "title": "Rain on the Roof"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "curious-cubs-s01e03",
+              "duration_seconds": 510,
+              "languages": [
+                "en"
+              ],
+              "title": "A BRIDGE OF STONES"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "curious-cubs-s01e04",
+              "duration_seconds": 510,
+              "languages": [
+                "en"
+              ],
+              "title": "The Midnight Market"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "curious-cubs-s01e05",
+              "duration_seconds": 480,
+              "languages": [
+                "en"
+              ],
+              "title": "Footprints in Flour"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "curious-cubs-s01e06",
+              "duration_seconds": 480,
+              "languages": [
+                "en"
+              ],
+              "title": "The Whistling Well"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "curious-cubs-s01e07",
+              "duration_seconds": 660,
+              "languages": [
+                "en"
+              ],
+              "title": "Grandmother's Map"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "curious-cubs-s01e08",
+              "duration_seconds": 480,
+              "languages": [
+                "en"
+              ],
+              "title": "The Runaway Cart"
+            }
+          ],
+          "season_number": 1
+        }
+      ],
+      "show_id": "657ae2a3-a988-4650-87ff-da989b5a8c16",
+      "slug": "curious-cubs",
+      "synopsis": "Two cubs ask big questions about the natural world.",
+      "title": "Curious Cubs",
+      "trailers": []
+    },
+    {
+      "categories": [
+        "maths",
+        "learning"
+      ],
+      "seasons": [
+        {
+          "episodes": [
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "number-nest-s01e01",
+              "duration_seconds": 420,
+              "languages": [
+                "en"
+              ],
+              "title": "The Lost Kite"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "number-nest-s01e02",
+              "duration_seconds": 600,
+              "languages": [
+                "en"
+              ],
+              "title": "rain on the roof"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "number-nest-s01e03",
+              "duration_seconds": 510,
+              "languages": [
+                "en"
+              ],
+              "title": "A Bridge of Stones"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "number-nest-s01e04",
+              "duration_seconds": 600,
+              "languages": [
+                "en"
+              ],
+              "title": "The Midnight Market"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "number-nest-s01e05",
+              "duration_seconds": 540,
+              "languages": [
+                "en"
+              ],
+              "title": "Footprints in Flour"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "number-nest-s01e06",
+              "duration_seconds": 510,
+              "languages": [
+                "en"
+              ],
+              "title": "The Whistling Well"
+            }
+          ],
+          "season_number": 1
+        }
+      ],
+      "show_id": "ab86c9a5-7774-405b-9b2d-12340c7d2bd5",
+      "slug": "number-nest",
+      "synopsis": "Playful stories that sneak in early number sense.",
+      "title": "Number Nest",
+      "trailers": []
+    },
+    {
+      "categories": [
+        "stories",
+        "values",
+        "folk"
+      ],
+      "seasons": [
+        {
+          "episodes": [
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "tiny-tales-banyan-dadi-s01e01",
+              "duration_seconds": 540,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "The Lost Kite"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "tiny-tales-banyan-dadi-s01e02",
+              "duration_seconds": 480,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "Rain on the Roof"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "tiny-tales-banyan-dadi-s01e03",
+              "duration_seconds": 600,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "A Bridge of Stones"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "tiny-tales-banyan-dadi-s01e04",
+              "duration_seconds": 420,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "The Midnight Market"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "tiny-tales-banyan-dadi-s01e05",
+              "duration_seconds": 420,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "Footprints in Flour"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "tiny-tales-banyan-dadi-s01e06",
+              "duration_seconds": 660,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "The Whistling Well"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "tiny-tales-banyan-dadi-s01e07",
+              "duration_seconds": 600,
+              "languages": [
+                "en"
+              ],
+              "title": "Grandmother's Map"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "tiny-tales-banyan-dadi-s01e08",
+              "duration_seconds": 420,
+              "languages": [
+                "en"
+              ],
+              "title": "The Runaway Cart"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "tiny-tales-banyan-dadi-s01e09",
+              "duration_seconds": 600,
+              "languages": [
+                "en"
+              ],
+              "title": "Songs of the Sea"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "tiny-tales-banyan-dadi-s01e10",
+              "duration_seconds": 600,
+              "languages": [
+                "en"
+              ],
+              "title": "The Paper Boat"
+            }
+          ],
+          "season_number": 1
+        }
+      ],
+      "show_id": "2cbd179b-6719-436f-800f-e97982418cf0",
+      "slug": "tiny-tales-banyan-dadi",
+      "synopsis": "Banyan Dadi tells short bedtime tales under the old banyan tree.",
+      "title": "Tiny Tales by Banyan Dadi",
+      "trailers": [
+        {
+          "artwork": {
+            "thumbnail": "thumbnail_valid.jpg"
+          },
+          "content_group": "tiny-tales-banyan-dadi-s00e01",
+          "duration_seconds": 75,
+          "languages": [
+            "en"
+          ],
+          "title": "Trailer"
+        }
+      ]
+    }
+  ],
+  "songs": [
+    {
+      "categories": [
+        "music",
+        "singalong"
+      ],
+      "seasons": [
+        {
+          "episodes": [
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-s01e01",
+              "duration_seconds": 420,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "The Lost Kite"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-s01e02",
+              "duration_seconds": 510,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "Rain on the Roof"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-s01e03",
+              "duration_seconds": 660,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "A Bridge of Stones"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-s01e04",
+              "duration_seconds": 420,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "The Midnight Market"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-s01e05",
+              "duration_seconds": 600,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "Footprints in Flour"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-s01e06",
+              "duration_seconds": 480,
+              "languages": [
+                "en",
+                "hi"
+              ],
+              "title": "The Whistling Well"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-s01e07",
+              "duration_seconds": 420,
+              "languages": [
+                "en"
+              ],
+              "title": "Grandmother's Map"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-s01e08",
+              "duration_seconds": 600,
+              "languages": [
+                "en"
+              ],
+              "title": "The Runaway Cart"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-s01e09",
+              "duration_seconds": 660,
+              "languages": [
+                "en"
+              ],
+              "title": "Songs of the Sea"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-s01e10",
+              "duration_seconds": 420,
+              "languages": [
+                "en"
+              ],
+              "title": "The Paper Boat"
+            }
+          ],
+          "season_number": 1
+        }
+      ],
+      "show_id": "59bf4ee8-25cb-4dee-94d5-6722e5d0a3f6",
+      "slug": "peblo-songs",
+      "synopsis": "Catchy singalongs for little learners.",
+      "title": "Peblo Songs",
+      "trailers": []
+    },
+    {
+      "categories": [
+        "music",
+        "reading"
+      ],
+      "seasons": [
+        {
+          "episodes": [
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-lyrical-s01e01",
+              "duration_seconds": 600,
+              "languages": [
+                "en"
+              ],
+              "title": "The Lost Kite"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-lyrical-s01e02",
+              "duration_seconds": 420,
+              "languages": [
+                "en"
+              ],
+              "title": "Rain on the Roof"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-lyrical-s01e03",
+              "duration_seconds": 600,
+              "languages": [
+                "en"
+              ],
+              "title": "A Bridge of Stones"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-lyrical-s01e04",
+              "duration_seconds": 480,
+              "languages": [
+                "en"
+              ],
+              "title": "The Midnight Market"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-lyrical-s01e05",
+              "duration_seconds": 540,
+              "languages": [
+                "en"
+              ],
+              "title": "Footprints in Flour"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-lyrical-s01e06",
+              "duration_seconds": 660,
+              "languages": [
+                "en"
+              ],
+              "title": "The Whistling Well"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-lyrical-s01e07",
+              "duration_seconds": 600,
+              "languages": [
+                "en"
+              ],
+              "title": "Grandmother's Map"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-lyrical-s01e08",
+              "duration_seconds": 540,
+              "languages": [
+                "en"
+              ],
+              "title": "The Runaway Cart"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-lyrical-s01e09",
+              "duration_seconds": 510,
+              "languages": [
+                "en"
+              ],
+              "title": "Songs of the Sea"
+            },
+            {
+              "artwork": {
+                "banner": "banner_invalid_size.jpg",
+                "poster": "poster_valid.jpg",
+                "thumbnail": "thumbnail_valid.jpg"
+              },
+              "content_group": "peblo-songs-lyrical-s01e10",
+              "duration_seconds": 540,
+              "languages": [
+                "en"
+              ],
+              "title": "The Paper Boat"
+            }
+          ],
+          "season_number": 1
+        }
+      ],
+      "show_id": "6b44e0ea-8246-453e-9ce1-f8ac4cf4d1bb",
+      "slug": "peblo-songs-lyrical",
+      "synopsis": "The same songs with words on screen to read along.",
+      "title": "Peblo Songs \u2014 Lyrical",
+      "trailers": []
+    }
+  ]
+}

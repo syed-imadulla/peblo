@@ -1,5 +1,7 @@
 import os
 
+from app.core.config import settings
+
 class StorageProvider:
     def write(self, filename: str, content: str):
         raise NotImplementedError
@@ -8,8 +10,8 @@ class StorageProvider:
         raise NotImplementedError
 
 class LocalStorageProvider(StorageProvider):
-    def __init__(self, base_path: str = "/home/syed-imadulla/Desktop/peblo-tv-mini/docs/challenge/assets"):
-        self.base_path = base_path
+    def __init__(self, base_path: str = None):
+        self.base_path = base_path or settings.DATA_DIR
         os.makedirs(self.base_path, exist_ok=True)
 
     def write(self, filename: str, content: str):

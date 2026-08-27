@@ -59,3 +59,22 @@ def test_search_api(client):
     data = response.json()
     assert len(data) > 0
     assert data[0]["slug"] == "motis-many-lives"
+
+def test_viewer_api_independence(client):
+    # Mock the database dependency to fail if called
+    from app.main import app
+    from app.core.database import get_db
+    
+    def override_get_db():
+        raise RuntimeError("Database accessed by Viewer API!")
+        
+    app.dependency_overrides[get_db] = override_get_db
+    
+    try:
+        response = client.get("/catalog")
+        assert response.status_code == 200
+        
+        response = client.get("/catalog/search?q=moti")
+        assert response.status_code == 200
+    finally:
+        app.dependency_overrides.clear()
