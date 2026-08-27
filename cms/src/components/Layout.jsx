@@ -20,8 +20,7 @@ const Layout = () => {
   const activeStyle = {
     backgroundColor: 'var(--purple-100)',
     color: 'var(--purple-700)',
-    fontWeight: '700',
-    borderLeft: '4px solid var(--purple-700)'
+    fontWeight: '700'
   };
 
   const itemStyle = {
@@ -29,12 +28,12 @@ const Layout = () => {
     alignItems: 'center',
     gap: '12px',
     padding: '12px 16px',
-    borderRadius: '0 var(--radius-md) var(--radius-md) 0',
+    margin: '0 20px',
+    borderRadius: '12px',
     color: 'var(--text-muted)',
     marginBottom: '8px',
     transition: 'all 0.2s',
-    borderLeft: '4px solid transparent',
-    fontWeight: '500'
+    fontWeight: '600'
   };
   
   const getPageTitle = () => {
@@ -81,7 +80,7 @@ const Layout = () => {
           </button>
         </div>
         
-        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', paddingRight: '24px' }}>
+        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {navItems.map((item) => (
             <NavLink 
               key={item.name} 
@@ -95,11 +94,11 @@ const Layout = () => {
           ))}
         </nav>
 
-        <div style={{ marginTop: 'auto', padding: '16px 24px 0' }}>
+        <div style={{ marginTop: 'auto', padding: '16px 20px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(255,255,255,0.9)', padding: '12px', borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', cursor: 'pointer' }} onClick={logout} title="Logout">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--purple-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-700)', fontWeight: 'bold', overflow: 'hidden' }}>
-                <img src="/assets/eoEf12a30xBVz5Q1VMqOk8gbgs.avif" alt="avatar" style={{width: '24px'}} />
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--purple-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-700)', fontWeight: 'bold', overflow: 'hidden' }}>
+                <img src="/assets/eoEf12a30xBVz5Q1VMqOk8gbgs.avif" alt="avatar" style={{width: '28px', objectFit: 'cover'}} />
               </div>
               <div>
                 <div style={{ fontWeight: '700', fontSize: '13px', color: 'var(--navy-900)' }}>
