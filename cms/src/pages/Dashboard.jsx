@@ -2,7 +2,11 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Film, PlaySquare, FileText, AlertTriangle, CheckCircle, Tv, Edit2, UploadCloud, ChevronDown, Plus } from 'lucide-react';
+import { 
+  Film, PlaySquare, FileText, AlertTriangle, 
+  CheckCircle, Tv, UploadCloud, Plus, 
+  Bell, ChevronDown, Clock, Image, Settings
+} from 'lucide-react';
 
 const fetchShows = async () => {
   const { data } = await axios.get('/api/admin/shows');
@@ -20,9 +24,9 @@ const fetchPublishHistory = async () => {
 };
 
 const safeFormatDate = (dateString, relative = false) => {
-  if (!dateString) return relative ? 'Recently' : 'Not available';
+  if (!dateString) return '';
   const d = new Date(dateString);
-  if (isNaN(d.getTime())) return relative ? 'Recently' : 'Not available';
+  if (isNaN(d.getTime())) return '';
   
   if (relative) {
     const hours = Math.floor((new Date() - d) / 3600000);
@@ -42,11 +46,7 @@ const Dashboard = () => {
   if (showsLoading || valLoading || histLoading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '400px', width: '100%' }}>
-        <div className="card" style={{ padding: '40px', width: '100%', textAlign: 'center' }}>
-          <div style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite', height: '20px', backgroundColor: 'var(--border)', borderRadius: '4px', width: '200px', margin: '0 auto 16px' }}></div>
-          <div style={{ color: 'var(--text-muted)' }}>Loading dashboard data...</div>
-        </div>
-        <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }`}</style>
+        <div style={{ color: 'var(--text-muted)' }}>Loading dashboard data...</div>
       </div>
     );
   }
@@ -55,318 +55,316 @@ const Dashboard = () => {
   const totalShows = shows?.length || 0;
   let totalEpisodes = 0;
   let publishedShows = 0;
+  let publishedEpisodes = 0;
+  let draftEpisodes = 0;
+  let episodesWithoutArtwork = 0;
+  let episodesWithoutDuration = 0;
   let languages = new Set();
-  let categories = new Set();
   
   shows?.forEach(show => {
-    let hasPublished = false;
-    show.categories?.forEach(c => categories.add(c));
+    let showHasPublished = false;
     show.seasons?.forEach(season => {
       totalEpisodes += season.episodes?.length || 0;
       season.episodes?.forEach(ep => {
-        if (ep.status === 'published') hasPublished = true;
-        if (ep.language) languages.add(ep.language);
+        if (ep.status === 'published') {
+          showHasPublished = true;
+          publishedEpisodes++;
+        } else {
+          draftEpisodes++;
+        }
+        
+        if (!ep.artwork || ep.artwork.length === 0) {
+          episodesWithoutArtwork++;
+        }
+        if (ep.duration_seconds === null || ep.duration_seconds === undefined) {
+          episodesWithoutDuration++;
+        }
+        if (ep.language) {
+          languages.add(ep.language);
+        }
       });
     });
-    if (hasPublished) publishedShows++;
+    if (showHasPublished) publishedShows++;
   });
   
   const draftShows = totalShows - publishedShows;
   const validationIssues = validation?.blocked_records_count || 0;
+  const publishRuns = history?.length || 0;
   const lastPublish = history?.[0] || null;
 
-  // Synthesize recent activity from real shows and history data
-  const recentActivity = [];
-  if (shows && shows.length > 0) {
-    const sortedShows = [...shows].sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-    // Most recent show
-    recentActivity.push({ 
-      title: `New show "${sortedShows[0].title}" created`, 
-      user: 'Editor User', 
-      time: safeFormatDate(sortedShows[0].created_at, true), 
-      bg: 'var(--purple-100)', 
-      icon: <Plus size={16} color="var(--purple-700)" strokeWidth={2.5} /> 
-    });
-    // Find a show with draft status to simulate an update (if any)
-    const draftShow = shows.find(s => s.seasons?.some(se => se.episodes?.some(ep => ep.status === 'draft')));
-    if (draftShow) {
-      recentActivity.push({ 
-        title: `Show "${draftShow.title}" updated`, 
-        user: 'Editor User', 
-        time: 'Recently', 
-        bg: 'var(--green-100)', 
-        icon: <Edit2 size={16} color="var(--green-500)" strokeWidth={2.5} /> 
+  // --- Recent Shows (Sorted by created_at) ---
+  const recentShows = shows ? [...shows].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5) : [];
+
+  // --- Recent Activity (Synthesized from verifiable timestamps) ---
+  const allEvents = [];
+  
+  // Add show creations
+  shows?.forEach(show => {
+    if (show.created_at) {
+      allEvents.push({
+        type: 'show_created',
+        timestamp: new Date(show.created_at),
+        title: `New show "${show.title}" created`,
+        subtitle: `${show.categories?.[0] || 'Show'}`,
+        icon: <Plus size={16} color="var(--purple-700)" strokeWidth={2.5} />,
+        bg: 'var(--purple-100)'
       });
     }
-  }
-  if (validationIssues > 0) {
-    recentActivity.push({ 
-      title: `Validation issues found in ${validationIssues} items`, 
-      user: 'System', 
-      time: 'Just now', 
-      bg: 'var(--amber-100)', 
-      icon: <AlertTriangle size={16} color="var(--amber-500)" strokeWidth={2.5} /> 
-    });
-  }
-  if (lastPublish) {
-    recentActivity.push({ 
-      title: `Catalogue published successfully`, 
-      user: lastPublish.triggered_by || 'Admin User', 
-      time: safeFormatDate(lastPublish.created_at, true), 
-      bg: 'var(--blue-100)', 
-      icon: <UploadCloud size={16} color="var(--blue-500)" strokeWidth={2.5} /> 
-    });
-  }
+  });
 
-  const chartPoints = [
-    [0,140], [80,140], [160,80], [240,100], [320,80], [400,20]
-  ];
+  // Add publish events
+  history?.forEach(run => {
+    if (run.created_at) {
+      const isSuccess = run.status === 'success';
+      allEvents.push({
+        type: 'publish_run',
+        timestamp: new Date(run.created_at),
+        title: isSuccess ? 'Catalogue published successfully' : 'Catalogue publish failed',
+        subtitle: `Publish #${run.id.substring(0,8)} • ${run.published_records} items`,
+        icon: isSuccess ? <CheckCircle size={16} color="var(--green-500)" strokeWidth={2.5} /> : <AlertTriangle size={16} color="var(--red-500)" strokeWidth={2.5} />,
+        bg: isSuccess ? 'var(--green-100)' : 'var(--red-100)'
+      });
+    }
+  });
 
+  // Sort all true timestamp events and take top 5
+  const recentActivity = allEvents.sort((a,b) => b.timestamp - a.timestamp).slice(0, 5);
+
+  // --- Components ---
   const StatCard = ({ value, title, subtitle, icon: Icon, color, bgColor }) => (
-    <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '20px', padding: '24px', marginBottom: 0, height: '100%' }}>
-      <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: bgColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <Icon size={24} color={color} strokeWidth={2} />
+    <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px', marginBottom: 0, flex: 1, minWidth: '200px' }}>
+      <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: bgColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <Icon size={20} color={color} strokeWidth={2.5} />
       </div>
       <div>
-        <div style={{ fontSize: '32px', fontWeight: '800', color: 'var(--navy-900)', lineHeight: '1.2' }}>{value}</div>
-        <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--navy-900)' }}>{title}</div>
-        <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{subtitle}</div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+          <div style={{ fontSize: '28px', fontWeight: '800', color: 'var(--navy-900)', lineHeight: '1.2' }}>{value}</div>
+        </div>
+        <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--navy-900)' }}>{title}</div>
+        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{subtitle}</div>
       </div>
     </div>
   );
 
   const QuickAction = ({ title, desc, icon: Icon, color, linkTo, bgColor }) => (
-    <Link to={linkTo} style={{ display: 'flex', flexDirection: 'column', backgroundColor: bgColor, borderRadius: 'var(--radius-lg)', padding: '24px 16px', textAlign: 'center', transition: 'transform 0.2s', textDecoration: 'none', height: '100%', flex: 1, minWidth: '160px' }} className="hover-scale">
-      <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-        <Icon size={22} color={color} strokeWidth={2} />
+    <Link to={linkTo} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: bgColor, borderRadius: 'var(--radius-lg)', padding: '20px 16px', textAlign: 'center', transition: 'transform 0.2s', textDecoration: 'none', flex: 1, minWidth: '130px' }} className="hover-scale">
+      <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+        <Icon size={18} color={color} strokeWidth={2.5} />
       </div>
-      <div style={{ fontWeight: '700', color: 'var(--navy-900)', fontSize: '15px', marginBottom: '6px' }}>{title}</div>
-      <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{desc}</div>
+      <div style={{ fontWeight: '700', color: 'var(--navy-900)', fontSize: '14px', marginBottom: '4px' }}>{title}</div>
+      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{desc}</div>
     </Link>
+  );
+
+  const RealtimeRow = ({ title, subtitle, value, icon: Icon, color }) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <Icon size={18} color={color} />
+        <div>
+          <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--navy-900)' }}>{title}</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{subtitle}</div>
+        </div>
+      </div>
+      <div style={{ fontSize: '18px', fontWeight: '700', color }}>{value}</div>
+    </div>
   );
 
   return (
     <div>
       <style>{`
         .hover-scale:hover { transform: translateY(-2px); }
-        .chart-line { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw 2s forwards; }
-        @keyframes draw { to { stroke-dashoffset: 0; } }
+        .kpi-row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 24px; }
+        .main-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+        .bottom-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
         
-        .dash-row {
-          display: flex;
-          gap: 24px;
-          margin-bottom: 24px;
-          align-items: stretch;
-        }
-        
-        .dash-col-large { flex: 2; min-width: 0; display: flex; flex-direction: column; }
-        .dash-col-small { flex: 1; min-width: 320px; display: flex; flex-direction: column; }
-        
-        .kpi-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 24px;
-          margin-bottom: 24px;
-        }
-        
-        .quick-actions-grid {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 16px;
-        }
+        .card-header { display: flex; justifyContent: space-between; align-items: center; margin-bottom: 20px; }
+        .card-title { margin: 0; fontSize: 16px; fontWeight: 700; color: var(--navy-900); }
+        .view-all { fontSize: 13px; fontWeight: 600; color: var(--purple-700); text-decoration: none; }
         
         @media (max-width: 1200px) {
-          .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-          .dash-row { flex-direction: column; }
-          .dash-col-small { min-width: 0; }
+          .main-grid { grid-template-columns: 1fr 1fr; }
+          .bottom-grid { grid-template-columns: 1fr; }
         }
-        
         @media (max-width: 768px) {
-          .kpi-grid { grid-template-columns: 1fr; }
-          .quick-actions-grid { flex-direction: column; }
+          .main-grid { grid-template-columns: 1fr; }
+          .kpi-row { flex-direction: column; }
         }
       `}</style>
+
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
+        <div>
+          <h1 style={{ margin: '0 0 8px 0', fontSize: '28px', fontWeight: '800', color: 'var(--navy-900)' }}>Good morning, Admin! 👋</h1>
+          <p style={{ margin: 0, fontSize: '15px', color: 'var(--text-muted)' }}>Here's what's happening with your content today.</p>
+        </div>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <button style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <Bell size={18} color="var(--navy-700)" />
+          </button>
+          <div style={{ position: 'relative' }}>
+            <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'var(--purple-700)', padding: '10px 16px', borderRadius: '8px' }}>
+              <Plus size={16} /> Create New <ChevronDown size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
       
-      {/* Top Cards */}
-      <div className="kpi-grid">
-        <StatCard value={totalShows} title="Total Shows" subtitle="All shows in system" icon={Tv} color="var(--purple-700)" bgColor="var(--purple-100)" />
-        <StatCard value={publishedShows} title="Published Shows" subtitle="Live on catalogue" icon={CheckCircle} color="var(--green-500)" bgColor="var(--green-100)" />
-        <StatCard value={draftShows} title="Draft Shows" subtitle="Not yet published" icon={FileText} color="var(--amber-500)" bgColor="var(--amber-100)" />
-        <StatCard value={validationIssues} title="Validation Issues" subtitle="Need attention" icon={AlertTriangle} color="var(--red-500)" bgColor="var(--red-100)" />
+      {/* 5 KPI Cards */}
+      <div className="kpi-row">
+        <StatCard value={totalShows} title="Total Shows" subtitle={`${publishedShows} Published • ${draftShows} Draft`} icon={Tv} color="var(--purple-700)" bgColor="var(--purple-50)" />
+        <StatCard value={totalEpisodes} title="Total Episodes" subtitle={`${publishedEpisodes} Published • ${draftEpisodes} Draft`} icon={PlaySquare} color="var(--green-500)" bgColor="var(--green-50)" />
+        <StatCard value={validationIssues} title="Validation Issues" subtitle="Need your attention" icon={AlertTriangle} color="var(--amber-500)" bgColor="var(--amber-50)" />
+        <StatCard value={languages.size} title="Languages" subtitle={Array.from(languages).slice(0,3).join(', ') || 'None'} icon={FileText} color="var(--blue-500)" bgColor="var(--blue-50)" />
+        <StatCard value={publishRuns} title="Publish Runs" subtitle={lastPublish ? `Last: ${safeFormatDate(lastPublish.created_at)}` : 'Never published'} icon={UploadCloud} color="var(--purple-700)" bgColor="var(--purple-50)" />
       </div>
 
-      <div className="dash-row">
-        {/* Content Overview Chart */}
-        <div className="dash-col-large">
-          <div className="card" style={{ padding: '24px', marginBottom: 0, flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>Content Overview</h3>
-              <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-pill)', padding: '6px 12px', fontSize: '13px', color: 'var(--navy-900)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                This Week <ChevronDown size={14} color="var(--text-muted)" />
-              </div>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap', flex: 1 }}>
-              <div style={{ flex: '1 1 300px', position: 'relative', minHeight: '220px' }}>
-                <div style={{ position: 'absolute', inset: 0 }}>
-                  {/* Y-Axis */}
-                  <div style={{ position: 'absolute', left: 0, top: 0, bottom: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', color: 'var(--text-muted)', fontSize: '12px', textAlign: 'right', width: '24px' }}>
-                    <span>100</span><span>80</span><span>60</span><span>40</span><span>20</span><span>0</span>
-                  </div>
-                  {/* Grid Lines */}
-                  <div style={{ position: 'absolute', left: '40px', right: 0, top: '6px', bottom: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    {[1,2,3,4,5,6].map(i => <div key={i} style={{ borderBottom: '1px solid var(--border)', width: '100%' }}></div>)}
-                  </div>
-                  {/* SVG Line matching visual curve */}
-                  <svg viewBox="0 0 500 200" style={{ position: 'absolute', left: '40px', right: 0, top: 0, height: 'calc(100% - 24px)', width: 'calc(100% - 40px)', overflow: 'visible' }} preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--purple-700)" stopOpacity="0.15"/>
-                        <stop offset="100%" stopColor="var(--purple-700)" stopOpacity="0"/>
-                      </linearGradient>
-                    </defs>
-                    <path d="M 0,140 C 20,110 50,110 80,140 C 110,170 140,80 160,80 C 190,80 220,100 240,100 C 270,100 300,90 320,80 C 350,60 380,40 400,20" fill="none" stroke="var(--purple-700)" strokeWidth="3" className="chart-line" />
-                    <path d="M 0,140 C 20,110 50,110 80,140 C 110,170 140,80 160,80 C 190,80 220,100 240,100 C 270,100 300,90 320,80 C 350,60 380,40 400,20 L 400,200 L 0,200 Z" fill="url(#chartGrad)" />
-                    {chartPoints.map((pt, i) => (
-                      <circle key={i} cx={pt[0]} cy={pt[1]} r="5" fill="var(--purple-700)" stroke="white" strokeWidth="2" />
-                    ))}
-                  </svg>
-                  {/* X-Axis */}
-                  <div style={{ position: 'absolute', left: '40px', right: 0, bottom: 0, display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)', fontSize: '12px', paddingRight: '20px' }}>
-                    <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div style={{ width: '180px', display: 'flex', flexDirection: 'column', gap: '20px', justifyContent: 'center' }}>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                  <div style={{ color: 'var(--purple-700)', backgroundColor: 'var(--purple-50)', padding: '10px', borderRadius: '50%' }}><Film size={20} strokeWidth={2} /></div>
-                  <div>
-                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600' }}>Total Episodes</div>
-                    <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--navy-900)' }}>{totalEpisodes}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Across all shows</div>
-                  </div>
-                </div>
-                <div style={{ borderBottom: '1px solid var(--border)' }}></div>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                  <div style={{ color: 'var(--blue-500)', backgroundColor: 'var(--blue-50)', padding: '10px', borderRadius: '50%' }}><Tv size={20} strokeWidth={2} /></div>
-                  <div>
-                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600' }}>Total Languages</div>
-                    <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--navy-900)' }}>{languages.size}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{Array.from(languages).slice(0,2).join(', ') || 'None'}</div>
-                  </div>
-                </div>
-                <div style={{ borderBottom: '1px solid var(--border)' }}></div>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                  <div style={{ color: 'var(--green-500)', backgroundColor: 'var(--green-50)', padding: '10px', borderRadius: '50%' }}><FileText size={20} strokeWidth={2} /></div>
-                  <div>
-                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600' }}>Total Categories</div>
-                    <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--navy-900)' }}>{categories.size}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Active categories</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* Main 3 Columns */}
+      <div className="main-grid">
+        {/* 1. Realtime Overview */}
+        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
+          <h3 className="card-title" style={{ marginBottom: '24px' }}>Realtime Overview</h3>
+          
+          <div style={{ flex: 1 }}>
+            <RealtimeRow title="Published Episodes" subtitle="Live on catalogue" value={publishedEpisodes} icon={CheckCircle} color="var(--green-500)" />
+            <RealtimeRow title="Draft Episodes" subtitle="Not yet published" value={draftEpisodes} icon={FileText} color="var(--amber-500)" />
+            <RealtimeRow title="Shows with Issues" subtitle="Fix validation errors" value={validationIssues} icon={AlertTriangle} color="var(--red-500)" />
+            <RealtimeRow title="Episodes without Artwork" subtitle="Add missing artwork" value={episodesWithoutArtwork} icon={Image} color="var(--purple-700)" />
+            <RealtimeRow title="Episodes without Duration" subtitle="Add duration to publish" value={episodesWithoutDuration} icon={Clock} color="var(--blue-500)" />
           </div>
+
+          <Link to="/validation" style={{ display: 'block', textAlign: 'center', backgroundColor: 'var(--purple-50)', color: 'var(--purple-700)', padding: '12px', borderRadius: '8px', textDecoration: 'none', fontWeight: '600', fontSize: '14px', marginTop: '24px' }}>
+            View Validation Report →
+          </Link>
         </div>
 
-        {/* Recent Activity */}
-        <div className="dash-col-small">
-          <div className="card" style={{ marginBottom: 0, padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>Recent Activity</h3>
-              <Link to="/shows" style={{ fontSize: '14px', fontWeight: '600', color: 'var(--purple-700)', textDecoration: 'none' }}>View All</Link>
-            </div>
-            
-            {recentActivity.length === 0 ? (
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '14px' }}>No recent activity to show.</div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                {recentActivity.map((act, i) => (
-                  <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: act.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {act.icon}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--navy-900)', lineHeight: '1.4' }}>{act.title}</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>by {act.user}</div>
-                    </div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{act.time}</div>
-                  </div>
-                ))}
-              </div>
-            )}
+        {/* 2. Recent Shows */}
+        <div className="card" style={{ padding: '24px' }}>
+          <div className="card-header">
+            <h3 className="card-title">Recent Shows</h3>
+            <Link to="/shows" className="view-all">View All</Link>
           </div>
+          
+          {recentShows.length === 0 ? (
+            <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: '14px' }}>
+              No shows yet. Create your first show to get started.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {recentShows.map((show) => {
+                const epCount = show.seasons?.reduce((acc, s) => acc + (s.episodes?.length || 0), 0) || 0;
+                const hasPublished = show.seasons?.some(s => s.episodes?.some(ep => ep.status === 'published'));
+                const thumbnail = show.artwork?.find(a => a.type === 'thumbnail')?.url;
+                
+                return (
+                  <div key={show.id} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    {thumbnail ? (
+                      <img src={thumbnail} alt="" style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '48px', height: '48px', borderRadius: '8px', backgroundColor: 'var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Tv size={20} color="var(--text-muted)" />
+                      </div>
+                    )}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--navy-900)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{show.title}</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{epCount} Episodes • {show.categories?.[0] || 'Series'}</div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      {hasPublished ? (
+                        <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--green-500)', backgroundColor: 'var(--green-50)', padding: '2px 8px', borderRadius: '12px', display: 'inline-block', marginBottom: '4px' }}>Published</div>
+                      ) : (
+                        <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--amber-500)', backgroundColor: 'var(--amber-50)', padding: '2px 8px', borderRadius: '12px', display: 'inline-block', marginBottom: '4px' }}>Draft</div>
+                      )}
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{safeFormatDate(show.created_at, true)}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* 3. Recent Activity */}
+        <div className="card" style={{ padding: '24px' }}>
+          <div className="card-header">
+            <h3 className="card-title">Recent Activity</h3>
+          </div>
+          
+          {recentActivity.length === 0 ? (
+            <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: '14px' }}>
+              No recent activity to display.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {recentActivity.map((act, i) => (
+                <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: act.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {act.icon}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)', lineHeight: '1.4' }}>{act.title}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{act.subtitle}</div>
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{safeFormatDate(act.timestamp)}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="dash-row">
+      {/* Bottom Grid */}
+      <div className="bottom-grid">
         {/* Quick Actions */}
-        <div className="dash-col-large">
-          <div className="card" style={{ padding: '24px', marginBottom: 0, flex: 1 }}>
-            <h3 style={{ margin: '0 0 24px 0', fontSize: '18px', fontWeight: '700' }}>Quick Actions</h3>
-            <div className="quick-actions-grid">
-              <QuickAction title="Create New Show" desc="Add a new show to the library" icon={Tv} color="var(--purple-700)" bgColor="var(--purple-50)" linkTo="/shows" />
-              <QuickAction title="Add Episode" desc="Add a new episode to a show" icon={PlaySquare} color="var(--green-500)" bgColor="var(--green-100)" linkTo="/episodes" />
-              <QuickAction title="View Validation" desc="Check issues before publishing" icon={AlertTriangle} color="var(--amber-500)" bgColor="var(--amber-100)" linkTo="/validation" />
-              <QuickAction title="Publish Catalogue" desc="Publish content to viewers" icon={UploadCloud} color="var(--red-500)" bgColor="var(--red-100)" linkTo="/publish" />
-            </div>
+        <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
+          <h3 className="card-title" style={{ marginBottom: '24px' }}>Quick Actions</h3>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+            <QuickAction title="Create New Show" desc="Add a new show to the library" icon={Tv} color="var(--purple-700)" bgColor="var(--purple-50)" linkTo="/shows" />
+            <QuickAction title="Add Episode" desc="Add an episode to a show" icon={PlaySquare} color="var(--green-500)" bgColor="var(--green-50)" linkTo="/episodes" />
+            <QuickAction title="Run Validation" desc="Check content before publishing" icon={AlertTriangle} color="var(--amber-500)" bgColor="var(--amber-50)" linkTo="/validation" />
+            <QuickAction title="Publish Catalogue" desc="Publish content to viewers" icon={UploadCloud} color="var(--red-500)" bgColor="var(--red-50)" linkTo="/publish" />
           </div>
         </div>
 
         {/* Last Publish */}
-        <div className="dash-col-small">
-          <div className="card" style={{ marginBottom: 0, padding: '24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>Last Publish</h3>
-              {lastPublish ? (
-                <span className="badge badge-success" style={{ backgroundColor: 'var(--green-100)', color: 'var(--green-500)', border: 'none' }}>Success</span>
-              ) : (
-                <span className="badge" style={{ backgroundColor: 'var(--border)', color: 'var(--text-muted)', border: 'none' }}>None</span>
-              )}
-            </div>
-            
+        <div className="card" style={{ padding: '24px', marginBottom: 0, display: 'flex', flexDirection: 'column' }}>
+          <div className="card-header">
+            <h3 className="card-title">Last Publish</h3>
             {lastPublish ? (
-              <>
-                <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--navy-900)' }}>Publish #{lastPublish.id.substring(0,8)}</div>
-                <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '24px' }}>{safeFormatDate(lastPublish.created_at)}</div>
-                
-                <div style={{ borderBottom: '1px solid var(--border)', margin: '0 -24px 24px -24px' }}></div>
-                
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '32px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                    <Film size={20} color="var(--purple-700)" />
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '20px', fontWeight: '800', color: 'var(--navy-900)', lineHeight: '1' }}>{lastPublish.published_records || 0}</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Shows</div>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                    <PlaySquare size={20} color="var(--navy-700)" />
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '20px', fontWeight: '800', color: 'var(--navy-900)', lineHeight: '1' }}>-</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Episodes</div>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                    <FileText size={20} color="var(--text-muted)" />
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '20px', fontWeight: '800', color: 'var(--navy-900)', lineHeight: '1' }}>-</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Sections</div>
-                    </div>
+              <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--green-500)', backgroundColor: 'var(--green-50)', padding: '4px 10px', borderRadius: '12px' }}>Success</span>
+            ) : null}
+          </div>
+          
+          {lastPublish ? (
+            <>
+              <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--navy-900)' }}>Publish #{lastPublish.id.substring(0,8)}</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '24px' }}>{safeFormatDate(lastPublish.created_at)} {lastPublish.triggered_by ? 'by Admin User' : ''}</div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Tv size={16} color="var(--purple-700)" />
+                  <div>
+                    <div style={{ fontSize: '16px', fontWeight: '800', color: 'var(--navy-900)', lineHeight: '1' }}>{lastPublish.published_records || 0}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Shows</div>
                   </div>
                 </div>
-              </>
-            ) : (
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '14px', marginBottom: '24px' }}>
-                The catalogue has not been published yet.
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <AlertTriangle size={16} color="var(--amber-500)" />
+                  <div>
+                    <div style={{ fontSize: '16px', fontWeight: '800', color: 'var(--navy-900)', lineHeight: '1' }}>{lastPublish.blocked_records || 0}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Blocked</div>
+                  </div>
+                </div>
               </div>
-            )}
-            
-            <Link to="/publish-history" className="btn btn-primary" style={{ width: '100%', marginTop: 'auto', backgroundColor: 'var(--purple-700)', borderRadius: '12px', padding: '12px' }}>
-              View Publish History
-            </Link>
-          </div>
+            </>
+          ) : (
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '14px', marginBottom: '24px' }}>
+              No catalogue published yet.
+            </div>
+          )}
+          
+          <Link to="/publish-history" style={{ display: 'block', textAlign: 'center', backgroundColor: 'var(--purple-700)', color: 'white', padding: '12px', borderRadius: '8px', textDecoration: 'none', fontWeight: '600', fontSize: '14px', marginTop: 'auto' }}>
+            View Publish History →
+          </Link>
         </div>
       </div>
     </div>

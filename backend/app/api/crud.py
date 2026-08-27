@@ -17,6 +17,7 @@ class ArtworkSchema(BaseModel):
     type: str
     url: str
     size_bytes: int
+    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -31,6 +32,7 @@ class EpisodeCreate(BaseModel):
 class EpisodeSchema(EpisodeCreate):
     id: UUID
     artwork: List[ArtworkSchema] = []
+    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -41,6 +43,7 @@ class SeasonCreate(BaseModel):
 class SeasonSchema(SeasonCreate):
     id: UUID
     episodes: List[EpisodeSchema] = []
+    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -55,6 +58,7 @@ class ShowSchema(ShowCreate):
     id: UUID
     seasons: List[SeasonSchema] = []
     artwork: List[ArtworkSchema] = []
+    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
