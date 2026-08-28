@@ -38,6 +38,18 @@ const safeFormatDate = (dateString, relative = false) => {
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 };
 
+const DashboardEmptyState = ({ icon: Icon, title, subtitle }) => (
+  <div style={{ margin: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 0 32px 0' }}>
+    {Icon && (
+      <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', border: '1px solid #F1F5F9', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+        <Icon size={20} color="#94A3B8" strokeWidth={2} />
+      </div>
+    )}
+    <div style={{ fontSize: '14px', fontWeight: '600', color: '#64748B', marginBottom: '4px' }}>{title}</div>
+    <div style={{ fontSize: '13px', color: '#94A3B8' }}>{subtitle}</div>
+  </div>
+);
+
 const Dashboard = () => {
   const { data: shows, isLoading: showsLoading } = useQuery({ queryKey: ['adminShows'], queryFn: fetchShows });
   const { data: validation, isLoading: valLoading } = useQuery({ queryKey: ['adminValidation'], queryFn: fetchValidation });
@@ -219,15 +231,14 @@ const Dashboard = () => {
           </div>
           
           {recentShows.length === 0 ? (
-            <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: '14px' }}>
-              No shows yet. Create your first show to get started.
-            </div>
+            <DashboardEmptyState icon={Film} title="No shows yet" subtitle="Create your first show to get started." />
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {recentShows.map((show) => {
                 const epCount = show.seasons?.reduce((acc, s) => acc + (s.episodes?.length || 0), 0) || 0;
                 const hasPublished = show.seasons?.some(s => s.episodes?.some(ep => ep.status === 'published'));
-                const thumbnail = show.artwork?.find(a => a.type === 'thumbnail')?.url;
+                const thumbnailObj = show.artwork?.find(a => a.type === 'Thumbnail' || a.type === 'thumbnail');
+                const thumbnail = thumbnailObj?.file_path ? `http://127.0.0.1:8000/content${thumbnailObj.file_path}` : null;
                 
                 return (
                   <div key={show.id} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -264,10 +275,7 @@ const Dashboard = () => {
           </div>
           
           {recentActivity.length === 0 ? (
-            <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--text-muted)' }}>
-              <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--navy-900)', marginBottom: '4px' }}>No activity history available</div>
-              <div style={{ fontSize: '13px' }}>Activity will appear here when recorded by the system.</div>
-            </div>
+            <DashboardEmptyState icon={Clock} title="No activity history" subtitle="Activity will appear here once recorded." />
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {recentActivity.map((act, i) => (
@@ -332,10 +340,7 @@ const Dashboard = () => {
               </div>
             </>
           ) : (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', marginBottom: '24px', textAlign: 'center', gap: '8px' }}>
-              <div style={{ fontWeight: '600', color: 'var(--navy-900)', fontSize: '14px' }}>No catalogue published yet</div>
-              <div style={{ fontSize: '13px' }}>Publish your catalogue to see the latest run here.</div>
-            </div>
+            <DashboardEmptyState icon={UploadCloud} title="No catalogue published yet" subtitle="Publish your catalogue to see the latest run here." />
           )}
           
           <Link to="/publish-history" style={{ display: 'block', textAlign: 'center', backgroundColor: 'var(--purple-700)', color: 'white', padding: '12px', borderRadius: '8px', textDecoration: 'none', fontWeight: '600', fontSize: '14px', marginTop: 'auto' }}>
