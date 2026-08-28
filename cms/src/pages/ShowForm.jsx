@@ -26,12 +26,12 @@ const CustomDropdown = ({ value, options, onChange, label, placeholder }) => {
         {label} <span style={{ color: '#DC2626' }}>*</span>
       </label>
       <div 
+        className="form-control"
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          width: '100%', height: '46px', padding: '0 16px', borderRadius: '12px', border: '1px solid var(--border)', 
-          backgroundColor: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
-          boxShadow: isOpen ? '0 0 0 3px var(--purple-50)' : 'none', borderColor: isOpen ? 'var(--purple-500)' : 'var(--border)', outline: 'none', transition: 'all 0.2s',
-          color: value ? 'var(--navy-900)' : 'var(--text-muted)', fontSize: '14px'
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
+          boxShadow: isOpen ? '0 0 0 3px var(--purple-50)' : 'none', borderColor: isOpen ? 'var(--purple-500)' : undefined,
+          color: value ? 'var(--navy-900)' : 'var(--text-muted)'
         }}
         tabIndex={0}
         onKeyDown={(e) => {
@@ -45,7 +45,7 @@ const CustomDropdown = ({ value, options, onChange, label, placeholder }) => {
       
       {isOpen && (
         <div style={{
-          position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, backgroundColor: '#FFFFFF', border: '1px solid var(--border)', 
+          position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, backgroundColor: '#FFFFFF', border: '1px solid #CBD5E1', 
           borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 50, padding: '6px', maxHeight: '200px', overflowY: 'auto'
         }}>
           {options.map(opt => (
@@ -101,12 +101,11 @@ const MultiSelect = ({ selected, options, onChange, label }) => {
       </label>
       
       <div 
-        onClick={() => setIsOpen(true)}
+        className="form-control"
+        onClick={() => { setIsOpen(true); setTimeout(() => document.getElementById('multi-search')?.focus(), 10); }}
         style={{
-          width: '100%', minHeight: '46px', padding: '6px 36px 6px 8px', borderRadius: '12px', border: '1px solid var(--border)', 
-          backgroundColor: '#FFFFFF', display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center', cursor: 'text',
-          boxShadow: isOpen ? '0 0 0 3px var(--purple-50)' : 'none', borderColor: isOpen ? 'var(--purple-500)' : 'var(--border)', outline: 'none', transition: 'all 0.2s',
-          position: 'relative'
+          display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px', cursor: 'text', minHeight: '46px', height: 'auto', padding: '6px 16px',
+          boxShadow: isOpen ? '0 0 0 3px var(--purple-50)' : 'none', borderColor: isOpen ? 'var(--purple-500)' : undefined
         }}
         tabIndex={0}
         onKeyDown={(e) => {
@@ -131,6 +130,7 @@ const MultiSelect = ({ selected, options, onChange, label }) => {
         ))}
         
         <input 
+          id="multi-search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={selected.length === 0 ? "Select categories..." : ""}
@@ -143,7 +143,7 @@ const MultiSelect = ({ selected, options, onChange, label }) => {
       {isOpen && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, backgroundColor: '#FFFFFF', border: '1px solid var(--border)', 
-          borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 50, padding: '6px', maxHeight: '240px', overflowY: 'auto'
+          borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 50, padding: '6px', maxHeight: '240px', display: 'flex', flexDirection: 'column'
         }}>
           {filteredOptions.length === 0 ? (
             <div style={{ padding: '10px 12px', color: 'var(--text-muted)', fontSize: '14px', textAlign: 'center' }}>No categories found</div>
@@ -221,7 +221,9 @@ const ArtworkUploadCard = ({ type, aspectText, width, height, maxKb, showId, exi
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', padding: '20px', backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '12px', marginBottom: '16px', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
+    <div style={{ display: 'flex', gap: '20px', padding: '20px', backgroundColor: '#FAFAFC', border: '1px solid #E2E8F0', borderRadius: '12px', marginBottom: '16px', alignItems: 'center', transition: 'all 0.2s' }}
+         onMouseEnter={e => e.currentTarget.style.borderColor = '#CBD5E1'}
+         onMouseLeave={e => e.currentTarget.style.borderColor = '#E2E8F0'}>
       {/* Preview Area */}
       <div style={{ 
         width: type === 'Poster' ? '100px' : '140px', 
@@ -395,8 +397,8 @@ const ShowForm = () => {
               if (isDirty && !window.confirm("You have unsaved changes. Are you sure you want to leave?")) return;
               navigate('/shows');
             }}
-            className="btn btn-outline" style={{ height: '44px', borderRadius: '12px', padding: '0 20px', fontWeight: '600' }}>
-            <ArrowLeft size={16} style={{ marginRight: '6px' }}/> Back to Shows
+            className="btn btn-outline" style={{ height: '44px', borderRadius: '12px', padding: '0 20px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--navy-900)', border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF' }}>
+            <ArrowLeft size={16} /> Back to Shows
           </button>
           
           <button 
@@ -434,12 +436,10 @@ const ShowForm = () => {
                 </label>
                 <input 
                   type="text" 
+                  className="form-control"
                   value={formData.title} 
                   onChange={e => handleChange('title', e.target.value)}
                   placeholder="Enter a clear and engaging title"
-                  style={{ width: '100%', height: '46px', padding: '0 16px', borderRadius: '12px', border: '1px solid var(--border)', outline: 'none', fontSize: '14px', transition: 'all 0.2s', backgroundColor: '#FFFFFF' }}
-                  onFocus={e => { e.target.style.borderColor = 'var(--purple-500)'; e.target.style.boxShadow = '0 0 0 3px var(--purple-50)'; }}
-                  onBlur={e => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; }}
                 />
               </div>
 
@@ -449,12 +449,11 @@ const ShowForm = () => {
                 </label>
                 <input 
                   type="text" 
+                  className="form-control"
                   value={formData.slug} 
                   onChange={e => handleChange('slug', e.target.value)}
                   placeholder="url-friendly-identifier"
-                  style={{ width: '100%', height: '46px', padding: '0 16px', borderRadius: '12px', border: '1px solid var(--border)', outline: 'none', fontSize: '14px', transition: 'all 0.2s', fontFamily: 'monospace', backgroundColor: '#FFFFFF' }}
-                  onFocus={e => { e.target.style.borderColor = 'var(--purple-500)'; e.target.style.boxShadow = '0 0 0 3px var(--purple-50)'; }}
-                  onBlur={e => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; }}
+                  style={{ fontFamily: 'monospace' }}
                 />
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>Unique identifier used in URLs.</div>
               </div>
@@ -465,12 +464,10 @@ const ShowForm = () => {
                 Synopsis
               </label>
               <textarea 
+                className="form-control"
                 value={formData.synopsis} 
                 onChange={e => handleChange('synopsis', e.target.value)}
                 placeholder="Brief description of the show..."
-                style={{ width: '100%', height: '140px', padding: '16px', borderRadius: '12px', border: '1px solid var(--border)', outline: 'none', fontSize: '14px', transition: 'all 0.2s', resize: 'vertical', backgroundColor: '#FFFFFF' }}
-                onFocus={e => { e.target.style.borderColor = 'var(--purple-500)'; e.target.style.boxShadow = '0 0 0 3px var(--purple-50)'; }}
-                onBlur={e => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; }}
               />
               <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>
                 {formData.synopsis?.length || 0} / 500 characters

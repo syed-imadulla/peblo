@@ -158,22 +158,37 @@ h1 { font-size: 28px; letter-spacing: -0.5px; }
   color: var(--navy-900);
 }
 
-.input-group input, .input-group select, .input-group textarea {
+.form-control {
   width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  height: 46px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid #CBD5E1;
+  background-color: #FFFFFF;
   font-family: inherit;
   font-size: 14px;
-  background-color: var(--surface);
-  transition: all 0.2s;
-  color: var(--text-main);
+  color: var(--navy-900);
+  transition: all 0.2s ease;
+  outline: none;
 }
 
-.input-group input:focus, .input-group select:focus, .input-group textarea:focus {
-  outline: none;
-  border-color: var(--purple-600);
-  box-shadow: 0 0 0 3px var(--purple-100);
+.form-control:hover {
+  border-color: #94A3B8;
+}
+
+.form-control:focus {
+  border-color: var(--purple-500);
+  box-shadow: 0 0 0 3px var(--purple-50);
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+textarea.form-control {
+  height: 140px;
+  padding: 16px;
+  resize: vertical;
 }
 
 /* TABLES */
