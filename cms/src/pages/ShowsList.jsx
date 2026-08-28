@@ -86,9 +86,9 @@ const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix,
         style={{ 
           height, padding, display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
           backgroundColor: isOpen ? '#F5F3FF' : '#FFFFFF', 
-          border: isOpen ? '1px solid #A78BFA' : '1px solid transparent', 
-          borderRadius: '20px', cursor: 'pointer', color: isOpen ? '#6D28D9' : '#475569', 
-          fontSize: '13px', transition: 'all 0.2s ease', boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+          border: isOpen ? '1px solid #A78BFA' : '1px solid #E2E8F0', 
+          borderRadius: '20px', cursor: 'pointer', color: isOpen ? '#6D28D9' : '#334155', 
+          fontSize: '13px', transition: 'all 0.2s ease', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
         }}
       >
         <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: '8px', fontWeight: value.startsWith('All') ? '400' : '500' }}>
@@ -319,12 +319,13 @@ const ShowsList = () => {
               width: '100%', 
               padding: '10px 16px 10px 42px', 
               borderRadius: '20px', 
-              border: '1px solid transparent',
+              border: '1px solid #E2E8F0',
               backgroundColor: '#FFFFFF',
-              color: '#475569',
+              color: '#334155',
               fontSize: '14px',
               outline: 'none',
               height: '42px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
               transition: 'all 0.2s ease'
             }}
           />
@@ -364,25 +365,25 @@ const ShowsList = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', flexWrap: 'wrap', minHeight: '32px' }}>
           <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', marginRight: '4px' }}>Active Filters:</span>
           {search && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', backgroundColor: 'var(--purple-50)', color: 'var(--purple-700)', borderRadius: '20px', fontSize: '12px', fontWeight: '600', border: '1px solid var(--purple-200)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', backgroundColor: '#F5F3FF', color: '#6D28D9', borderRadius: '20px', fontSize: '12px', fontWeight: '600', border: '1px solid #DDD6FE' }}>
               Search: <span style={{ fontWeight: '400' }}>{search}</span>
               <X size={12} style={{ cursor: 'pointer', marginLeft: '2px' }} onClick={() => setSearch('')} />
             </div>
           )}
           {filterSection !== 'All Sections' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', backgroundColor: 'var(--purple-50)', color: 'var(--purple-700)', borderRadius: '20px', fontSize: '12px', fontWeight: '600', border: '1px solid var(--purple-200)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', backgroundColor: '#F5F3FF', color: '#6D28D9', borderRadius: '20px', fontSize: '12px', fontWeight: '600', border: '1px solid #DDD6FE' }}>
               Section: <span style={{ fontWeight: '400' }}>{filterSection}</span>
               <X size={12} style={{ cursor: 'pointer', marginLeft: '2px' }} onClick={() => setFilterSection('All Sections')} />
             </div>
           )}
           {filterLanguage !== 'All Languages' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', backgroundColor: 'var(--purple-50)', color: 'var(--purple-700)', borderRadius: '20px', fontSize: '12px', fontWeight: '600', border: '1px solid var(--purple-200)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', backgroundColor: '#F5F3FF', color: '#6D28D9', borderRadius: '20px', fontSize: '12px', fontWeight: '600', border: '1px solid #DDD6FE' }}>
               Language: <span style={{ fontWeight: '400' }}>{filterLanguage}</span>
               <X size={12} style={{ cursor: 'pointer', marginLeft: '2px' }} onClick={() => setFilterLanguage('All Languages')} />
             </div>
           )}
           {filterStatus !== 'All Status' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', backgroundColor: 'var(--purple-50)', color: 'var(--purple-700)', borderRadius: '20px', fontSize: '12px', fontWeight: '600', border: '1px solid var(--purple-200)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', backgroundColor: '#F5F3FF', color: '#6D28D9', borderRadius: '20px', fontSize: '12px', fontWeight: '600', border: '1px solid #DDD6FE' }}>
               Status: <span style={{ fontWeight: '400' }}>{filterStatus}</span>
               <X size={12} style={{ cursor: 'pointer', marginLeft: '2px' }} onClick={() => setFilterStatus('All Status')} />
             </div>
@@ -394,7 +395,7 @@ const ShowsList = () => {
       )}
 
       {/* TABLE */}
-      <div style={{ backgroundColor: '#FFFFFF', overflow: 'visible', borderRadius: '24px', border: 'none', boxShadow: '0 12px 40px -10px rgba(0,0,0,0.06)' }}>
+      <div style={{ backgroundColor: '#FFFFFF', overflow: 'visible', borderRadius: '24px', border: '1px solid #F1F5F9', boxShadow: '0 4px 24px -8px rgba(0,0,0,0.08)' }}>
         {filteredShows.length === 0 ? (
           <div style={{ padding: '100px 24px', textAlign: 'center' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'var(--gray-100)', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
@@ -420,14 +421,14 @@ const ShowsList = () => {
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '950px' }}>
                 <thead>
-                <tr style={{ backgroundColor: '#F8F9FF', borderBottom: '1px solid #F1F5F9', color: '#64748B', fontSize: '12px', fontWeight: '700' }}>
-                  <th style={{ padding: '16px 24px', width: '35%', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Show</th>
+                <tr style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E2E8F0', color: '#475569', fontSize: '12px', fontWeight: '700' }}>
+                  <th style={{ padding: '16px 24px', width: '35%', textTransform: 'uppercase', letterSpacing: '0.5px', borderTopLeftRadius: '24px' }}>Show</th>
                   <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Section</th>
                   <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Languages</th>
                   <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Episodes</th>
                   <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Status</th>
                   <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Updated</th>
-                  <th style={{ padding: '16px 24px', textAlign: 'right', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Actions</th>
+                  <th style={{ padding: '16px 24px', textAlign: 'right', textTransform: 'uppercase', letterSpacing: '0.5px', borderTopRightRadius: '24px' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -455,10 +456,10 @@ const ShowsList = () => {
                             </div>
                           )}
                           <div style={{ overflow: 'hidden' }}>
-                            <div style={{ fontWeight: '700', fontSize: '14px', color: 'var(--navy-900)', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            <div style={{ fontWeight: '700', fontSize: '14px', color: '#0F172A', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               {show.title}
                             </div>
-                            <div style={{ fontSize: '12px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            <div style={{ fontSize: '12px', color: '#64748B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               {show.categories?.length > 0 ? show.categories.join(' • ') : 'No category'}
                             </div>
                           </div>
@@ -477,7 +478,7 @@ const ShowsList = () => {
                         {show.languages.length > 0 ? (
                           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                             {displayLanguages.map(l => (
-                              <span key={l} style={{ backgroundColor: 'var(--green-50)', color: 'var(--green-700)', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: '700', letterSpacing: '0.5px' }}>
+                              <span key={l} style={{ backgroundColor: '#F0FDF4', color: '#16A34A', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '700', letterSpacing: '0.5px' }}>
                                 {l}
                               </span>
                             ))}
@@ -522,7 +523,7 @@ const ShowsList = () => {
             </div>
 
             {/* Pagination */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderTop: '1px solid #F1F5F9' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderTop: '1px solid #F1F5F9', borderBottomLeftRadius: '24px', borderBottomRightRadius: '24px' }}>
               <div style={{ fontSize: '13px', color: '#64748B', fontWeight: '500' }}>
                 Showing <strong style={{ color: '#0F172A' }}>{(currentPage - 1) * itemsPerPage + (filteredShows.length > 0 ? 1 : 0)}</strong> to <strong style={{ color: '#0F172A' }}>{Math.min(currentPage * itemsPerPage, filteredShows.length)}</strong> of <strong style={{ color: '#0F172A' }}>{filteredShows.length}</strong> results
               </div>

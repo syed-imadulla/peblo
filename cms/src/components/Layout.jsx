@@ -18,10 +18,9 @@ const Layout = () => {
   ];
 
   const activeStyle = {
-    backgroundColor: 'var(--purple-50)',
-    color: 'var(--purple-700)',
-    fontWeight: '700',
-    borderLeft: '4px solid var(--purple-700)'
+    backgroundColor: '#F5F3FF',
+    color: '#6D28D9',
+    fontWeight: '700'
   };
 
   const itemStyle = {
@@ -30,7 +29,7 @@ const Layout = () => {
     gap: '12px',
     padding: '12px 16px',
     margin: '0 20px',
-    borderRadius: '12px',
+    borderRadius: '20px',
     color: 'var(--text-muted)',
     marginBottom: '8px',
     transition: 'all 0.2s',
@@ -101,7 +100,7 @@ const Layout = () => {
         </nav>
 
         <div style={{ marginTop: 'auto', padding: '16px 20px 24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: '12px', cursor: 'pointer', border: '1px solid var(--border)', backgroundColor: 'rgba(255,255,255,0.8)' }} onClick={logout} title="Logout">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: '20px', cursor: 'pointer', border: '1px solid var(--border)', backgroundColor: 'rgba(255,255,255,0.8)' }} onClick={logout} title="Logout">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--purple-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-700)', fontWeight: 'bold', overflow: 'hidden' }}>
                 <img src="/assets/eoEf12a30xBVz5Q1VMqOk8gbgs.avif" alt="avatar" style={{width: '28px', objectFit: 'cover'}} />
@@ -152,7 +151,7 @@ const Layout = () => {
               <Bell size={20} />
               <span style={{ position: 'absolute', top: '0px', right: '0px', backgroundColor: 'var(--purple-700)', color: 'white', fontSize: '10px', fontWeight: 'bold', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid white' }}>3</span>
             </div>
-            <button className="btn btn-primary" style={{ padding: '0 20px', borderRadius: '10px', height: '44px' }}>
+            <button className="btn btn-primary" style={{ padding: '0 24px', borderRadius: '22px', height: '44px' }}>
               <Plus size={18} /> Create New
             </button>
           </div>
