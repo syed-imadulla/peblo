@@ -59,7 +59,7 @@ const getShowMetrics = (show) => {
 
 // --- UI COMPONENTS ---
 
-const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix, placement = 'bottom' }) => {
+const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix, placement = 'bottom', height = '42px', padding = '0 12px 0 16px' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
 
@@ -84,7 +84,7 @@ const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix,
       <div 
         onClick={() => setIsOpen(!isOpen)}
         style={{ 
-          height: '42px', padding: '0 12px 0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+          height, padding, display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
           backgroundColor: isOpen ? '#F5F3FF' : '#FFFFFF', 
           border: isOpen ? '1px solid #A78BFA' : '1px solid transparent', 
           borderRadius: '20px', cursor: 'pointer', color: isOpen ? '#6D28D9' : '#475569', 
@@ -522,35 +522,61 @@ const ShowsList = () => {
             </div>
 
             {/* Pagination */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderTop: '1px solid #E2E8F0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderTop: '1px solid #F1F5F9' }}>
               <div style={{ fontSize: '13px', color: '#64748B', fontWeight: '500' }}>
-                Showing <strong style={{ color: 'var(--navy-900)' }}>{(currentPage - 1) * itemsPerPage + (filteredShows.length > 0 ? 1 : 0)}</strong> to <strong style={{ color: 'var(--navy-900)' }}>{Math.min(currentPage * itemsPerPage, filteredShows.length)}</strong> of <strong style={{ color: 'var(--navy-900)' }}>{filteredShows.length}</strong> shows
+                Showing <strong style={{ color: '#0F172A' }}>{(currentPage - 1) * itemsPerPage + (filteredShows.length > 0 ? 1 : 0)}</strong> to <strong style={{ color: '#0F172A' }}>{Math.min(currentPage * itemsPerPage, filteredShows.length)}</strong> of <strong style={{ color: '#0F172A' }}>{filteredShows.length}</strong> results
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <button 
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--white)', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', color: currentPage === 1 ? 'var(--gray-300)' : 'var(--navy-900)', transition: 'all 0.2s ease', boxShadow: currentPage === 1 ? 'none' : 'var(--shadow-sm)' }}
+                  style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderRadius: '10px', background: 'transparent', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', color: currentPage === 1 ? '#CBD5E1' : '#64748B', transition: 'all 0.2s ease' }}
+                  onMouseOver={e => { if(currentPage !== 1) { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.color = '#334155'; } }}
+                  onMouseOut={e => { if(currentPage !== 1) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748B'; } }}
                 >
                   <ChevronLeft size={16} />
                 </button>
-                <div style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--purple-700)', color: 'var(--purple-700)', borderRadius: '8px', background: 'var(--purple-50)', fontWeight: '600', fontSize: '13px' }}>
+                
+                <div style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', color: '#FFFFFF', borderRadius: '10px', background: '#8B5CF6', fontWeight: '600', fontSize: '13px', boxShadow: '0 4px 12px rgba(139, 92, 246, 0.25)' }}>
                   {currentPage}
                 </div>
+                
+                {totalPages > 1 && currentPage < totalPages && (
+                  <button 
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', color: '#64748B', borderRadius: '10px', background: 'transparent', fontWeight: '500', fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                    onMouseOver={e => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.color = '#334155'; }}
+                    onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748B'; }}
+                  >
+                    {currentPage + 1}
+                  </button>
+                )}
+                
+                {totalPages > 2 && currentPage < totalPages - 1 && (
+                  <div style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', color: '#94A3B8', background: 'transparent', fontWeight: '500', fontSize: '13px' }}>
+                    ...
+                  </div>
+                )}
+
                 <button 
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages || totalPages === 0}
-                  style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--white)', cursor: (currentPage === totalPages || totalPages === 0) ? 'not-allowed' : 'pointer', color: (currentPage === totalPages || totalPages === 0) ? 'var(--gray-300)' : 'var(--navy-900)', transition: 'all 0.2s ease', boxShadow: (currentPage === totalPages || totalPages === 0) ? 'none' : 'var(--shadow-sm)' }}
+                  style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderRadius: '10px', background: 'transparent', cursor: (currentPage === totalPages || totalPages === 0) ? 'not-allowed' : 'pointer', color: (currentPage === totalPages || totalPages === 0) ? '#CBD5E1' : '#64748B', transition: 'all 0.2s ease' }}
+                  onMouseOver={e => { if(currentPage !== totalPages && totalPages !== 0) { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.color = '#334155'; } }}
+                  onMouseOut={e => { if(currentPage !== totalPages && totalPages !== 0) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748B'; } }}
                 >
                   <ChevronRight size={16} />
                 </button>
               </div>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <Dropdown 
-                  value={`${itemsPerPage} per page`}
+                  value={`${itemsPerPage} / page`}
                   onChange={(val) => setItemsPerPage(Number(val.split(' ')[0]))}
-                  options={['10 per page', '20 per page', '50 per page']}
-                  minWidth="130px"
+                  options={['10 / page', '20 / page', '50 / page']}
+                  minWidth="110px"
+                  placement="top"
+                  height="36px"
+                  padding="0 10px 0 14px"
                 />
               </div>
             </div>
