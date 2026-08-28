@@ -400,7 +400,7 @@ const ShowForm = () => {
   }
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: '1400px', margin: '0 auto', animation: 'fadeIn 0.3s ease' }}>
+    <div style={{ padding: '0 8px', maxWidth: '1400px', margin: '0 auto', animation: 'fadeIn 0.3s ease' }}>
       
       {/* Header */}
       <div style={{ marginBottom: '32px' }}>
