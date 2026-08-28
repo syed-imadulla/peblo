@@ -195,7 +195,7 @@ const Dashboard = () => {
       {/* Main 3 Columns */}
       <div className="main-grid">
         {/* 1. Realtime Overview */}
-        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
+        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', marginBottom: 0 }}>
           <h3 className="card-title" style={{ marginBottom: '24px' }}>Realtime Overview</h3>
           
           <div style={{ flex: 1 }}>
@@ -212,7 +212,7 @@ const Dashboard = () => {
         </div>
 
         {/* 2. Recent Shows */}
-        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
+        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', marginBottom: 0 }}>
           <div className="card-header">
             <h3 className="card-title">Recent Shows</h3>
             <Link to="/shows" className="view-all">View All</Link>
@@ -258,7 +258,7 @@ const Dashboard = () => {
         </div>
 
         {/* 3. Recent Activity */}
-        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
+        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', marginBottom: 0 }}>
           <div className="card-header">
             <h3 className="card-title">Recent Activity</h3>
           </div>
