@@ -85,10 +85,10 @@ const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix,
         onClick={() => setIsOpen(!isOpen)}
         style={{ 
           height: '42px', padding: '0 12px 0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-          backgroundColor: isOpen ? 'var(--purple-50)' : 'var(--white)', 
-          border: isOpen ? '1px solid var(--purple-400)' : '1px solid var(--border)', 
-          borderRadius: '12px', cursor: 'pointer', color: isOpen ? 'var(--purple-700)' : 'var(--navy-900)', 
-          fontSize: '13px', transition: 'all 0.2s ease', boxShadow: 'var(--shadow-sm)'
+          backgroundColor: isOpen ? '#F5F3FF' : '#FFFFFF', 
+          border: isOpen ? '1px solid #A78BFA' : '1px solid transparent', 
+          borderRadius: '20px', cursor: 'pointer', color: isOpen ? '#6D28D9' : '#475569', 
+          fontSize: '13px', transition: 'all 0.2s ease', boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
         }}
       >
         <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: '8px', fontWeight: value.startsWith('All') ? '400' : '500' }}>
@@ -104,9 +104,9 @@ const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix,
           left: 0, 
           minWidth: '100%', 
           backgroundColor: '#FFFFFF', 
-          border: '1px solid #E2E8F0', 
-          borderRadius: '12px', 
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)', 
+          border: 'none', 
+          borderRadius: '20px', 
+          boxShadow: '0 10px 40px -10px rgba(109, 40, 217, 0.15)', 
           zIndex: 50, 
           padding: '6px' 
         }}>
@@ -144,7 +144,9 @@ const ActionMenu = ({ show, onDeleteClick }) => {
     <div ref={ref} style={{ position: 'relative', display: 'inline-block' }}>
       <button 
         onClick={() => setIsOpen(!isOpen)} 
-        style={{ background: isOpen ? 'var(--gray-100)' : 'transparent', border: '1px solid var(--border)', borderRadius: '8px', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isOpen ? 'var(--navy-900)' : 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s ease' }}
+        style={{ background: isOpen ? '#F5F3FF' : 'transparent', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isOpen ? '#6D28D9' : '#94A3B8', cursor: 'pointer', transition: 'all 0.2s ease' }}
+        onMouseOver={e => { if(!isOpen) { e.currentTarget.style.background = '#F8F9FF'; e.currentTarget.style.color = '#64748B'; } }}
+        onMouseOut={e => { if(!isOpen) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#94A3B8'; } }}
         title="Actions"
       >
         <MoreHorizontal size={14} />
@@ -312,18 +314,17 @@ const ShowsList = () => {
             type="text" 
             placeholder="Search shows by title, category or section..." 
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
             style={{ 
               width: '100%', 
               padding: '10px 16px 10px 42px', 
-              borderRadius: '12px', 
-              border: search ? '1px solid var(--purple-400)' : '1px solid var(--border)',
-              backgroundColor: search ? 'var(--purple-50)' : 'var(--white)',
-              color: 'var(--navy-900)',
+              borderRadius: '20px', 
+              border: '1px solid transparent',
+              backgroundColor: '#FFFFFF',
+              color: '#475569',
               fontSize: '14px',
               outline: 'none',
               height: '42px',
-              boxShadow: 'var(--shadow-sm)',
               transition: 'all 0.2s ease'
             }}
           />
@@ -393,7 +394,7 @@ const ShowsList = () => {
       )}
 
       {/* TABLE */}
-      <div style={{ backgroundColor: '#FFFFFF', overflow: 'visible', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)' }}>
+      <div style={{ backgroundColor: '#FFFFFF', overflow: 'visible', borderRadius: '24px', border: 'none', boxShadow: '0 12px 40px -10px rgba(0,0,0,0.06)' }}>
         {filteredShows.length === 0 ? (
           <div style={{ padding: '100px 24px', textAlign: 'center' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'var(--gray-100)', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
@@ -419,7 +420,7 @@ const ShowsList = () => {
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '950px' }}>
                 <thead>
-                <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid #E2E8F0', color: '#64748B', fontSize: '12px', fontWeight: '600' }}>
+                <tr style={{ backgroundColor: '#F8F9FF', borderBottom: '1px solid #F1F5F9', color: '#64748B', fontSize: '12px', fontWeight: '700' }}>
                   <th style={{ padding: '16px 24px', width: '35%', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Show</th>
                   <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Section</th>
                   <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Languages</th>
@@ -435,21 +436,21 @@ const ShowsList = () => {
                   const extraLanguages = show.languages.length - 3;
                   
                   return (
-                    <tr key={show.id} style={{ borderBottom: idx === paginatedShows.length - 1 ? 'none' : '1px solid var(--border)', transition: 'background-color 0.15s ease' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--gray-50)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                    <tr key={show.id} style={{ borderBottom: idx === paginatedShows.length - 1 ? 'none' : '1px solid #F1F5F9', transition: 'background-color 0.15s ease' }} onMouseOver={e => e.currentTarget.style.backgroundColor = '#FAFAFF'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
                       <td style={{ padding: '16px 24px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                           {show.artwork?.length > 0 ? (
                             <img 
                               src={`http://127.0.0.1:8000/content${show.artwork[0].file_path}`} 
                               alt={show.title} 
-                              style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '10px', border: '1px solid var(--border)', flexShrink: 0 }} 
+                              style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '16px', border: '1px solid #F1F5F9', flexShrink: 0, boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }} 
                               onError={(e) => {
                                 e.target.onerror = null;
-                                e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Crect width='56' height='56' fill='%23f3f4f6'/%3E%3Cpath d='M20 28l4 4 8-8' stroke='%239ca3af' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+                                e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Crect width='56' height='56' fill='%23f5f3ff'/%3E%3Cpath d='M20 28l4 4 8-8' stroke='%23a78bfa' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
                               }}
                             />
                           ) : (
-                            <div style={{ width: '56px', height: '56px', borderRadius: '10px', backgroundColor: 'var(--gray-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', border: '1px solid var(--border)', flexShrink: 0 }}>
+                            <div style={{ width: '56px', height: '56px', borderRadius: '16px', backgroundColor: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A78BFA', border: 'none', flexShrink: 0 }}>
                               <ImageIcon size={20} />
                             </div>
                           )}
