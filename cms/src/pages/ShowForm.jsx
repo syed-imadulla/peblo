@@ -416,7 +416,7 @@ const ShowForm = () => {
       )}
 
       {/* Main Layout Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: '24px' }}>
+      <div className="show-form-layout">
         
         {/* LEFT COLUMN: Basic Info */}
         <div>
