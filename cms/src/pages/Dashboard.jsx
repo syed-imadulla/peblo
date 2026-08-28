@@ -319,7 +319,7 @@ const Dashboard = () => {
                   <Tv size={20} color="var(--purple-700)" />
                   <div>
                     <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--navy-900)', lineHeight: '1' }}>{lastPublish.published_records || 0}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Shows</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Published</div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
