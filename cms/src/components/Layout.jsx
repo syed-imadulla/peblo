@@ -43,6 +43,17 @@ const Layout = () => {
     return currentItem ? currentItem.name : 'Peblo CMS';
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
+  const getUserName = () => {
+    return user?.role === 'admin' ? 'Admin' : 'Editor';
+  };
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(180deg, #F0F5FF 0%, #F8F9FF 50%, #FAFAFF 100%)' }}>
       {/* Mobile Sidebar Overlay */}
@@ -139,7 +150,7 @@ const Layout = () => {
           </button>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ fontWeight: '800', fontSize: '28px', color: 'var(--navy-900)', display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '-0.5px' }}>
-              {location.pathname === '/dashboard' ? 'Good morning, Admin! 👋' : getPageTitle()}
+              {location.pathname === '/dashboard' ? `${getGreeting()}, ${getUserName()}! 👋` : getPageTitle()}
             </div>
             <div style={{ color: 'var(--text-muted)', fontSize: '15px' }}>
               {location.pathname === '/dashboard' ? 'Here\'s what\'s happening with your content today.' : 
