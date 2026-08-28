@@ -150,13 +150,17 @@ const Layout = () => {
             <Menu size={24} />
           </button>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontWeight: '800', fontSize: '28px', color: 'var(--navy-900)', display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '-0.5px' }}>
-              {location.pathname === '/dashboard' ? `${getGreeting()}, ${getUserName()}! 👋` : getPageTitle()}
-            </div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '15px' }}>
-              {location.pathname === '/dashboard' ? 'Here\'s what\'s happening with your content today.' : 
-               location.pathname.startsWith('/shows') ? 'Manage and organize all your shows in the library.' : ''}
-            </div>
+            {!(location.pathname.includes('/new') || location.pathname.includes('/edit')) && (
+              <>
+                <div style={{ fontWeight: '800', fontSize: '28px', color: 'var(--navy-900)', display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '-0.5px' }}>
+                  {location.pathname === '/dashboard' ? `${getGreeting()}, ${getUserName()}! 👋` : getPageTitle()}
+                </div>
+                <div style={{ color: 'var(--text-muted)', fontSize: '15px' }}>
+                  {location.pathname === '/dashboard' ? 'Here\'s what\'s happening with your content today.' : 
+                   location.pathname.startsWith('/shows') ? 'Manage and organize all your shows in the library.' : ''}
+                </div>
+              </>
+            )}
           </div>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '24px' }}>
             <div style={{ position: 'relative', cursor: 'pointer', color: 'var(--purple-700)', backgroundColor: '#FFFFFF', padding: '10px', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>

@@ -138,7 +138,7 @@ const MultiSelect = ({ selected, options, onChange, label, helperText }) => {
           style={{ border: 'none', outline: 'none', flex: 1, minWidth: '120px', fontSize: '14px', background: 'transparent', color: 'var(--navy-900)' }}
         />
         
-        <ChevronDown size={16} color="var(--text-muted)" style={{ position: 'absolute', right: '16px', top: '14px', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+        <ChevronDown size={16} color="var(--text-muted)" style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0, marginLeft: 'auto' }} />
       </div>
 
       {isOpen && (
@@ -520,10 +520,10 @@ const ShowForm = () => {
               />
               
               <CustomDropdown 
-                label="Primary Language"
+                label="Primary Language *"
                 placeholder="Select language"
                 value={formData.primaryLanguage}
-                options={['English', 'Spanish', 'French', 'German', 'Japanese']}
+                options={['English', 'Hindi']}
                 onChange={val => handleChange('primaryLanguage', val)}
                 helperText="Default audio track language."
               />
@@ -550,7 +550,7 @@ const ShowForm = () => {
 
             <div className="grid-cols-2" style={{ display: 'grid', gap: '24px' }}>
               <MultiSelect 
-                label="Categories *"
+                label="Categories"
                 selected={formData.categories}
                 options={CATEGORIES}
                 onChange={val => handleChange('categories', val)}
