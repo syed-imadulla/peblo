@@ -276,7 +276,7 @@ h1 { font-size: 28px; letter-spacing: -0.5px; }
 /* ShowForm Layout */
 .show-form-layout {
   display: grid;
-  grid-template-columns: 1fr 360px;
+  grid-template-columns: minmax(0, 1fr) 380px;
   gap: 24px;
 }
 

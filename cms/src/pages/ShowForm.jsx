@@ -28,9 +28,9 @@ const CustomDropdown = ({ value, options, onChange, label, placeholder }) => {
       <div 
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          width: '100%', height: '44px', padding: '0 16px', borderRadius: '12px', border: isOpen ? '2px solid var(--purple-500)' : '1px solid var(--border)', 
+          width: '100%', height: '46px', padding: '0 16px', borderRadius: '12px', border: '1px solid var(--border)', 
           backgroundColor: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
-          boxShadow: isOpen ? '0 0 0 3px rgba(109, 40, 217, 0.1)' : '0 1px 2px rgba(0,0,0,0.02)', outline: 'none', transition: 'all 0.2s',
+          boxShadow: isOpen ? '0 0 0 3px var(--purple-50)' : 'none', borderColor: isOpen ? 'var(--purple-500)' : 'var(--border)', outline: 'none', transition: 'all 0.2s',
           color: value ? 'var(--navy-900)' : 'var(--text-muted)', fontSize: '14px'
         }}
         tabIndex={0}
@@ -103,9 +103,9 @@ const MultiSelect = ({ selected, options, onChange, label }) => {
       <div 
         onClick={() => setIsOpen(true)}
         style={{
-          width: '100%', minHeight: '44px', padding: '6px 36px 6px 8px', borderRadius: '12px', border: isOpen ? '2px solid var(--purple-500)' : '1px solid var(--border)', 
+          width: '100%', minHeight: '46px', padding: '6px 36px 6px 8px', borderRadius: '12px', border: '1px solid var(--border)', 
           backgroundColor: '#FFFFFF', display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center', cursor: 'text',
-          boxShadow: isOpen ? '0 0 0 3px rgba(109, 40, 217, 0.1)' : '0 1px 2px rgba(0,0,0,0.02)', outline: 'none', transition: 'all 0.2s',
+          boxShadow: isOpen ? '0 0 0 3px var(--purple-50)' : 'none', borderColor: isOpen ? 'var(--purple-500)' : 'var(--border)', outline: 'none', transition: 'all 0.2s',
           position: 'relative'
         }}
         tabIndex={0}
@@ -221,9 +221,12 @@ const ArtworkUploadCard = ({ type, aspectText, width, height, maxKb, showId, exi
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', padding: '16px', border: '1px solid var(--border)', borderRadius: '12px', marginBottom: '16px' }}>
+    <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', padding: '20px', backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '12px', marginBottom: '16px', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
+      {/* Preview Area */}
       <div style={{ 
-        width: '100px', height: type === 'Poster' ? '150px' : '56px', backgroundColor: '#F8FAFC', borderRadius: '8px', 
+        width: type === 'Poster' ? '100px' : '140px', 
+        height: type === 'Poster' ? '150px' : '79px', 
+        backgroundColor: '#F8FAFC', borderRadius: '8px', 
         display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid #E2E8F0', flexShrink: 0
       }}>
         {currentArt ? (
@@ -233,38 +236,37 @@ const ArtworkUploadCard = ({ type, aspectText, width, height, maxKb, showId, exi
         )}
       </div>
       
-      <div style={{ marginLeft: '16px', flex: 1 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
-          <div style={{ fontWeight: '600', color: 'var(--navy-900)', fontSize: '14px' }}>
-            {type} <span style={{ color: 'var(--text-muted)', fontWeight: '400', fontSize: '12px' }}>({aspectText})</span>
+      {/* Details & Action */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+          <div style={{ fontWeight: '600', color: 'var(--navy-900)', fontSize: '15px' }}>
+            {type} <span style={{ color: 'var(--text-muted)', fontWeight: '400', fontSize: '13px' }}>({aspectText})</span>
           </div>
-          {currentArt && <span style={{ backgroundColor: '#DCFCE7', color: '#15803D', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '600' }}>Uploaded</span>}
+          {currentArt && <span style={{ backgroundColor: '#DCFCE7', color: '#15803D', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '600', border: '1px solid #BBF7D0' }}>Uploaded</span>}
         </div>
         
-        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: '1.5' }}>
+        <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px', lineHeight: '1.5' }}>
           {width} × {height} px • Max {maxKb} KB
         </div>
         
-        {error && <div style={{ color: '#DC2626', fontSize: '12px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}><AlertCircle size={12}/> {error}</div>}
+        {error && <div style={{ color: '#DC2626', fontSize: '12px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}><AlertCircle size={14}/> {error}</div>}
         
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} />
-          
+        <div>
           <button 
             type="button"
-            disabled={isUploading}
             onClick={() => fileInputRef.current?.click()}
-            style={{ 
-              padding: '6px 12px', backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '8px', 
-              fontSize: '13px', fontWeight: '500', color: 'var(--navy-900)', cursor: isUploading ? 'not-allowed' : 'pointer',
-              display: 'flex', alignItems: 'center', gap: '6px', opacity: isUploading ? 0.7 : 1
-            }}
-            onMouseOver={e => !isUploading && (e.currentTarget.style.backgroundColor = '#F8FAFC')}
-            onMouseOut={e => !isUploading && (e.currentTarget.style.backgroundColor = '#FFFFFF')}
-          >
-            {isUploading ? <div style={{ width: '14px', height: '14px', borderRadius: '50%', border: '2px solid #CBD5E1', borderTopColor: 'var(--navy-900)', animation: 'spin 1s linear infinite' }}/> : <UploadCloud size={14} />}
-            {currentArt ? 'Replace Image' : 'Upload Image'}
+            disabled={isUploading}
+            className="btn btn-outline" style={{ height: '36px', borderRadius: '8px', padding: '0 16px', fontSize: '13px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            {isUploading ? <div style={{ width: '12px', height: '12px', borderRadius: '50%', border: '2px solid var(--purple-200)', borderTopColor: 'var(--purple-600)', animation: 'spin 1s linear infinite' }}/> : <UploadCloud size={14} />}
+            {isUploading ? 'Uploading...' : currentArt ? 'Replace Image' : 'Upload Image'}
           </button>
+          <input 
+            type="file" 
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            accept="image/jpeg, image/png, image/webp"
+            onChange={handleFileChange}
+          />
         </div>
       </div>
     </div>
@@ -379,12 +381,12 @@ const ShowForm = () => {
     <div style={{ padding: '32px 40px', maxWidth: '1400px', margin: '0 auto', animation: 'fadeIn 0.3s ease' }}>
       
       {/* Header */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-muted)', marginBottom: '8px' }}>
-            <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = 'var(--navy-900)'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-muted)'} onClick={() => navigate('/shows')}>Shows</span>
-            <span>›</span>
-            <span style={{ color: 'var(--navy-900)', fontWeight: '500' }}>{isEditMode ? 'Edit Show' : 'Create Show'}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-muted)' }}>
+            <span style={{ cursor: 'pointer', transition: 'color 0.2s', fontWeight: '500' }} onMouseOver={e => e.currentTarget.style.color = 'var(--navy-900)'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-muted)'} onClick={() => navigate('/shows')}>Shows</span>
+            <span>/</span>
+            <span style={{ color: 'var(--navy-900)', fontWeight: '700' }}>{isEditMode ? 'Edit Show' : 'Create Show'}</span>
           </div>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
@@ -393,15 +395,15 @@ const ShowForm = () => {
               if (isDirty && !window.confirm("You have unsaved changes. Are you sure you want to leave?")) return;
               navigate('/shows');
             }}
-            className="btn" style={{ padding: '0 20px', height: '40px', backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '20px', color: 'var(--navy-900)', fontWeight: '600' }}>
+            className="btn btn-outline" style={{ height: '44px', borderRadius: '12px', padding: '0 20px', fontWeight: '600' }}>
             <ArrowLeft size={16} style={{ marginRight: '6px' }}/> Back to Shows
           </button>
           
           <button 
             onClick={handleSubmit}
             disabled={isSaving || !formData.title || !formData.slug || !formData.section || formData.categories.length === 0}
-            className="btn btn-primary" style={{ padding: '0 24px', height: '40px', borderRadius: '20px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
-            {isSaving && <div style={{ width: '14px', height: '14px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#FFF', animation: 'spin 1s linear infinite' }}/>}
+            className="btn btn-primary" style={{ height: '44px', borderRadius: '12px', padding: '0 28px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
+            {isSaving && <div style={{ width: '16px', height: '16px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#FFF', animation: 'spin 1s linear infinite' }}/>}
             {!isSaving && isSaved && <Check size={16} />}
             {isSaving ? 'Saving...' : isSaved ? 'Saved' : 'Save Show'}
           </button>
@@ -420,8 +422,8 @@ const ShowForm = () => {
         
         {/* LEFT COLUMN: Basic Info */}
         <div>
-          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--navy-900)', marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid var(--border)' }}>
+          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '16px', padding: '28px 32px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--navy-900)', marginBottom: '28px', paddingBottom: '20px', borderBottom: '1px solid var(--border)' }}>
               Basic Information
             </h2>
             
@@ -435,9 +437,9 @@ const ShowForm = () => {
                   value={formData.title} 
                   onChange={e => handleChange('title', e.target.value)}
                   placeholder="Enter a clear and engaging title"
-                  style={{ width: '100%', height: '44px', padding: '0 16px', borderRadius: '12px', border: '1px solid var(--border)', outline: 'none', fontSize: '14px', transition: 'all 0.2s' }}
-                  onFocus={e => e.target.style.border = '2px solid var(--purple-500)'}
-                  onBlur={e => e.target.style.border = '1px solid var(--border)'}
+                  style={{ width: '100%', height: '46px', padding: '0 16px', borderRadius: '12px', border: '1px solid var(--border)', outline: 'none', fontSize: '14px', transition: 'all 0.2s', backgroundColor: '#FFFFFF' }}
+                  onFocus={e => { e.target.style.borderColor = 'var(--purple-500)'; e.target.style.boxShadow = '0 0 0 3px var(--purple-50)'; }}
+                  onBlur={e => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; }}
                 />
               </div>
 
@@ -450,15 +452,15 @@ const ShowForm = () => {
                   value={formData.slug} 
                   onChange={e => handleChange('slug', e.target.value)}
                   placeholder="url-friendly-identifier"
-                  style={{ width: '100%', height: '44px', padding: '0 16px', borderRadius: '12px', border: '1px solid var(--border)', outline: 'none', fontSize: '14px', transition: 'all 0.2s', fontFamily: 'monospace' }}
-                  onFocus={e => e.target.style.border = '2px solid var(--purple-500)'}
-                  onBlur={e => e.target.style.border = '1px solid var(--border)'}
+                  style={{ width: '100%', height: '46px', padding: '0 16px', borderRadius: '12px', border: '1px solid var(--border)', outline: 'none', fontSize: '14px', transition: 'all 0.2s', fontFamily: 'monospace', backgroundColor: '#FFFFFF' }}
+                  onFocus={e => { e.target.style.borderColor = 'var(--purple-500)'; e.target.style.boxShadow = '0 0 0 3px var(--purple-50)'; }}
+                  onBlur={e => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; }}
                 />
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px' }}>Unique identifier used in URLs.</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>Unique identifier used in URLs.</div>
               </div>
             </div>
 
-            <div className="form-group" style={{ marginBottom: '24px' }}>
+            <div className="form-group" style={{ marginBottom: '28px' }}>
               <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
                 Synopsis
               </label>
@@ -466,12 +468,12 @@ const ShowForm = () => {
                 value={formData.synopsis} 
                 onChange={e => handleChange('synopsis', e.target.value)}
                 placeholder="Brief description of the show..."
-                style={{ width: '100%', height: '120px', padding: '12px 16px', borderRadius: '12px', border: '1px solid var(--border)', outline: 'none', fontSize: '14px', transition: 'all 0.2s', resize: 'vertical' }}
-                onFocus={e => e.target.style.border = '2px solid var(--purple-500)'}
-                onBlur={e => e.target.style.border = '1px solid var(--border)'}
+                style={{ width: '100%', height: '140px', padding: '16px', borderRadius: '12px', border: '1px solid var(--border)', outline: 'none', fontSize: '14px', transition: 'all 0.2s', resize: 'vertical', backgroundColor: '#FFFFFF' }}
+                onFocus={e => { e.target.style.borderColor = 'var(--purple-500)'; e.target.style.boxShadow = '0 0 0 3px var(--purple-50)'; }}
+                onBlur={e => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; }}
               />
-              <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px' }}>
-                {formData.synopsis?.length || 0} characters
+              <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>
+                {formData.synopsis?.length || 0} / 500 characters
               </div>
             </div>
 
@@ -496,13 +498,10 @@ const ShowForm = () => {
 
         {/* RIGHT COLUMN: Artwork */}
         <div>
-          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--navy-900)', marginBottom: '12px' }}>
+          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '16px', padding: '28px 32px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--navy-900)', marginBottom: '24px', paddingBottom: '20px', borderBottom: '1px solid var(--border)' }}>
               Show Artwork
             </h2>
-            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '24px', lineHeight: '1.5' }}>
-              Upload images that represent your show. Images are required for publishing.
-            </p>
 
             {!isEditMode ? (
               <div style={{ backgroundColor: '#F8FAFC', border: '1px dashed #CBD5E1', borderRadius: '12px', padding: '32px 20px', textAlign: 'center' }}>
@@ -527,12 +526,15 @@ const ShowForm = () => {
               </div>
             )}
             
-            <div style={{ marginTop: '24px', padding: '16px', backgroundColor: '#F5F3FF', borderRadius: '12px', border: '1px solid #E0E7FF' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--purple-700)', fontWeight: '600', fontSize: '13px', marginBottom: '8px' }}>
-                <AlertCircle size={16} /> Artwork Guidelines
-              </div>
-              <div style={{ fontSize: '12px', color: 'var(--purple-700)', opacity: 0.8, lineHeight: '1.5' }}>
-                Ensure images meet the exact aspect ratio and file size requirements. Format must be JPG, PNG, or WEBP.
+            <div style={{ marginTop: '24px', padding: '16px', backgroundColor: '#F8F9FC', borderRadius: '12px', border: '1px solid #E2E8F0', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+              <AlertCircle size={18} color="var(--purple-600)" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <div>
+                <div style={{ fontWeight: '600', color: 'var(--navy-900)', fontSize: '13px', marginBottom: '4px' }}>
+                  Artwork Guidelines
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                  Ensure images meet the exact aspect ratio and file size requirements. Format must be JPG, PNG, or WEBP.
+                </div>
               </div>
             </div>
             
