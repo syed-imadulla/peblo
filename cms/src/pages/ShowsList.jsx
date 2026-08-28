@@ -163,9 +163,9 @@ const ActionMenu = ({ show, onDeleteClick }) => {
     <div ref={ref} style={{ position: 'relative', display: 'inline-block' }}>
       <button 
         onClick={() => setIsOpen(!isOpen)} 
-        style={{ background: 'transparent', border: isOpen ? '1px solid #0F172A' : '1px solid transparent', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isOpen ? '#0F172A' : '#94A3B8', cursor: 'pointer', transition: 'all 0.2s ease' }}
-        onMouseOver={e => { if(!isOpen) { e.currentTarget.style.border = '1px solid #0F172A'; e.currentTarget.style.color = '#0F172A'; } }}
-        onMouseOut={e => { if(!isOpen) { e.currentTarget.style.border = '1px solid transparent'; e.currentTarget.style.color = '#94A3B8'; } }}
+        style={{ background: isOpen ? '#F5F3FF' : 'transparent', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isOpen ? '#6D28D9' : '#94A3B8', cursor: 'pointer', transition: 'all 0.2s ease' }}
+        onMouseOver={e => { if(!isOpen) { e.currentTarget.style.background = '#F8F9FF'; e.currentTarget.style.color = '#64748B'; } }}
+        onMouseOut={e => { if(!isOpen) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#94A3B8'; } }}
         title="Actions"
       >
         <MoreHorizontal size={14} />
