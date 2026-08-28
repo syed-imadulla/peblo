@@ -95,24 +95,10 @@ const Dashboard = () => {
   // --- Recent Shows (Sorted by created_at) ---
   const recentShows = shows ? [...shows].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5) : [];
 
-  // --- Recent Activity (Synthesized from verifiable timestamps) ---
+  // --- Recent Activity (Derived ONLY from genuine historical records) ---
   const allEvents = [];
-  
-  // Add show creations
-  shows?.forEach(show => {
-    if (show.created_at) {
-      allEvents.push({
-        type: 'show_created',
-        timestamp: new Date(show.created_at),
-        title: `New show "${show.title}" created`,
-        subtitle: `${show.categories?.[0] || 'Show'}`,
-        icon: <Plus size={16} color="var(--purple-700)" strokeWidth={2.5} />,
-        bg: 'var(--purple-100)'
-      });
-    }
-  });
 
-  // Add publish events
+  // Add publish events (genuine audit records)
   history?.forEach(run => {
     if (run.created_at) {
       const isSuccess = run.status === 'success';
@@ -278,8 +264,9 @@ const Dashboard = () => {
           </div>
           
           {recentActivity.length === 0 ? (
-            <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: '14px' }}>
-              No recent activity to display.
+            <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--text-muted)' }}>
+              <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--navy-900)', marginBottom: '4px' }}>No activity history available</div>
+              <div style={{ fontSize: '13px' }}>Activity will appear here when recorded by the system.</div>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
