@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { 
   Film, PlaySquare, FileText, AlertTriangle, 
   CheckCircle, Tv, UploadCloud, Plus, 
-  Bell, ChevronDown, Clock, Image, Settings
+  Bell, ChevronDown, ChevronRight, Clock, Image, Settings
 } from 'lucide-react';
 
 const fetchShows = async () => {
@@ -147,12 +147,15 @@ const Dashboard = () => {
   );
 
   const QuickAction = ({ title, desc, icon: Icon, color, linkTo, bgColor }) => (
-    <Link to={linkTo} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: bgColor, borderRadius: 'var(--radius-lg)', padding: '20px 16px', textAlign: 'center', transition: 'transform 0.2s', textDecoration: 'none', flex: 1, minWidth: '130px' }} className="hover-scale">
-      <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-        <Icon size={18} color={color} strokeWidth={2.5} />
+    <Link to={linkTo} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', backgroundColor: bgColor, borderRadius: '16px', padding: '24px', transition: 'transform 0.2s', textDecoration: 'none', flex: 1, minWidth: '150px' }} className="hover-scale">
+      <div style={{ marginBottom: '16px', color: color }}>
+        <Icon size={24} strokeWidth={2} />
       </div>
-      <div style={{ fontWeight: '700', color: 'var(--navy-900)', fontSize: '14px', marginBottom: '4px' }}>{title}</div>
-      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{desc}</div>
+      <div style={{ fontWeight: '700', color: 'var(--navy-900)', fontSize: '15px', marginBottom: '4px' }}>{title}</div>
+      <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px', lineHeight: '1.4', flex: 1 }}>{desc}</div>
+      <div style={{ marginTop: 'auto', alignSelf: 'flex-end', color: color }}>
+        <ChevronRight size={18} strokeWidth={2.5} />
+      </div>
     </Link>
   );
 
@@ -173,7 +176,7 @@ const Dashboard = () => {
     <div>
       <style>{`
         .hover-scale:hover { transform: translateY(-2px); }
-        .kpi-row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 24px; }
+        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 24px; }
         .main-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
         .bottom-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
         
@@ -193,12 +196,11 @@ const Dashboard = () => {
 
       {/* Header handled by Layout */}
       
-      {/* 5 KPI Cards */}
+      {/* 4 KPI Cards */}
       <div className="kpi-row">
         <StatCard value={totalShows} title="Total Shows" subtitle={`${publishedShows} Published • ${draftShows} Draft`} icon={Tv} color="var(--purple-700)" bgColor="var(--purple-50)" />
         <StatCard value={totalEpisodes} title="Total Episodes" subtitle={`${publishedEpisodes} Published • ${draftEpisodes} Draft`} icon={PlaySquare} color="var(--green-500)" bgColor="var(--green-50)" />
-        <StatCard value={validationIssues} title="Validation Issues" subtitle="Need your attention" icon={AlertTriangle} color="var(--amber-500)" bgColor="var(--amber-50)" />
-        <StatCard value={languages.size} title="Languages" subtitle={Array.from(languages).slice(0,3).join(', ') || 'None'} icon={FileText} color="var(--blue-500)" bgColor="var(--blue-50)" />
+        <StatCard value={validationIssues} title="Validation Issues" subtitle="Blocking publish" icon={AlertTriangle} color="var(--amber-500)" bgColor="var(--amber-50)" />
         <StatCard value={publishRuns} title="Publish Runs" subtitle={lastPublish ? `Last: ${safeFormatDate(lastPublish.created_at)}` : 'Never published'} icon={UploadCloud} color="var(--purple-700)" bgColor="var(--purple-50)" />
       </div>
 
@@ -325,17 +327,17 @@ const Dashboard = () => {
               
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Tv size={16} color="var(--purple-700)" />
+                  <Tv size={20} color="var(--purple-700)" />
                   <div>
-                    <div style={{ fontSize: '16px', fontWeight: '800', color: 'var(--navy-900)', lineHeight: '1' }}>{lastPublish.published_records || 0}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Shows</div>
+                    <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--navy-900)', lineHeight: '1' }}>{lastPublish.published_records || 0}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Shows</div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <AlertTriangle size={16} color="var(--amber-500)" />
+                  <AlertTriangle size={20} color="var(--amber-500)" />
                   <div>
-                    <div style={{ fontSize: '16px', fontWeight: '800', color: 'var(--navy-900)', lineHeight: '1' }}>{lastPublish.blocked_records || 0}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Blocked</div>
+                    <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--navy-900)', lineHeight: '1' }}>{lastPublish.blocked_records || 0}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Blocked</div>
                   </div>
                 </div>
               </div>
