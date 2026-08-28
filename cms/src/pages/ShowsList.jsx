@@ -186,7 +186,7 @@ const ActionMenu = ({ show, onDeleteClick }) => {
         <MoreHorizontal size={14} />
       </button>
       {isOpen && (
-        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0, width: '160px', backgroundColor: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', zIndex: 50, padding: '6px' }}>
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0, width: '160px', backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', zIndex: 50, padding: '6px' }}>
           <button 
             onClick={() => { setIsOpen(false); navigate(`/shows/${show.id}/edit`); }}
             style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', backgroundColor: 'transparent', border: 'none', color: 'var(--navy-900)', fontSize: '13px', fontWeight: '500', cursor: 'pointer', textAlign: 'left', marginBottom: '2px' }}
@@ -213,7 +213,7 @@ const DeleteModal = ({ show, onClose, onConfirm, isDeleting }) => {
   if (!show) return null;
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }}>
-      <div style={{ backgroundColor: 'var(--white)', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '400px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+      <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '400px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
         <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#FEF2F2', color: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
           <AlertTriangle size={24} />
         </div>
@@ -222,7 +222,7 @@ const DeleteModal = ({ show, onClose, onConfirm, isDeleting }) => {
           Are you sure you want to delete <strong>{show.title}</strong>? This will permanently remove the show and all its episodes. This action cannot be undone.
         </p>
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-          <button onClick={onClose} disabled={isDeleting} style={{ padding: '10px 16px', borderRadius: '10px', border: '1px solid var(--border)', backgroundColor: 'var(--white)', color: 'var(--navy-900)', fontSize: '14px', fontWeight: '600', cursor: isDeleting ? 'not-allowed' : 'pointer' }}>Cancel</button>
+          <button onClick={onClose} disabled={isDeleting} style={{ padding: '10px 16px', borderRadius: '10px', border: '1px solid var(--border)', backgroundColor: '#FFFFFF', color: 'var(--navy-900)', fontSize: '14px', fontWeight: '600', cursor: isDeleting ? 'not-allowed' : 'pointer' }}>Cancel</button>
           <button onClick={onConfirm} disabled={isDeleting} style={{ padding: '10px 16px', borderRadius: '10px', border: 'none', backgroundColor: '#DC2626', color: 'white', fontSize: '14px', fontWeight: '600', cursor: isDeleting ? 'not-allowed' : 'pointer', opacity: isDeleting ? 0.7 : 1 }}>
             {isDeleting ? 'Deleting...' : 'Delete Show'}
           </button>
@@ -452,7 +452,7 @@ const ShowsList = () => {
               <>
                 <h3 style={{ color: 'var(--navy-900)', marginBottom: '8px', fontSize: '16px', fontWeight: '700' }}>No shows found</h3>
                 <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '24px' }}>Try adjusting your search or filters.</p>
-                <button onClick={clearFilters} style={{ padding: '10px 24px', borderRadius: '12px', border: '1px solid var(--border)', backgroundColor: 'var(--white)', color: 'var(--navy-900)', fontSize: '14px', fontWeight: '600', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}>
+                <button onClick={clearFilters} style={{ padding: '10px 24px', borderRadius: '12px', border: '1px solid var(--border)', backgroundColor: '#FFFFFF', color: 'var(--navy-900)', fontSize: '14px', fontWeight: '600', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}>
                   Clear Filters
                 </button>
               </>

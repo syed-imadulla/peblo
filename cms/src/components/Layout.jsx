@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
-import { LayoutDashboard, Film, UploadCloud, LogOut, FileText, Menu, X, PlaySquare, History, Bell, Plus } from 'lucide-react';
+import { LayoutDashboard, Film, UploadCloud, LogOut, FileText, Menu, X, PlaySquare, History, Plus } from 'lucide-react';
 
 const Layout = () => {
   const { user, logout } = useAuth();
@@ -160,10 +160,7 @@ const Layout = () => {
               </div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '24px' }}>
-              <div style={{ position: 'relative', cursor: 'pointer', color: 'var(--purple-700)', backgroundColor: '#FFFFFF', padding: '10px', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>
-                <Bell size={20} />
-                <span style={{ position: 'absolute', top: '0px', right: '0px', backgroundColor: 'var(--purple-700)', color: 'white', fontSize: '10px', fontWeight: 'bold', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid white' }}>3</span>
-              </div>
+
               {location.pathname.startsWith('/shows') && (
                 <button 
                   onClick={() => navigate('/shows/new')}
