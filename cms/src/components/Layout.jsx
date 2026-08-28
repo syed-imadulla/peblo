@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
 import { LayoutDashboard, Film, UploadCloud, LogOut, FileText, Menu, X, PlaySquare, History, Bell, Plus } from 'lucide-react';
 
@@ -7,6 +7,7 @@ const Layout = () => {
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -162,9 +163,14 @@ const Layout = () => {
               <Bell size={20} />
               <span style={{ position: 'absolute', top: '0px', right: '0px', backgroundColor: 'var(--purple-700)', color: 'white', fontSize: '10px', fontWeight: 'bold', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid white' }}>3</span>
             </div>
-            <button className="btn btn-primary" style={{ padding: '0 24px', borderRadius: '22px', height: '44px' }}>
-              <Plus size={18} /> Create New
-            </button>
+            {location.pathname.startsWith('/shows') && !location.pathname.includes('/new') && !location.pathname.includes('/edit') && (
+              <button 
+                onClick={() => navigate('/shows/new')}
+                className="btn btn-primary" style={{ padding: '0 24px', borderRadius: '22px', height: '44px' }}
+              >
+                <Plus size={18} /> Create New
+              </button>
+            )}
           </div>
         </header>
         <main style={{ flex: 1, padding: '32px', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>

@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ShowsList from './pages/ShowsList';
+import ShowForm from './pages/ShowForm';
 import EpisodesList from './pages/EpisodesList';
 import Validation from './pages/Validation';
 import Publish from './pages/Publish';
@@ -26,6 +27,8 @@ const AppRoutes = () => {
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="shows" element={<ShowsList />} />
+        <Route path="shows/new" element={<ShowForm />} />
+        <Route path="shows/:id/edit" element={<ShowForm />} />
         <Route path="episodes" element={<EpisodesList />} />
         <Route path="validation" element={<Validation />} />
         <Route path="publish" element={<Publish />} />

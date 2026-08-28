@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Search, MoreHorizontal, ChevronLeft, ChevronRight, ChevronDown, Image as ImageIcon, X, Trash2, Check, AlertTriangle } from 'lucide-react';
@@ -150,6 +151,7 @@ const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix,
 const ActionMenu = ({ show, onDeleteClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -186,12 +188,20 @@ const ActionMenu = ({ show, onDeleteClick }) => {
       {isOpen && (
         <div style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0, width: '160px', backgroundColor: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', zIndex: 50, padding: '6px' }}>
           <button 
+            onClick={() => { setIsOpen(false); navigate(`/shows/${show.id}/edit`); }}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', backgroundColor: 'transparent', border: 'none', color: 'var(--navy-900)', fontSize: '13px', fontWeight: '500', cursor: 'pointer', textAlign: 'left', marginBottom: '2px' }}
+            onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--gray-100)'}
+            onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            Edit Show
+          </button>
+          <button 
             onClick={() => { setIsOpen(false); onDeleteClick(show); }}
             style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', backgroundColor: 'transparent', border: 'none', color: '#DC2626', fontSize: '13px', fontWeight: '500', cursor: 'pointer', textAlign: 'left' }}
             onMouseOver={e => e.currentTarget.style.backgroundColor = '#FEF2F2'}
             onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            <Trash2 size={14} /> Delete Show
+            <Trash2 size={14} /> Delete
           </button>
         </div>
       )}
