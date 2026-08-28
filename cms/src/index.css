@@ -160,9 +160,9 @@ h1 { font-size: 28px; letter-spacing: -0.5px; }
 
 .form-control {
   width: 100%;
-  height: 46px;
+  height: 40px;
   padding: 0 16px;
-  border-radius: 12px;
+  border-radius: 8px;
   border: 1px solid #CBD5E1;
   background-color: #FFFFFF;
   font-family: inherit;

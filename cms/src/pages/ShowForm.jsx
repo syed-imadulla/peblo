@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { ArrowLeft, ChevronDown, Check, X, Image as ImageIcon, UploadCloud, Trash2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Check, X, Image as ImageIcon, UploadCloud, AlertCircle, Info, Lock } from 'lucide-react';
 
 const SECTIONS = ['Featured', 'Series', 'Minisodes', 'Songs'];
 const CATEGORIES = ['Adventure', 'Folk', 'Friendship', 'India', 'Language', 'Learning', 'Maths', 'Music', 'Nature', 'Reading', 'Science', 'Singalong', 'Stories', 'Travel', 'Vocabulary'];
 
 // Custom Dropdown Component
-const CustomDropdown = ({ value, options, onChange, label, placeholder }) => {
+const CustomDropdown = ({ value, options, onChange, label, placeholder, helperText }) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
 
@@ -21,7 +21,7 @@ const CustomDropdown = ({ value, options, onChange, label, placeholder }) => {
   }, []);
 
   return (
-    <div className="form-group" style={{ marginBottom: '20px', position: 'relative' }} ref={ref}>
+    <div className="form-group" style={{ position: 'relative' }} ref={ref}>
       <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
         {label} <span style={{ color: '#DC2626' }}>*</span>
       </label>
@@ -45,7 +45,7 @@ const CustomDropdown = ({ value, options, onChange, label, placeholder }) => {
       
       {isOpen && (
         <div className="custom-scrollbar" style={{
-          position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, backgroundColor: '#FFFFFF', border: '1px solid #CBD5E1', 
+          position: 'absolute', top: 'calc(100% - 10px)', left: 0, right: 0, backgroundColor: '#FFFFFF', border: '1px solid #CBD5E1', 
           borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 50, padding: '6px', maxHeight: '200px', overflowY: 'auto'
         }}>
           {options.map(opt => (
@@ -66,12 +66,13 @@ const CustomDropdown = ({ value, options, onChange, label, placeholder }) => {
           ))}
         </div>
       )}
+      {helperText && <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>{helperText}</div>}
     </div>
   );
 };
 
 // Custom Multi-Select Component
-const MultiSelect = ({ selected, options, onChange, label }) => {
+const MultiSelect = ({ selected, options, onChange, label, helperText }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const ref = useRef(null);
@@ -95,7 +96,7 @@ const MultiSelect = ({ selected, options, onChange, label }) => {
   };
 
   return (
-    <div className="form-group" style={{ marginBottom: '20px', position: 'relative' }} ref={ref}>
+    <div className="form-group" style={{ position: 'relative' }} ref={ref}>
       <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
         {label} <span style={{ color: '#DC2626' }}>*</span>
       </label>
@@ -134,7 +135,7 @@ const MultiSelect = ({ selected, options, onChange, label }) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={selected.length === 0 ? "Select categories..." : ""}
-          style={{ border: 'none', outline: 'none', flex: 1, minWidth: '120px', fontSize: '14px', background: 'transparent' }}
+          style={{ border: 'none', outline: 'none', flex: 1, minWidth: '120px', fontSize: '14px', background: 'transparent', color: 'var(--navy-900)' }}
         />
         
         <ChevronDown size={16} color="var(--text-muted)" style={{ position: 'absolute', right: '16px', top: '14px', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
@@ -170,6 +171,7 @@ const MultiSelect = ({ selected, options, onChange, label }) => {
           )}
         </div>
       )}
+      {helperText && <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>{helperText}</div>}
     </div>
   );
 };
@@ -218,49 +220,54 @@ const ArtworkUploadCard = ({ type, aspectText, width, height, maxKb, showId, exi
 
   return (
     <div style={{ 
-      display: 'flex', gap: '24px', padding: '24px', backgroundColor: '#FAFAFC', border: '1px solid #E2E8F0', 
-      borderRadius: '14px', marginBottom: '16px', alignItems: 'center', transition: 'all 0.2s', opacity: isDisabled ? 0.7 : 1 
-    }}
-         onMouseEnter={e => !isDisabled && (e.currentTarget.style.borderColor = '#CBD5E1')}
-         onMouseLeave={e => !isDisabled && (e.currentTarget.style.borderColor = '#E2E8F0')}>
-      {/* Preview Area */}
+      display: 'flex', padding: '16px', backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', 
+      borderRadius: '12px', marginBottom: '16px', gap: '16px', transition: 'border-color 0.2s' 
+    }}>
+      {/* Left Box (Preview) */}
       <div style={{ 
-        width: type === 'Poster' ? '120px' : '160px', 
-        height: type === 'Poster' ? '180px' : '90px', 
-        backgroundColor: '#F1F5F9', borderRadius: '8px', 
-        display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid #E2E8F0', flexShrink: 0
+        width: type === 'Poster' ? '72px' : '112px', 
+        height: type === 'Poster' ? '108px' : '63px', 
+        backgroundColor: '#F8FAFC', borderRadius: '8px', 
+        display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px dashed #CBD5E1', flexShrink: 0,
+        position: 'relative'
       }}>
         {currentArt ? (
           <img src={currentArt.url} alt={type} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
-          <ImageIcon size={28} color="#94A3B8" />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#94A3B8' }}>
+            <ImageIcon size={type === 'Poster' ? 20 : 18} style={{ marginBottom: type === 'Poster' ? '6px' : '2px' }} />
+            <span style={{ fontSize: '11px', fontWeight: '600' }}>{aspectText}</span>
+          </div>
         )}
       </div>
       
-      {/* Details & Action */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-          <div style={{ fontWeight: '600', color: 'var(--navy-900)', fontSize: '15px' }}>
-            {type} <span style={{ color: 'var(--text-muted)', fontWeight: '400', fontSize: '13px' }}>({aspectText})</span>
-          </div>
-          {currentArt && <span style={{ backgroundColor: '#DCFCE7', color: '#15803D', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '600', border: '1px solid #BBF7D0' }}>Uploaded</span>}
+      {/* Right Details */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+        <div style={{ fontWeight: '600', color: 'var(--navy-900)', fontSize: '14px', marginBottom: '4px' }}>
+          {type} <span style={{ color: 'var(--text-muted)', fontWeight: '400', fontSize: '13px' }}>({aspectText})</span>
         </div>
-        
-        <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px', lineHeight: '1.5' }}>
+        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }}>
           {width} × {height} px • Max {maxKb} KB
         </div>
         
-        {error && <div style={{ color: '#DC2626', fontSize: '12px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}><AlertCircle size={14}/> {error}</div>}
+        {error && <div style={{ color: '#DC2626', fontSize: '12px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}><AlertCircle size={14}/> {error}</div>}
         
-        <div>
+        <div style={{ marginTop: 'auto' }}>
           <button 
             type="button"
             onClick={() => !isDisabled && fileInputRef.current?.click()}
             disabled={isUploading || isDisabled}
-            className="btn btn-outline" style={{ height: '36px', borderRadius: '8px', padding: '0 16px', fontSize: '13px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: isDisabled ? 'not-allowed' : 'pointer', opacity: isDisabled ? 0.7 : 1, whiteSpace: 'nowrap', flexShrink: 0 }}>
-            {isUploading ? <div style={{ width: '12px', height: '12px', borderRadius: '50%', border: '2px solid var(--purple-200)', borderTopColor: 'var(--purple-600)', animation: 'spin 1s linear infinite' }}/> : <UploadCloud size={14} />}
+            className="btn btn-outline" style={{ height: '32px', borderRadius: '6px', padding: '0 12px', fontSize: '12px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: isDisabled ? 'not-allowed' : 'pointer', opacity: isDisabled ? 0.6 : 1, width: 'fit-content' }}>
+            {isUploading ? <div style={{ width: '12px', height: '12px', borderRadius: '50%', border: '2px solid var(--navy-200)', borderTopColor: 'var(--navy-600)', animation: 'spin 1s linear infinite' }}/> : <UploadCloud size={14} />}
             {isUploading ? 'Uploading...' : currentArt ? 'Replace Image' : 'Upload Image'}
           </button>
+          
+          {isDisabled && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '10px', color: 'var(--purple-700)', fontSize: '11px', fontWeight: '600' }}>
+              <Lock size={12} /> Save show to enable uploads
+            </div>
+          )}
+
           {!isDisabled && (
             <input 
               type="file" 
@@ -290,7 +297,13 @@ const ShowForm = () => {
     slug: '',
     synopsis: '',
     section: '',
-    categories: []
+    categories: [],
+    primaryLanguage: 'English',
+    showType: 'Series',
+    status: 'Draft',
+    releaseYear: '',
+    ageGroup: '',
+    tags: ''
   });
   
   const [isDirty, setIsDirty] = useState(false);
@@ -309,7 +322,13 @@ const ShowForm = () => {
         slug: data.slug || '',
         synopsis: data.synopsis || '',
         section: data.section || '',
-        categories: data.categories || []
+        categories: data.categories || [],
+        primaryLanguage: 'English',
+        showType: 'Series',
+        status: 'Draft',
+        releaseYear: '',
+        ageGroup: '',
+        tags: ''
       });
       setIsDirty(false);
     }
@@ -384,32 +403,42 @@ const ShowForm = () => {
     <div style={{ padding: '32px 40px', maxWidth: '1400px', margin: '0 auto', animation: 'fadeIn 0.3s ease' }}>
       
       {/* Header */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-muted)' }}>
-            <span style={{ cursor: 'pointer', transition: 'color 0.2s', fontWeight: '500' }} onMouseOver={e => e.currentTarget.style.color = 'var(--navy-900)'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-muted)'} onClick={() => navigate('/shows')}>Shows</span>
-            <span>/</span>
-            <span style={{ color: 'var(--navy-900)', fontWeight: '700' }}>{isEditMode ? 'Edit Show' : 'Create Show'}</span>
-          </div>
+      <div style={{ marginBottom: '32px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
+          <span style={{ cursor: 'pointer', transition: 'color 0.2s', fontWeight: '500' }} onMouseOver={e => e.currentTarget.style.color = 'var(--navy-900)'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-muted)'} onClick={() => navigate('/shows')}>Shows</span>
+          <span>&gt;</span>
+          <span style={{ color: 'var(--navy-900)', fontWeight: '600' }}>{isEditMode ? 'Edit Show' : 'Create New Show'}</span>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button 
-            onClick={() => {
-              if (isDirty && !window.confirm("You have unsaved changes. Are you sure you want to leave?")) return;
-              navigate('/shows');
-            }}
-            className="btn btn-outline" style={{ height: '44px', borderRadius: '12px', padding: '0 20px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--navy-900)', border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF' }}>
-            <ArrowLeft size={16} /> Back to Shows
-          </button>
+        
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+          <div>
+            <h1 style={{ fontSize: '28px', fontWeight: '800', color: 'var(--navy-900)', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
+              {isEditMode ? 'Edit Show' : 'Create New Show'}
+            </h1>
+            <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
+              {isEditMode ? "Update the show's information and artwork." : "Add a new show to your library. All fields marked with * are required."}
+            </div>
+          </div>
           
-          <button 
-            onClick={handleSubmit}
-            disabled={isSaving || !formData.title || !formData.slug || !formData.section || formData.categories.length === 0}
-            className="btn btn-primary" style={{ height: '44px', borderRadius: '12px', padding: '0 24px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s', backgroundColor: 'var(--purple-500)', border: 'none', color: '#FFF' }}>
-            {isSaving && <div style={{ width: '16px', height: '16px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#FFF', animation: 'spin 1s linear infinite' }}/>}
-            {!isSaving && isSaved && <Check size={16} />}
-            {isSaving ? 'Saving...' : isSaved ? 'Saved' : 'Save Show'}
-          </button>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <button 
+              onClick={() => {
+                if (isDirty && !window.confirm("You have unsaved changes. Are you sure you want to leave?")) return;
+                navigate('/shows');
+              }}
+              className="btn btn-outline" style={{ height: '44px', borderRadius: '12px', padding: '0 20px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--navy-900)', border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF' }}>
+              <ArrowLeft size={16} /> Back to Shows
+            </button>
+            
+            <button 
+              onClick={handleSubmit}
+              disabled={isSaving || !formData.title || !formData.slug || !formData.section || formData.categories.length === 0}
+              className="btn btn-primary" style={{ height: '44px', borderRadius: '12px', padding: '0 24px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s', backgroundColor: 'var(--purple-500)', border: 'none', color: '#FFF' }}>
+              {isSaving && <div style={{ width: '16px', height: '16px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#FFF', animation: 'spin 1s linear infinite' }}/>}
+              {!isSaving && isSaved && <Check size={16} />}
+              {isSaving ? 'Saving...' : isSaved ? 'Saved' : 'Save Show'}
+            </button>
+          </div>
         </div>
       </div>
       
@@ -425,13 +454,16 @@ const ShowForm = () => {
         
         {/* LEFT COLUMN: Basic Info */}
         <div>
-          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', boxShadow: 'var(--shadow-sm)' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--navy-900)', marginBottom: '28px', paddingBottom: '20px', borderBottom: '1px solid var(--border)' }}>
-              Basic Information
-            </h2>
+          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '32px', boxShadow: 'var(--shadow-sm)', height: '100%', display: 'flex', flexDirection: 'column', gap: '24px', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Info size={18} color="var(--purple-700)" />
+              <h2 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--navy-900)', margin: 0 }}>
+                Basic Information
+              </h2>
+            </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-              <div className="form-group" style={{ marginBottom: '20px' }}>
+            <div className="grid-cols-2" style={{ display: 'grid', gap: '24px' }}>
+              <div className="form-group">
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
                   Show Title <span style={{ color: '#DC2626' }}>*</span>
                 </label>
@@ -440,11 +472,12 @@ const ShowForm = () => {
                   className="form-control"
                   value={formData.title} 
                   onChange={e => handleChange('title', e.target.value)}
-                  placeholder="Enter a clear and engaging title"
+                  placeholder="Enter show title"
                 />
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>Enter a clear and engaging title for the show.</div>
               </div>
 
-              <div className="form-group" style={{ marginBottom: '20px' }}>
+              <div className="form-group">
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
                   Slug <span style={{ color: '#DC2626' }}>*</span>
                 </label>
@@ -453,108 +486,112 @@ const ShowForm = () => {
                   className="form-control"
                   value={formData.slug} 
                   onChange={e => handleChange('slug', e.target.value)}
-                  placeholder="url-friendly-identifier"
+                  placeholder="show-slug"
                   style={{ fontFamily: 'monospace' }}
                 />
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>Unique identifier used in URLs.</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>URL friendly unique identifier (auto-generated recommended).</div>
               </div>
             </div>
 
-            <div className="form-group" style={{ marginBottom: '28px' }}>
+            <div className="form-group">
               <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
-                Synopsis
+                Synopsis <span style={{ color: '#DC2626' }}>*</span>
               </label>
               <textarea 
                 className="form-control"
                 value={formData.synopsis} 
                 onChange={e => handleChange('synopsis', e.target.value)}
-                placeholder="Brief description of the show..."
+                placeholder="Write a brief synopsis about your show..."
               />
-              <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>
-                {formData.synopsis?.length || 0} / 500 characters
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>
+                <span>Brief description of what the show is about.</span>
+                <span>{formData.synopsis?.length || 0} / 500</span>
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-              <MultiSelect 
-                label="Categories"
-                selected={formData.categories}
-                options={CATEGORIES}
-                onChange={val => handleChange('categories', val)}
-              />
+            <div className="grid-cols-3" style={{ display: 'grid', gap: '24px' }}>
               <CustomDropdown 
-                label="Section"
-                placeholder="Select a section"
+                label="Section *"
+                placeholder="Select section"
                 value={formData.section}
                 options={SECTIONS}
                 onChange={val => handleChange('section', val)}
+                helperText="Where this show will appear."
               />
+              
+              <CustomDropdown 
+                label="Primary Language"
+                placeholder="Select language"
+                value={formData.primaryLanguage}
+                options={['English', 'Spanish', 'French', 'German', 'Japanese']}
+                onChange={val => handleChange('primaryLanguage', val)}
+                helperText="Default audio track language."
+              />
+
+              <div className="form-group">
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
+                  Show Type
+                </label>
+                <div style={{ display: 'flex', backgroundColor: '#F8FAFC', borderRadius: '8px', padding: '4px', height: '40px', border: '1px solid #CBD5E1' }}>
+                  <div 
+                    onClick={() => handleChange('showType', 'Series')}
+                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '600', borderRadius: '4px', cursor: 'pointer', backgroundColor: formData.showType === 'Series' ? 'var(--purple-50)' : 'transparent', color: formData.showType === 'Series' ? 'var(--purple-700)' : 'var(--navy-900)' }}>
+                    Series
+                  </div>
+                  <div 
+                    onClick={() => handleChange('showType', 'Minisodes')}
+                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '600', borderRadius: '4px', cursor: 'pointer', backgroundColor: formData.showType === 'Minisodes' ? 'var(--purple-50)' : 'transparent', color: formData.showType === 'Minisodes' ? 'var(--purple-700)' : 'var(--navy-900)' }}>
+                    Minisodes
+                  </div>
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>Choose the format of this show.</div>
+              </div>
             </div>
-            
-          </div>
-          
-          {/* Additional Details */}
-          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', boxShadow: 'var(--shadow-sm)', marginTop: '24px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--navy-900)', marginBottom: '8px' }}>
-              Additional Details <span style={{ color: 'var(--text-muted)', fontSize: '14px', fontWeight: '400' }}>(Optional)</span>
-            </h2>
-            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '24px' }}>System metadata generated by the CMS.</div>
-            
-            {isEditMode ? (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                <div className="form-group">
-                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
-                    Show ID
-                  </label>
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    value={show?.id || ''} 
-                    readOnly 
-                    style={{ backgroundColor: '#FAFAFC', color: 'var(--text-muted)', cursor: 'not-allowed', fontFamily: 'monospace', fontSize: '13px' }} 
-                  />
+
+            <div className="grid-cols-2" style={{ display: 'grid', gap: '24px' }}>
+              <MultiSelect 
+                label="Categories *"
+                selected={formData.categories}
+                options={CATEGORIES}
+                onChange={val => handleChange('categories', val)}
+                helperText="Select one or more categories."
+              />
+
+              <div className="form-group">
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
+                  Status <span style={{ color: '#DC2626' }}>*</span>
+                </label>
+                <div style={{ display: 'flex', backgroundColor: '#F8FAFC', borderRadius: '8px', padding: '4px', height: '40px', border: '1px solid #CBD5E1' }}>
+                  {['Draft', 'Review', 'Published'].map(s => (
+                    <div 
+                      key={s}
+                      onClick={() => handleChange('status', s)}
+                      style={{ 
+                        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '600', borderRadius: '4px', cursor: 'pointer', 
+                        backgroundColor: formData.status === s ? (s === 'Draft' ? '#FFEDD5' : s === 'Review' ? '#E0F2FE' : '#DCFCE7') : 'transparent', 
+                        color: formData.status === s ? (s === 'Draft' ? '#C2410C' : s === 'Review' ? '#0369A1' : '#15803D') : 'var(--navy-900)',
+                        boxShadow: formData.status === s ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
+                      }}>
+                      {s === 'Draft' ? <span style={{marginRight: '6px', fontSize: '16px', lineHeight: 1}}>•</span> : null} 
+                      {s}
+                    </div>
+                  ))}
                 </div>
-                <div className="form-group">
-                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
-                    Created At
-                  </label>
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    value={show?.created_at ? new Date(show.created_at).toLocaleString() : ''} 
-                    readOnly 
-                    style={{ backgroundColor: '#FAFAFC', color: 'var(--text-muted)', cursor: 'not-allowed', fontSize: '13px' }} 
-                  />
-                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>Only published shows are visible to viewers.</div>
               </div>
-            ) : (
-              <div style={{ padding: '24px', backgroundColor: '#FAFAFC', border: '1px dashed #CBD5E1', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-                  System properties such as ID and Creation Date will be generated automatically after you save the show.
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         </div>
 
         {/* RIGHT COLUMN: Artwork */}
         <div>
-          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', boxShadow: 'var(--shadow-sm)' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--navy-900)', marginBottom: '24px', paddingBottom: '20px', borderBottom: '1px solid var(--border)' }}>
+          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '32px', boxShadow: 'var(--shadow-sm)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--navy-900)', marginBottom: '8px', marginTop: 0 }}>
               Show Artwork
             </h2>
-
-            {!isEditMode && (
-              <div style={{ marginBottom: '24px', backgroundColor: '#FAFAFC', border: '1px dashed #CBD5E1', borderRadius: '12px', padding: '20px', display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <ImageIcon size={20} color="#94A3B8" />
-                </div>
-                <div>
-                  <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--navy-900)', marginBottom: '4px' }}>Save Show First</div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Save the basic show information to enable artwork uploads.</div>
-                </div>
-              </div>
-            )}
+            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '24px', lineHeight: '1.5' }}>
+              Upload images that represent your show.<br/>Images are required for publishing.
+            </div>
 
             <div>
               <ArtworkUploadCard 
@@ -571,14 +608,16 @@ const ShowForm = () => {
               />
             </div>
             
-            <div style={{ marginTop: '24px', padding: '16px', backgroundColor: 'var(--purple-50)', borderRadius: '12px', border: '1px solid var(--purple-100)', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-              <AlertCircle size={18} color="var(--purple-700)" style={{ flexShrink: 0, marginTop: '2px' }} />
-              <div>
-                <div style={{ fontWeight: '600', color: 'var(--purple-700)', fontSize: '13px', marginBottom: '4px' }}>
-                  Artwork Guidelines
-                </div>
-                <div style={{ fontSize: '12px', color: 'var(--purple-700)', opacity: 0.8, lineHeight: '1.5' }}>
-                  Ensure images meet the exact aspect ratio and file size requirements. Format must be JPG, PNG, or WEBP.
+            <div style={{ marginTop: 'auto', paddingTop: '24px' }}>
+              <div style={{ padding: '16px', backgroundColor: 'var(--purple-50)', borderRadius: '12px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                <Info size={18} color="var(--purple-700)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                <div>
+                  <div style={{ fontWeight: '600', color: 'var(--purple-700)', fontSize: '13px', marginBottom: '4px' }}>
+                    Artwork Guidelines
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--purple-700)', opacity: 0.8, lineHeight: '1.5' }}>
+                    Ensure images meet the exact aspect ratio and file size requirements. Format must be JPG, PNG, or WEBP.
+                  </div>
                 </div>
               </div>
             </div>
