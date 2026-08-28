@@ -142,11 +142,10 @@ const Layout = () => {
             <div style={{ fontWeight: '800', fontSize: '28px', color: 'var(--navy-900)', display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '-0.5px' }}>
               {location.pathname === '/dashboard' ? 'Good morning, Admin! 👋' : getPageTitle()}
             </div>
-            {location.pathname === '/dashboard' && (
-              <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                Here's what's happening with your content today.
-              </div>
-            )}
+            <div style={{ color: 'var(--text-muted)', fontSize: '15px' }}>
+              {location.pathname === '/dashboard' ? 'Here\'s what\'s happening with your content today.' : 
+               location.pathname.startsWith('/shows') ? 'Manage and organize all your shows in the library.' : ''}
+            </div>
           </div>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '24px' }}>
             <div style={{ position: 'relative', cursor: 'pointer', color: 'var(--purple-700)', backgroundColor: '#FFFFFF', padding: '10px', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>
