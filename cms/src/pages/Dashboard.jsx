@@ -147,14 +147,16 @@ const Dashboard = () => {
   );
 
   const QuickAction = ({ title, desc, icon: Icon, color, linkTo, bgColor }) => (
-    <Link to={linkTo} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', backgroundColor: bgColor, borderRadius: '16px', padding: '24px', transition: 'transform 0.2s', textDecoration: 'none', flex: 1, minWidth: '150px' }} className="hover-scale">
-      <div style={{ marginBottom: '16px', color: color }}>
+    <Link to={linkTo} style={{ display: 'flex', alignItems: 'center', gap: '16px', backgroundColor: bgColor, borderRadius: '12px', padding: '16px', transition: 'transform 0.2s, box-shadow 0.2s', textDecoration: 'none', flex: '1 1 calc(50% - 16px)', minWidth: '200px' }} className="hover-scale">
+      <div style={{ color: color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Icon size={24} strokeWidth={2} />
       </div>
-      <div style={{ fontWeight: '700', color: 'var(--navy-900)', fontSize: '15px', marginBottom: '4px' }}>{title}</div>
-      <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px', lineHeight: '1.4', flex: 1 }}>{desc}</div>
-      <div style={{ marginTop: 'auto', alignSelf: 'flex-end', color: color }}>
-        <ChevronRight size={18} strokeWidth={2.5} />
+      <div style={{ flex: 1 }}>
+        <div style={{ fontWeight: '600', color: 'var(--navy-900)', fontSize: '14px', marginBottom: '2px' }}>{title}</div>
+        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{desc}</div>
+      </div>
+      <div style={{ color: color }}>
+        <ChevronRight size={18} strokeWidth={2} />
       </div>
     </Link>
   );
@@ -181,7 +183,7 @@ const Dashboard = () => {
         .bottom-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
         
         .card-header { display: flex; justifyContent: space-between; align-items: center; margin-bottom: 20px; }
-        .card-title { margin: 0; fontSize: 16px; fontWeight: 700; color: var(--navy-900); }
+        .card-title { margin: 0; fontSize: 18px; fontWeight: 600; color: var(--navy-900); }
         .view-all { fontSize: 13px; fontWeight: 600; color: var(--purple-700); text-decoration: none; }
         
         @media (max-width: 1200px) {
@@ -224,7 +226,7 @@ const Dashboard = () => {
         </div>
 
         {/* 2. Recent Shows */}
-        <div className="card" style={{ padding: '24px' }}>
+        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <div className="card-header">
             <h3 className="card-title">Recent Shows</h3>
             <Link to="/shows" className="view-all">View All</Link>
@@ -270,7 +272,7 @@ const Dashboard = () => {
         </div>
 
         {/* 3. Recent Activity */}
-        <div className="card" style={{ padding: '24px' }}>
+        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <div className="card-header">
             <h3 className="card-title">Recent Activity</h3>
           </div>
@@ -280,7 +282,7 @@ const Dashboard = () => {
               No recent activity to display.
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {recentActivity.map((act, i) => (
                 <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
                   <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: act.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>

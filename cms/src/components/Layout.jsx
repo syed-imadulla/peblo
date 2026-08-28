@@ -101,7 +101,7 @@ const Layout = () => {
         </nav>
 
         <div style={{ marginTop: 'auto', padding: '16px 20px 24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(255,255,255,0.9)', padding: '12px', borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', cursor: 'pointer' }} onClick={logout} title="Logout">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: '12px', cursor: 'pointer', border: '1px solid var(--border)', backgroundColor: 'rgba(255,255,255,0.8)' }} onClick={logout} title="Logout">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--purple-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-700)', fontWeight: 'bold', overflow: 'hidden' }}>
                 <img src="/assets/eoEf12a30xBVz5Q1VMqOk8gbgs.avif" alt="avatar" style={{width: '28px', objectFit: 'cover'}} />
@@ -139,7 +139,7 @@ const Layout = () => {
             <Menu size={24} />
           </button>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontWeight: '800', fontSize: '24px', color: 'var(--navy-900)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ fontWeight: '800', fontSize: '28px', color: 'var(--navy-900)', display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '-0.5px' }}>
               {location.pathname === '/dashboard' ? 'Good morning, Admin! 👋' : getPageTitle()}
             </div>
             {location.pathname === '/dashboard' && (
@@ -149,11 +149,11 @@ const Layout = () => {
             )}
           </div>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '24px' }}>
-            <div style={{ position: 'relative', cursor: 'pointer', color: 'var(--purple-700)', backgroundColor: '#FFFFFF', padding: '10px', borderRadius: '50%', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+            <div style={{ position: 'relative', cursor: 'pointer', color: 'var(--purple-700)', backgroundColor: '#FFFFFF', padding: '10px', borderRadius: '50%', boxShadow: 'var(--shadow-sm)' }}>
               <Bell size={20} />
               <span style={{ position: 'absolute', top: '0px', right: '0px', backgroundColor: 'var(--purple-700)', color: 'white', fontSize: '10px', fontWeight: 'bold', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid white' }}>3</span>
             </div>
-            <button className="btn btn-primary" style={{ padding: '12px 24px', borderRadius: '12px', height: '48px' }}>
+            <button className="btn btn-primary" style={{ padding: '0 20px', borderRadius: '10px', height: '44px' }}>
               <Plus size={18} /> Create New
             </button>
           </div>
