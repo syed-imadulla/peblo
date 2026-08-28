@@ -400,12 +400,12 @@ const ShowForm = () => {
   }
 
   return (
-    <div style={{ padding: '0 8px', maxWidth: '1400px', margin: '0 auto', animation: 'fadeIn 0.3s ease' }}>
+    <div style={{ animation: 'fadeIn 0.3s ease' }}>
       
       {/* Header */}
-      <div style={{ marginBottom: '32px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-          <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px' }}>
+      <div style={{ marginBottom: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+          <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseOver={e => e.target.style.color='var(--navy-900)'} onMouseOut={e => e.target.style.color='var(--text-muted)'} onClick={() => navigate('/shows')}>Shows</span>
             <span style={{ color: 'var(--purple-300)' }}>&gt;</span>
             <span style={{ color: 'var(--purple-700)' }}>{isEditMode ? 'Edit Show' : 'Create New Show'}</span>
@@ -430,7 +430,7 @@ const ShowForm = () => {
         </div>
         
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: '800', color: 'var(--navy-900)', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--navy-900)', margin: '0 0 4px 0', letterSpacing: '-0.5px' }}>
             {isEditMode ? 'Edit Show' : 'Create New Show'}
           </h1>
           <div style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
