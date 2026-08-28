@@ -62,9 +62,14 @@ h1 { font-size: 28px; letter-spacing: -0.5px; }
 .card {
   background: var(--surface);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   padding: 24px;
   margin-bottom: 24px;
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 8px 32px rgba(75, 39, 181, 0.06);
 }
 
 .grid {
@@ -133,6 +138,11 @@ h1 { font-size: 28px; letter-spacing: -0.5px; }
   border: 1px solid var(--border);
   padding: 24px;
   margin-bottom: 24px;
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 12px 32px rgba(27, 24, 51, 0.05);
 }
 
 /* FORMS */

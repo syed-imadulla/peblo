@@ -280,17 +280,17 @@ const Dashboard = () => {
               No recent activity to display.
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {recentActivity.map((act, i) => (
                 <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: act.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: act.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     {act.icon}
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)', lineHeight: '1.4' }}>{act.title}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{act.subtitle}</div>
+                  <div style={{ flex: 1, paddingTop: '2px' }}>
+                    <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--navy-900)', lineHeight: '1.4', marginBottom: '2px' }}>{act.title}</div>
+                    <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{act.subtitle}</div>
                   </div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{safeFormatDate(act.timestamp)}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', whiteSpace: 'nowrap', paddingTop: '4px' }}>{safeFormatDate(act.timestamp, true)}</div>
                 </div>
               ))}
             </div>
@@ -343,8 +343,9 @@ const Dashboard = () => {
               </div>
             </>
           ) : (
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '14px', marginBottom: '24px' }}>
-              No catalogue published yet.
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', marginBottom: '24px', textAlign: 'center', gap: '8px' }}>
+              <div style={{ fontWeight: '600', color: 'var(--navy-900)', fontSize: '14px' }}>No catalogue published yet</div>
+              <div style={{ fontSize: '13px' }}>Publish your catalogue to see the latest run here.</div>
             </div>
           )}
           

@@ -18,9 +18,10 @@ const Layout = () => {
   ];
 
   const activeStyle = {
-    backgroundColor: 'var(--purple-100)',
+    backgroundColor: 'var(--purple-50)',
     color: 'var(--purple-700)',
-    fontWeight: '700'
+    fontWeight: '700',
+    borderLeft: '4px solid var(--purple-700)'
   };
 
   const itemStyle = {
@@ -34,7 +35,8 @@ const Layout = () => {
     marginBottom: '8px',
     transition: 'all 0.2s',
     fontWeight: '600',
-    textDecoration: 'none'
+    textDecoration: 'none',
+    borderLeft: '4px solid transparent'
   };
   
   const getPageTitle = () => {
