@@ -115,17 +115,17 @@ const MultiSelect = ({ selected, options, onChange, label }) => {
       >
         {selected.map(sel => (
           <div key={sel} style={{ 
-            backgroundColor: '#F1F5F9', color: '#334155', padding: '4px 8px', borderRadius: '8px', fontSize: '12px', fontWeight: '500',
-            display: 'flex', alignItems: 'center', gap: '4px'
+            backgroundColor: 'var(--purple-50)', color: 'var(--purple-700)', padding: '4px 10px', borderRadius: '8px', fontSize: '13px', fontWeight: '500',
+            display: 'flex', alignItems: 'center', gap: '6px'
           }}>
             {sel}
             <div 
               onClick={(e) => { e.stopPropagation(); toggleOption(sel); }}
-              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', padding: '2px' }}
-              onMouseOver={e => e.currentTarget.style.backgroundColor = '#E2E8F0'}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', padding: '2px', transition: 'background-color 0.2s' }}
+              onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--purple-100)'}
               onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}
             >
-              <X size={12} />
+              <X size={14} />
             </div>
           </div>
         ))}
@@ -402,7 +402,7 @@ const ShowForm = () => {
           <button 
             onClick={handleSubmit}
             disabled={isSaving || !formData.title || !formData.slug || !formData.section || formData.categories.length === 0}
-            className="btn btn-primary" style={{ height: '44px', borderRadius: '12px', padding: '0 28px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}>
+            className="btn btn-primary" style={{ height: '44px', borderRadius: '12px', padding: '0 24px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s', backgroundColor: 'var(--purple-500)', border: 'none', color: '#FFF' }}>
             {isSaving && <div style={{ width: '16px', height: '16px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#FFF', animation: 'spin 1s linear infinite' }}/>}
             {!isSaving && isSaved && <Check size={16} />}
             {isSaving ? 'Saving...' : isSaved ? 'Saved' : 'Save Show'}
@@ -422,7 +422,7 @@ const ShowForm = () => {
         
         {/* LEFT COLUMN: Basic Info */}
         <div>
-          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '16px', padding: '28px 32px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)' }}>
+          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', boxShadow: 'var(--shadow-sm)' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--navy-900)', marginBottom: '28px', paddingBottom: '20px', borderBottom: '1px solid var(--border)' }}>
               Basic Information
             </h2>
@@ -498,16 +498,16 @@ const ShowForm = () => {
 
         {/* RIGHT COLUMN: Artwork */}
         <div>
-          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '16px', padding: '28px 32px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.02)' }}>
+          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', boxShadow: 'var(--shadow-sm)' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--navy-900)', marginBottom: '24px', paddingBottom: '20px', borderBottom: '1px solid var(--border)' }}>
               Show Artwork
             </h2>
 
             {!isEditMode ? (
-              <div style={{ backgroundColor: '#F8FAFC', border: '1px dashed #CBD5E1', borderRadius: '12px', padding: '32px 20px', textAlign: 'center' }}>
-                <ImageIcon size={32} color="#94A3B8" style={{ marginBottom: '12px' }} />
-                <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--navy-900)', marginBottom: '8px' }}>Save Show First</div>
-                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>You must save the basic information before uploading artwork.</div>
+              <div style={{ backgroundColor: '#FAFAFC', border: '1px dashed #CBD5E1', borderRadius: '12px', padding: '40px 24px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <ImageIcon size={32} color="#94A3B8" style={{ marginBottom: '16px' }} />
+                <div style={{ fontSize: '15px', fontWeight: '600', color: 'var(--navy-900)', marginBottom: '8px' }}>Save Show First</div>
+                <div style={{ fontSize: '13px', color: 'var(--text-muted)', maxWidth: '200px', lineHeight: '1.5' }}>You must save the basic information before uploading artwork.</div>
               </div>
             ) : (
               <div>
@@ -526,13 +526,13 @@ const ShowForm = () => {
               </div>
             )}
             
-            <div style={{ marginTop: '24px', padding: '16px', backgroundColor: '#F8F9FC', borderRadius: '12px', border: '1px solid #E2E8F0', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-              <AlertCircle size={18} color="var(--purple-600)" style={{ flexShrink: 0, marginTop: '2px' }} />
+            <div style={{ marginTop: '24px', padding: '16px', backgroundColor: 'var(--purple-50)', borderRadius: '12px', border: '1px solid var(--purple-100)', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+              <AlertCircle size={18} color="var(--purple-700)" style={{ flexShrink: 0, marginTop: '2px' }} />
               <div>
-                <div style={{ fontWeight: '600', color: 'var(--navy-900)', fontSize: '13px', marginBottom: '4px' }}>
+                <div style={{ fontWeight: '600', color: 'var(--purple-700)', fontSize: '13px', marginBottom: '4px' }}>
                   Artwork Guidelines
                 </div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                <div style={{ fontSize: '12px', color: 'var(--purple-700)', opacity: 0.8, lineHeight: '1.5' }}>
                   Ensure images meet the exact aspect ratio and file size requirements. Format must be JPG, PNG, or WEBP.
                 </div>
               </div>
