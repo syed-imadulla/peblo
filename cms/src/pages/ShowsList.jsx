@@ -163,9 +163,22 @@ const ActionMenu = ({ show, onDeleteClick }) => {
     <div ref={ref} style={{ position: 'relative', display: 'inline-block' }}>
       <button 
         onClick={() => setIsOpen(!isOpen)} 
-        style={{ background: isOpen ? '#F5F3FF' : 'transparent', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: isOpen ? '#6D28D9' : '#94A3B8', cursor: 'pointer', transition: 'all 0.2s ease' }}
-        onMouseOver={e => { if(!isOpen) { e.currentTarget.style.background = '#F8F9FF'; e.currentTarget.style.color = '#64748B'; } }}
-        onMouseOut={e => { if(!isOpen) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#94A3B8'; } }}
+        style={{ 
+          background: isOpen ? '#F5F3FF' : '#FFFFFF', 
+          border: isOpen ? '1px solid #C4B5FD' : '1px solid #E2E8F0', 
+          borderRadius: '10px', 
+          width: '32px', 
+          height: '32px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          color: isOpen ? '#6D28D9' : '#64748B', 
+          cursor: 'pointer', 
+          transition: 'all 0.2s ease',
+          boxShadow: isOpen ? '0 0 0 2px rgba(109, 40, 217, 0.1)' : '0 1px 2px rgba(0,0,0,0.03)'
+        }}
+        onMouseOver={e => { if(!isOpen) { e.currentTarget.style.background = '#F8F9FF'; e.currentTarget.style.borderColor = '#CBD5E1'; } }}
+        onMouseOut={e => { if(!isOpen) { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.borderColor = '#E2E8F0'; } }}
         title="Actions"
       >
         <MoreHorizontal size={14} />
