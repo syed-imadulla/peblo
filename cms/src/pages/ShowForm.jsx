@@ -106,9 +106,9 @@ const MultiSelect = ({ selected, options, onChange, label, helperText }) => {
       <div style={{ position: 'relative' }}>
       <div 
         className="form-control"
-        onClick={() => { setIsOpen(true); setTimeout(() => document.getElementById('multi-search')?.focus(), 10); }}
+        onClick={() => { setIsOpen(!isOpen); if (!isOpen) setTimeout(() => document.getElementById('multi-search')?.focus(), 10); }}
         style={{
-          display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px', cursor: 'text', minHeight: '46px', height: 'auto', padding: '6px 16px',
+          display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px', cursor: 'pointer', minHeight: '46px', height: 'auto', padding: '6px 16px',
           boxShadow: isOpen ? '0 0 0 3px var(--purple-50)' : 'none', borderColor: isOpen ? 'var(--purple-500)' : undefined
         }}
         tabIndex={0}
@@ -138,7 +138,7 @@ const MultiSelect = ({ selected, options, onChange, label, helperText }) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={selected.length === 0 ? "Select categories..." : ""}
-          style={{ border: 'none', outline: 'none', flex: 1, minWidth: '120px', fontSize: '14px', background: 'transparent', color: 'var(--navy-900)' }}
+          style={{ border: 'none', outline: 'none', flex: 1, minWidth: '120px', fontSize: '14px', background: 'transparent', color: 'var(--navy-900)', cursor: 'pointer' }}
         />
         
         <ChevronDown size={16} color="var(--text-muted)" style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0, marginLeft: 'auto' }} />
@@ -146,8 +146,8 @@ const MultiSelect = ({ selected, options, onChange, label, helperText }) => {
 
       {isOpen && (
         <div className="custom-scrollbar" style={{
-          position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, backgroundColor: '#FFFFFF', border: '1px solid #CBD5E1', 
-          borderRadius: '10px', boxShadow: '0 10px 30px rgba(0,0,0,0.15)', zIndex: 100, padding: '6px', maxHeight: '180px', display: 'flex', flexDirection: 'column', overflowY: 'auto'
+          position: 'absolute', bottom: 'calc(100% + 6px)', left: 0, right: 0, backgroundColor: '#FFFFFF', border: '1px solid #CBD5E1', 
+          borderRadius: '10px', boxShadow: '0 -10px 30px rgba(0,0,0,0.15)', zIndex: 100, padding: '6px', maxHeight: '180px', display: 'flex', flexDirection: 'column', overflowY: 'auto'
         }}>
           {filteredOptions.length === 0 ? (
             <div style={{ padding: '10px 12px', color: 'var(--text-muted)', fontSize: '14px', textAlign: 'center' }}>No categories found</div>
@@ -454,7 +454,7 @@ const ShowForm = () => {
       )}
 
       {/* Main Layout Grid */}
-      <div className="show-form-layout" style={{ paddingBottom: '120px' }}>
+      <div className="show-form-layout">
         
         {/* LEFT COLUMN: Basic Info */}
         <div>
