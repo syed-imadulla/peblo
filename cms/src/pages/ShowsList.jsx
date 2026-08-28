@@ -33,6 +33,25 @@ const safeFormatDate = (dateString, relative = false) => {
   return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(d);
 };
 
+const getSectionColors = (section) => {
+  switch (section?.toLowerCase()) {
+    case 'featured': return { bg: '#F3E8FF', text: '#7E22CE' };
+    case 'series': return { bg: '#E0F2FE', text: '#0369A1' };
+    case 'minisodes': return { bg: '#FFEDD5', text: '#C2410C' };
+    case 'songs': return { bg: '#FEF9C3', text: '#CA8A04' };
+    case 'shorts': return { bg: '#FCE7F3', text: '#BE185D' };
+    default: return { bg: '#F1F5F9', text: '#475569' };
+  }
+};
+
+const getLanguageColors = (lang) => {
+  switch(lang?.toUpperCase()) {
+    case 'EN': return { bg: '#DCFCE7', text: '#15803D' };
+    case 'HI': return { bg: '#E0F2FE', text: '#0369A1' };
+    default: return { bg: '#F3E8FF', text: '#7E22CE' };
+  }
+};
+
 const getShowMetrics = (show) => {
   let isPublished = false;
   let totalEpisodes = 0;
@@ -468,7 +487,15 @@ const ShowsList = () => {
                       
                       <td style={{ padding: '16px 16px', fontSize: '13px', color: 'var(--navy-900)', borderBottom: idx === paginatedShows.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
                         {show.section ? (
-                          <span>{show.section}</span>
+                          <span style={{ 
+                            backgroundColor: getSectionColors(show.section).bg, 
+                            color: getSectionColors(show.section).text, 
+                            padding: '4px 12px', 
+                            borderRadius: '12px', 
+                            fontWeight: '600' 
+                          }}>
+                            {show.section}
+                          </span>
                         ) : (
                           <span style={{ color: 'var(--text-muted)' }}>-</span>
                         )}
@@ -478,12 +505,19 @@ const ShowsList = () => {
                         {show.languages.length > 0 ? (
                           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                             {displayLanguages.map(l => (
-                              <span key={l} style={{ backgroundColor: '#F0FDF4', color: '#16A34A', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '700', letterSpacing: '0.5px' }}>
+                              <span key={l} style={{ 
+                                backgroundColor: getLanguageColors(l).bg, 
+                                color: getLanguageColors(l).text, 
+                                padding: '4px 12px', 
+                                borderRadius: '12px', 
+                                fontSize: '12px', 
+                                fontWeight: '700'
+                              }}>
                                 {l}
                               </span>
                             ))}
                             {extraLanguages > 0 && (
-                              <span style={{ backgroundColor: 'var(--gray-100)', color: 'var(--text-muted)', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>
+                              <span style={{ backgroundColor: 'var(--gray-100)', color: 'var(--text-muted)', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: '700' }}>
                                 +{extraLanguages}
                               </span>
                             )}
@@ -498,11 +532,9 @@ const ShowsList = () => {
                       </td>
 
                       <td style={{ padding: '16px 16px', borderBottom: idx === paginatedShows.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          {show.status === 'Published' && (
-                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--green-500)' }} />
-                          )}
-                          <span style={{ fontSize: '13px', fontWeight: '500', color: show.status === 'Published' ? 'var(--navy-900)' : 'var(--text-muted)' }}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: show.status === 'Published' ? '#DCFCE7' : '#FFEDD5', padding: '4px 10px', borderRadius: '12px' }}>
+                          <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: show.status === 'Published' ? '#16A34A' : '#EA580C' }} />
+                          <span style={{ fontSize: '12px', fontWeight: '600', color: show.status === 'Published' ? '#15803D' : '#C2410C' }}>
                             {show.status}
                           </span>
                         </div>
