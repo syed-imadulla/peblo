@@ -168,9 +168,9 @@ const Dashboard = () => {
         .main-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
         .bottom-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
         
-        .card-header { display: flex; justifyContent: space-between; align-items: center; margin-bottom: 20px; }
-        .card-title { margin: 0; fontSize: 18px; fontWeight: 600; color: var(--navy-900); }
-        .view-all { fontSize: 13px; fontWeight: 600; color: var(--purple-700); text-decoration: none; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-title { margin: 0; font-size: 18px; font-weight: 600; color: var(--navy-900); }
+        .view-all { font-size: 13px; font-weight: 600; color: var(--purple-700); text-decoration: none; }
         
         @media (max-width: 1200px) {
           .main-grid { grid-template-columns: 1fr 1fr; }
