@@ -315,14 +315,17 @@ const ShowForm = () => {
       const { data } = await axios.get(`/api/admin/shows/${id}`);
       return data;
     },
-    enabled: isEditMode,
-    onSuccess: (data) => {
+    enabled: isEditMode
+  });
+
+  useEffect(() => {
+    if (show) {
       setFormData({
-        title: data.title || '',
-        slug: data.slug || '',
-        synopsis: data.synopsis || '',
-        section: data.section || '',
-        categories: data.categories || [],
+        title: show.title || '',
+        slug: show.slug || '',
+        synopsis: show.synopsis || '',
+        section: show.section || '',
+        categories: show.categories || [],
         primaryLanguage: 'English',
         showType: 'Series',
         status: 'Draft',
@@ -332,7 +335,7 @@ const ShowForm = () => {
       });
       setIsDirty(false);
     }
-  });
+  }, [show]);
 
   // Handle Unsaved Changes Warning
   useEffect(() => {
@@ -388,7 +391,7 @@ const ShowForm = () => {
     }
   };
 
-  const isSaving = createMutation.isLoading || updateMutation.isLoading;
+  const isSaving = createMutation.isPending || updateMutation.isPending;
   const saveError = createMutation.error || updateMutation.error;
 
   if (isEditMode && isLoading) {
