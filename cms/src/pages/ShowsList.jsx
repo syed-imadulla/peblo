@@ -57,19 +57,9 @@ const getShowMetrics = (show) => {
   };
 };
 
-const getSectionColor = (section) => {
-  const map = {
-    'Featured': { bg: 'var(--purple-100)', text: 'var(--purple-700)' },
-    'Series': { bg: 'var(--blue-100)', text: 'var(--blue-700)' },
-    'Minisodes': { bg: 'var(--orange-100)', text: 'var(--orange-700)' },
-    'Songs': { bg: 'var(--amber-100)', text: 'var(--amber-700)' },
-  };
-  return map[section] || { bg: 'var(--gray-100)', text: 'var(--gray-700)' };
-};
-
 // --- UI COMPONENTS ---
 
-const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix }) => {
+const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix, placement = 'bottom' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
 
@@ -108,7 +98,18 @@ const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix 
         <ChevronDown size={14} style={{ flexShrink: 0, color: isOpen ? 'var(--purple-700)' : 'var(--text-muted)', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
       </div>
       {isOpen && (
-        <div style={{ position: 'absolute', top: 'calc(100% + 6px)', left: 0, minWidth: '100%', backgroundColor: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', zIndex: 50, padding: '6px' }}>
+        <div style={{ 
+          position: 'absolute', 
+          ...(placement === 'top' ? { bottom: 'calc(100% + 6px)' } : { top: 'calc(100% + 6px)' }), 
+          left: 0, 
+          minWidth: '100%', 
+          backgroundColor: '#FFFFFF', 
+          border: '1px solid #E2E8F0', 
+          borderRadius: '12px', 
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)', 
+          zIndex: 50, 
+          padding: '6px' 
+        }}>
           {options.map(opt => (
             <div 
               key={opt}
@@ -304,7 +305,7 @@ const ShowsList = () => {
       `}</style>
 
       {/* FILTER BAR */}
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', marginBottom: hasActiveFilters ? '16px' : '24px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', marginBottom: hasActiveFilters ? '16px' : '24px', flexWrap: 'wrap', position: 'relative', zIndex: 100 }}>
         <div style={{ position: 'relative', flex: 1, minWidth: '240px' }}>
           <Search size={16} style={{ position: 'absolute', left: '16px', top: '13px', color: 'var(--text-muted)' }} />
           <input 
@@ -392,7 +393,7 @@ const ShowsList = () => {
       )}
 
       {/* TABLE */}
-      <div className="card" style={{ padding: 0, backgroundColor: 'var(--white)', overflow: 'visible', borderRadius: '16px' }}>
+      <div style={{ backgroundColor: '#FFFFFF', overflow: 'visible', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)' }}>
         {filteredShows.length === 0 ? (
           <div style={{ padding: '100px 24px', textAlign: 'center' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'var(--gray-100)', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
@@ -414,10 +415,11 @@ const ShowsList = () => {
             )}
           </div>
         ) : (
-          <div style={{ overflowX: 'auto', paddingBottom: '12px' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '950px' }}>
-              <thead>
-                <tr style={{ backgroundColor: 'var(--gray-50)', borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '12px', fontWeight: '600' }}>
+          <>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '950px' }}>
+                <thead>
+                <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid #E2E8F0', color: '#64748B', fontSize: '12px', fontWeight: '600' }}>
                   <th style={{ padding: '16px 24px', width: '35%', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Show</th>
                   <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Section</th>
                   <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Languages</th>
@@ -429,7 +431,6 @@ const ShowsList = () => {
               </thead>
               <tbody>
                 {paginatedShows.map((show, idx) => {
-                  const secColor = getSectionColor(show.section);
                   const displayLanguages = show.languages.slice(0, 3);
                   const extraLanguages = show.languages.length - 3;
                   
@@ -463,11 +464,9 @@ const ShowsList = () => {
                         </div>
                       </td>
                       
-                      <td style={{ padding: '16px 16px' }}>
+                      <td style={{ padding: '16px 16px', fontSize: '13px', color: 'var(--navy-900)' }}>
                         {show.section ? (
-                          <span style={{ backgroundColor: secColor.bg, color: secColor.text, padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '600' }}>
-                            {show.section}
-                          </span>
+                          <span>{show.section}</span>
                         ) : (
                           <span style={{ color: 'var(--text-muted)' }}>-</span>
                         )}
@@ -498,7 +497,9 @@ const ShowsList = () => {
 
                       <td style={{ padding: '16px 16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: show.status === 'Published' ? 'var(--green-500)' : 'var(--orange-500)' }} />
+                          {show.status === 'Published' && (
+                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--green-500)' }} />
+                          )}
                           <span style={{ fontSize: '13px', fontWeight: '500', color: show.status === 'Published' ? 'var(--navy-900)' : 'var(--text-muted)' }}>
                             {show.status}
                           </span>
@@ -517,10 +518,11 @@ const ShowsList = () => {
                 })}
               </tbody>
             </table>
+            </div>
 
             {/* Pagination */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderTop: '1px solid var(--border)', marginTop: '8px' }}>
-              <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '500' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderTop: '1px solid #E2E8F0' }}>
+              <div style={{ fontSize: '13px', color: '#64748B', fontWeight: '500' }}>
                 Showing <strong style={{ color: 'var(--navy-900)' }}>{(currentPage - 1) * itemsPerPage + (filteredShows.length > 0 ? 1 : 0)}</strong> to <strong style={{ color: 'var(--navy-900)' }}>{Math.min(currentPage * itemsPerPage, filteredShows.length)}</strong> of <strong style={{ color: 'var(--navy-900)' }}>{filteredShows.length}</strong> shows
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -551,7 +553,7 @@ const ShowsList = () => {
                 />
               </div>
             </div>
-          </div>
+          </>
         )}
       </div>
 

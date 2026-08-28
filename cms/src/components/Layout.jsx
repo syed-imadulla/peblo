@@ -45,7 +45,7 @@ const Layout = () => {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--background)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div 
@@ -134,7 +134,7 @@ const Layout = () => {
 
       {/* Main Content */}
       <div className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', transition: 'margin-left 0.3s ease' }}>
-        <header style={{ height: '88px', display: 'flex', alignItems: 'center', padding: '0 32px', gap: '16px', backgroundColor: 'var(--background)' }}>
+        <header style={{ height: '88px', display: 'flex', alignItems: 'center', padding: '0 32px', gap: '16px', backgroundColor: '#F8FAFC' }}>
           <button className="mobile-only" onClick={() => setSidebarOpen(true)} style={{ color: 'var(--text-main)', display: 'none' }}>
             <Menu size={24} />
           </button>
