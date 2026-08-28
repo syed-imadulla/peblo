@@ -75,7 +75,14 @@ const ShowsList = () => {
   const [sortBy, setSortBy] = useState('Updated: Newest');
   
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [search, filterSection, filterLanguage, filterStatus, sortBy, itemsPerPage]);
+
+  const hasActiveFilters = search !== '' || filterSection !== 'All Sections' || filterLanguage !== 'All Languages' || filterStatus !== 'All Status';
 
   const { data: shows, isLoading, error } = useQuery({
     queryKey: ['shows'],
@@ -223,10 +230,25 @@ const ShowsList = () => {
           </div>
 
           <div style={{ alignSelf: 'flex-end' }}>
-            <button style={{ height: '42px', width: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', cursor: 'pointer', color: 'var(--text-muted)' }}>
+            <button style={{ height: '42px', width: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: hasActiveFilters ? 'var(--purple-50)' : 'var(--white)', border: hasActiveFilters ? '1px solid var(--purple-200)' : '1px solid var(--border)', borderRadius: '12px', cursor: 'pointer', color: hasActiveFilters ? 'var(--purple-700)' : 'var(--text-muted)', transition: 'all 0.2s ease' }}>
               <Filter size={16} />
             </button>
           </div>
+          
+          {hasActiveFilters && (
+            <div style={{ alignSelf: 'flex-end' }}>
+              <button 
+                onClick={() => {
+                  setSearch('');
+                  setFilterSection('All Sections');
+                  setFilterLanguage('All Languages');
+                  setFilterStatus('All Status');
+                }}
+                style={{ height: '42px', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent', border: '1px solid var(--border)', borderRadius: '12px', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '13px', fontWeight: '600', whiteSpace: 'nowrap', transition: 'all 0.2s ease' }}>
+                Clear Filters
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -328,9 +350,9 @@ const ShowsList = () => {
 
                       <td style={{ padding: '16px 24px', textAlign: 'right' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
-                          <button style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: '8px', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                          <Link to={`/shows/${show.id}`} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: '8px', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', cursor: 'pointer' }}>
                             <Eye size={14} />
-                          </button>
+                          </Link>
                           <Link to={`/shows/${show.id}/edit`} style={{ background: 'transparent', border: '1px solid var(--border)', borderRadius: '8px', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--purple-700)', cursor: 'pointer' }}>
                             <Edit2 size={14} />
                           </Link>
@@ -371,8 +393,14 @@ const ShowsList = () => {
               </div>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{ position: 'relative' }}>
-                  <select disabled style={{ appearance: 'none', padding: '8px 28px 8px 12px', borderRadius: '8px', border: '1px solid var(--border)', backgroundColor: 'var(--white)', fontSize: '13px', color: 'var(--navy-900)', outline: 'none' }}>
-                    <option>10 per page</option>
+                  <select 
+                    value={itemsPerPage}
+                    onChange={e => setItemsPerPage(Number(e.target.value))}
+                    style={{ appearance: 'none', padding: '8px 28px 8px 12px', borderRadius: '8px', border: '1px solid var(--border)', backgroundColor: 'var(--white)', fontSize: '13px', color: 'var(--navy-900)', outline: 'none', cursor: 'pointer' }}
+                  >
+                    <option value={10}>10 per page</option>
+                    <option value={20}>20 per page</option>
+                    <option value={50}>50 per page</option>
                   </select>
                   <ChevronDown size={14} style={{ position: 'absolute', right: '8px', top: '9px', color: 'var(--text-muted)', pointerEvents: 'none' }} />
                 </div>
