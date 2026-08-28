@@ -162,12 +162,7 @@ const MultiSelect = ({ selected, options, onChange, label }) => {
                   onMouseOver={(e) => e.currentTarget.style.backgroundColor = isSelected ? '#F5F3FF' : '#F8FAFC'}
                   onMouseOut={(e) => e.currentTarget.style.backgroundColor = isSelected ? '#F5F3FF' : 'transparent'}
                 >
-                  <div style={{ 
-                    width: '16px', height: '16px', borderRadius: '4px', border: isSelected ? 'none' : '1px solid #CBD5E1', 
-                    backgroundColor: isSelected ? 'var(--purple-600)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                  }}>
-                    {isSelected && <Check size={12} color="#FFF" />}
-                  </div>
+                  <input type="checkbox" checked={isSelected} readOnly style={{ accentColor: 'var(--purple-500)', cursor: 'pointer', width: '16px', height: '16px', flexShrink: 0, margin: 0 }} />
                   {opt}
                 </div>
               );
@@ -179,15 +174,16 @@ const MultiSelect = ({ selected, options, onChange, label }) => {
   );
 };
 
-// Artwork Upload Component
-const ArtworkUploadCard = ({ type, aspectText, width, height, maxKb, showId, existingArtwork, onUploadSuccess }) => {
+// Component for individual artwork slots
+const ArtworkUploadCard = ({ type, aspectText, width, height, maxKb, showId, existingArtwork, onUploadSuccess, isDisabled }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
   
-  const currentArt = existingArtwork?.find(a => a.type === type.toLowerCase());
+  const currentArt = existingArtwork?.[type.toLowerCase()];
 
   const handleFileChange = async (e) => {
+    if (isDisabled) return;
     const file = e.target.files[0];
     if (!file) return;
     
@@ -221,20 +217,23 @@ const ArtworkUploadCard = ({ type, aspectText, width, height, maxKb, showId, exi
   };
 
   return (
-    <div style={{ display: 'flex', gap: '20px', padding: '20px', backgroundColor: '#FAFAFC', border: '1px solid #E2E8F0', borderRadius: '12px', marginBottom: '16px', alignItems: 'center', transition: 'all 0.2s' }}
-         onMouseEnter={e => e.currentTarget.style.borderColor = '#CBD5E1'}
-         onMouseLeave={e => e.currentTarget.style.borderColor = '#E2E8F0'}>
+    <div style={{ 
+      display: 'flex', gap: '24px', padding: '24px', backgroundColor: '#FAFAFC', border: '1px solid #E2E8F0', 
+      borderRadius: '14px', marginBottom: '16px', alignItems: 'center', transition: 'all 0.2s', opacity: isDisabled ? 0.7 : 1 
+    }}
+         onMouseEnter={e => !isDisabled && (e.currentTarget.style.borderColor = '#CBD5E1')}
+         onMouseLeave={e => !isDisabled && (e.currentTarget.style.borderColor = '#E2E8F0')}>
       {/* Preview Area */}
       <div style={{ 
-        width: type === 'Poster' ? '100px' : '140px', 
-        height: type === 'Poster' ? '150px' : '79px', 
-        backgroundColor: '#F8FAFC', borderRadius: '8px', 
+        width: type === 'Poster' ? '120px' : '160px', 
+        height: type === 'Poster' ? '180px' : '90px', 
+        backgroundColor: '#F1F5F9', borderRadius: '8px', 
         display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid #E2E8F0', flexShrink: 0
       }}>
         {currentArt ? (
           <img src={currentArt.url} alt={type} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
-          <ImageIcon size={24} color="#CBD5E1" />
+          <ImageIcon size={28} color="#94A3B8" />
         )}
       </div>
       
@@ -256,19 +255,21 @@ const ArtworkUploadCard = ({ type, aspectText, width, height, maxKb, showId, exi
         <div>
           <button 
             type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-            className="btn btn-outline" style={{ height: '36px', borderRadius: '8px', padding: '0 16px', fontSize: '13px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            onClick={() => !isDisabled && fileInputRef.current?.click()}
+            disabled={isUploading || isDisabled}
+            className="btn btn-outline" style={{ height: '36px', borderRadius: '8px', padding: '0 16px', fontSize: '13px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: isDisabled ? 'not-allowed' : 'pointer', opacity: isDisabled ? 0.7 : 1, whiteSpace: 'nowrap', flexShrink: 0 }}>
             {isUploading ? <div style={{ width: '12px', height: '12px', borderRadius: '50%', border: '2px solid var(--purple-200)', borderTopColor: 'var(--purple-600)', animation: 'spin 1s linear infinite' }}/> : <UploadCloud size={14} />}
             {isUploading ? 'Uploading...' : currentArt ? 'Replace Image' : 'Upload Image'}
           </button>
-          <input 
-            type="file" 
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            accept="image/jpeg, image/png, image/webp"
-            onChange={handleFileChange}
-          />
+          {!isDisabled && (
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              accept="image/jpeg, image/png, image/webp"
+              onChange={handleFileChange}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -500,28 +501,32 @@ const ShowForm = () => {
               Show Artwork
             </h2>
 
-            {!isEditMode ? (
-              <div style={{ backgroundColor: '#FAFAFC', border: '1px dashed #CBD5E1', borderRadius: '12px', padding: '40px 24px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <ImageIcon size={32} color="#94A3B8" style={{ marginBottom: '16px' }} />
-                <div style={{ fontSize: '15px', fontWeight: '600', color: 'var(--navy-900)', marginBottom: '8px' }}>Save Show First</div>
-                <div style={{ fontSize: '13px', color: 'var(--text-muted)', maxWidth: '200px', lineHeight: '1.5' }}>You must save the basic information before uploading artwork.</div>
-              </div>
-            ) : (
-              <div>
-                <ArtworkUploadCard 
-                  type="Poster" aspectText="2:3" width="600" height="900" maxKb="200" 
-                  showId={id} existingArtwork={show?.artwork} onUploadSuccess={refetchShow}
-                />
-                <ArtworkUploadCard 
-                  type="Banner" aspectText="16:9" width="1280" height="720" maxKb="200" 
-                  showId={id} existingArtwork={show?.artwork} onUploadSuccess={refetchShow}
-                />
-                <ArtworkUploadCard 
-                  type="Thumbnail" aspectText="16:9" width="640" height="360" maxKb="200" 
-                  showId={id} existingArtwork={show?.artwork} onUploadSuccess={refetchShow}
-                />
+            {!isEditMode && (
+              <div style={{ marginBottom: '24px', backgroundColor: '#FAFAFC', border: '1px dashed #CBD5E1', borderRadius: '12px', padding: '20px', display: 'flex', gap: '16px', alignItems: 'center' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <ImageIcon size={20} color="#94A3B8" />
+                </div>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--navy-900)', marginBottom: '4px' }}>Save Show First</div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Save the basic show information to enable artwork uploads.</div>
+                </div>
               </div>
             )}
+
+            <div>
+              <ArtworkUploadCard 
+                type="Poster" aspectText="2:3" width="600" height="900" maxKb="200" 
+                showId={id} existingArtwork={show?.artwork} onUploadSuccess={refetchShow} isDisabled={!isEditMode}
+              />
+              <ArtworkUploadCard 
+                type="Banner" aspectText="16:9" width="1280" height="720" maxKb="200" 
+                showId={id} existingArtwork={show?.artwork} onUploadSuccess={refetchShow} isDisabled={!isEditMode}
+              />
+              <ArtworkUploadCard 
+                type="Thumbnail" aspectText="16:9" width="640" height="360" maxKb="200" 
+                showId={id} existingArtwork={show?.artwork} onUploadSuccess={refetchShow} isDisabled={!isEditMode}
+              />
+            </div>
             
             <div style={{ marginTop: '24px', padding: '16px', backgroundColor: 'var(--purple-50)', borderRadius: '12px', border: '1px solid var(--purple-100)', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
               <AlertCircle size={18} color="var(--purple-700)" style={{ flexShrink: 0, marginTop: '2px' }} />
