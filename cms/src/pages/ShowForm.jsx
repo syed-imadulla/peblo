@@ -21,12 +21,13 @@ const CustomDropdown = ({ value, options, onChange, label, placeholder, helperTe
   }, []);
 
   return (
-    <div className="form-group" style={{ position: 'relative' }} ref={ref}>
+    <div className="form-group" ref={ref}>
       <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
         {label} <span style={{ color: '#DC2626' }}>*</span>
       </label>
-      <div 
-        className="form-control"
+      <div style={{ position: 'relative' }}>
+        <div 
+          className="form-control"
         onClick={() => setIsOpen(!isOpen)}
         style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
@@ -45,8 +46,8 @@ const CustomDropdown = ({ value, options, onChange, label, placeholder, helperTe
       
       {isOpen && (
         <div className="custom-scrollbar" style={{
-          position: 'absolute', top: 'calc(100% - 10px)', left: 0, right: 0, backgroundColor: '#FFFFFF', border: '1px solid #CBD5E1', 
-          borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 50, padding: '6px', maxHeight: '200px', overflowY: 'auto'
+          position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, backgroundColor: '#FFFFFF', border: '1px solid #CBD5E1', 
+          borderRadius: '10px', boxShadow: '0 10px 30px rgba(0,0,0,0.15)', zIndex: 100, padding: '6px', maxHeight: '180px', overflowY: 'auto'
         }}>
           {options.map(opt => (
             <div 
@@ -66,6 +67,7 @@ const CustomDropdown = ({ value, options, onChange, label, placeholder, helperTe
           ))}
         </div>
       )}
+      </div>
       {helperText && <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>{helperText}</div>}
     </div>
   );
@@ -96,11 +98,12 @@ const MultiSelect = ({ selected, options, onChange, label, helperText }) => {
   };
 
   return (
-    <div className="form-group" style={{ position: 'relative' }} ref={ref}>
+    <div className="form-group" ref={ref}>
       <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
         {label} <span style={{ color: '#DC2626' }}>*</span>
       </label>
       
+      <div style={{ position: 'relative' }}>
       <div 
         className="form-control"
         onClick={() => { setIsOpen(true); setTimeout(() => document.getElementById('multi-search')?.focus(), 10); }}
@@ -143,8 +146,8 @@ const MultiSelect = ({ selected, options, onChange, label, helperText }) => {
 
       {isOpen && (
         <div className="custom-scrollbar" style={{
-          position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, backgroundColor: '#FFFFFF', border: '1px solid #CBD5E1', 
-          borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 50, padding: '6px', maxHeight: '240px', display: 'flex', flexDirection: 'column', overflowY: 'auto'
+          position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, backgroundColor: '#FFFFFF', border: '1px solid #CBD5E1', 
+          borderRadius: '10px', boxShadow: '0 10px 30px rgba(0,0,0,0.15)', zIndex: 100, padding: '6px', maxHeight: '180px', display: 'flex', flexDirection: 'column', overflowY: 'auto'
         }}>
           {filteredOptions.length === 0 ? (
             <div style={{ padding: '10px 12px', color: 'var(--text-muted)', fontSize: '14px', textAlign: 'center' }}>No categories found</div>
@@ -171,6 +174,7 @@ const MultiSelect = ({ selected, options, onChange, label, helperText }) => {
           )}
         </div>
       )}
+      </div>
       {helperText && <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>{helperText}</div>}
     </div>
   );
@@ -450,7 +454,7 @@ const ShowForm = () => {
       )}
 
       {/* Main Layout Grid */}
-      <div className="show-form-layout">
+      <div className="show-form-layout" style={{ paddingBottom: '120px' }}>
         
         {/* LEFT COLUMN: Basic Info */}
         <div>
