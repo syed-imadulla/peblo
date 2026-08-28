@@ -146,7 +146,7 @@ const Layout = () => {
       {/* Main Content */}
       <div className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', transition: 'margin-left 0.3s ease' }}>
         {!(location.pathname.includes('/new') || location.pathname.includes('/edit')) ? (
-          <header style={{ height: '88px', display: 'flex', alignItems: 'center', padding: '0 32px', gap: '16px', background: 'transparent' }}>
+          <header style={{ display: 'flex', alignItems: 'center', padding: '32px 32px 0 32px', gap: '16px', background: 'transparent' }}>
             <button className="mobile-only" onClick={() => setSidebarOpen(true)} style={{ color: 'var(--text-main)', display: 'none' }}>
               <Menu size={24} />
             </button>
@@ -181,7 +181,7 @@ const Layout = () => {
             </button>
           </header>
         )}
-        <main style={{ flex: 1, padding: '32px', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
+        <main style={{ flex: 1, padding: '24px 32px 32px 32px', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
           <Outlet />
         </main>
       </div>
