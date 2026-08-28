@@ -419,16 +419,16 @@ const ShowsList = () => {
         ) : (
           <>
             <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '950px' }}>
+              <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, textAlign: 'left', minWidth: '950px' }}>
                 <thead>
-                <tr style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E2E8F0', color: '#475569', fontSize: '12px', fontWeight: '700' }}>
-                  <th style={{ padding: '16px 24px', width: '35%', textTransform: 'uppercase', letterSpacing: '0.5px', borderTopLeftRadius: '24px' }}>Show</th>
-                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Section</th>
-                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Languages</th>
-                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Episodes</th>
-                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Status</th>
-                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Updated</th>
-                  <th style={{ padding: '16px 24px', textAlign: 'right', textTransform: 'uppercase', letterSpacing: '0.5px', borderTopRightRadius: '24px' }}>Actions</th>
+                <tr style={{ backgroundColor: '#FFFFFF', color: '#475569', fontSize: '12px', fontWeight: '700' }}>
+                  <th style={{ padding: '16px 24px', width: '35%', textTransform: 'uppercase', letterSpacing: '0.5px', borderTopLeftRadius: '24px', borderBottom: '1px solid #E2E8F0' }}>Show</th>
+                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Section</th>
+                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Languages</th>
+                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Episodes</th>
+                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Status</th>
+                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Updated</th>
+                  <th style={{ padding: '16px 24px', textAlign: 'right', textTransform: 'uppercase', letterSpacing: '0.5px', borderTopRightRadius: '24px', borderBottom: '1px solid #E2E8F0' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -437,8 +437,8 @@ const ShowsList = () => {
                   const extraLanguages = show.languages.length - 3;
                   
                   return (
-                    <tr key={show.id} style={{ borderBottom: idx === paginatedShows.length - 1 ? 'none' : '1px solid #F1F5F9', transition: 'background-color 0.15s ease' }} onMouseOver={e => e.currentTarget.style.backgroundColor = '#FAFAFF'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
-                      <td style={{ padding: '16px 24px' }}>
+                    <tr key={show.id} style={{ transition: 'background-color 0.15s ease' }} onMouseOver={e => e.currentTarget.style.backgroundColor = '#FAFAFF'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                      <td style={{ padding: '16px 24px', borderBottom: idx === paginatedShows.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                           {show.artwork?.length > 0 ? (
                             <img 
@@ -466,7 +466,7 @@ const ShowsList = () => {
                         </div>
                       </td>
                       
-                      <td style={{ padding: '16px 16px', fontSize: '13px', color: 'var(--navy-900)' }}>
+                      <td style={{ padding: '16px 16px', fontSize: '13px', color: 'var(--navy-900)', borderBottom: idx === paginatedShows.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
                         {show.section ? (
                           <span>{show.section}</span>
                         ) : (
@@ -474,7 +474,7 @@ const ShowsList = () => {
                         )}
                       </td>
 
-                      <td style={{ padding: '16px 16px' }}>
+                      <td style={{ padding: '16px 16px', borderBottom: idx === paginatedShows.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
                         {show.languages.length > 0 ? (
                           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                             {displayLanguages.map(l => (
@@ -493,11 +493,11 @@ const ShowsList = () => {
                         )}
                       </td>
 
-                      <td style={{ padding: '16px 16px', fontSize: '13px', color: 'var(--navy-900)', fontWeight: '500' }}>
+                      <td style={{ padding: '16px 16px', fontSize: '13px', color: 'var(--navy-900)', fontWeight: '500', borderBottom: idx === paginatedShows.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
                         {show.totalEpisodes}
                       </td>
 
-                      <td style={{ padding: '16px 16px' }}>
+                      <td style={{ padding: '16px 16px', borderBottom: idx === paginatedShows.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           {show.status === 'Published' && (
                             <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--green-500)' }} />
@@ -508,11 +508,11 @@ const ShowsList = () => {
                         </div>
                       </td>
 
-                      <td style={{ padding: '16px 16px', fontSize: '13px', color: 'var(--text-muted)' }}>
+                      <td style={{ padding: '16px 16px', fontSize: '13px', color: 'var(--text-muted)', borderBottom: idx === paginatedShows.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
                         {safeFormatDate(show.updated_at || show.created_at, true) || '-'}
                       </td>
 
-                      <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                      <td style={{ padding: '16px 24px', textAlign: 'right', borderBottom: idx === paginatedShows.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
                         <ActionMenu show={show} onDeleteClick={setShowToDelete} />
                       </td>
                     </tr>
