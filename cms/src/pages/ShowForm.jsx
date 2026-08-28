@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { ArrowLeft, ChevronDown, Check, X, Image as ImageIcon, UploadCloud, AlertCircle, Info, Lock } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Check, X, Image as ImageIcon, UploadCloud, AlertCircle, Info, Lock, Save } from 'lucide-react';
 
 const SECTIONS = ['Featured', 'Series', 'Minisodes', 'Songs'];
 const CATEGORIES = ['Adventure', 'Folk', 'Friendship', 'India', 'Language', 'Learning', 'Maths', 'Music', 'Nature', 'Reading', 'Science', 'Singalong', 'Stories', 'Travel', 'Vocabulary'];
@@ -404,40 +404,37 @@ const ShowForm = () => {
       
       {/* Header */}
       <div style={{ marginBottom: '32px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
-          <span style={{ cursor: 'pointer', transition: 'color 0.2s', fontWeight: '500' }} onMouseOver={e => e.currentTarget.style.color = 'var(--navy-900)'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-muted)'} onClick={() => navigate('/shows')}>Shows</span>
-          <span>&gt;</span>
-          <span style={{ color: 'var(--navy-900)', fontWeight: '600' }}>{isEditMode ? 'Edit Show' : 'Create New Show'}</span>
-        </div>
-        
-        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
-          <div>
-            <h1 style={{ fontSize: '28px', fontWeight: '800', color: 'var(--navy-900)', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
-              {isEditMode ? 'Edit Show' : 'Create New Show'}
-            </h1>
-            <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
-              {isEditMode ? "Update the show's information and artwork." : "Add a new show to your library. All fields marked with * are required."}
-            </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px' }}>
+            <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseOver={e => e.target.style.color='var(--navy-900)'} onMouseOut={e => e.target.style.color='var(--text-muted)'} onClick={() => navigate('/shows')}>Shows</span>
+            <span style={{ color: 'var(--purple-300)' }}>&gt;</span>
+            <span style={{ color: 'var(--purple-700)' }}>{isEditMode ? 'Edit Show' : 'Create New Show'}</span>
           </div>
-          
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button 
-              onClick={() => {
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button type="button" onClick={() => {
                 if (isDirty && !window.confirm("You have unsaved changes. Are you sure you want to leave?")) return;
                 navigate('/shows');
               }}
-              className="btn btn-outline" style={{ height: '44px', borderRadius: '12px', padding: '0 20px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--navy-900)', border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF' }}>
-              <ArrowLeft size={16} /> Back to Shows
+              className="btn btn-outline" style={{ height: '40px', padding: '0 20px', borderRadius: '8px', fontWeight: '600', fontSize: '14px', backgroundColor: '#FFFFFF', color: 'var(--navy-900)', border: '1px solid #CBD5E1' }}>
+              Cancel
             </button>
-            
             <button 
               onClick={handleSubmit}
               disabled={isSaving || !formData.title || !formData.slug || !formData.section || formData.categories.length === 0}
-              className="btn btn-primary" style={{ height: '44px', borderRadius: '12px', padding: '0 24px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s', backgroundColor: 'var(--purple-500)', border: 'none', color: '#FFF' }}>
-              {isSaving && <div style={{ width: '16px', height: '16px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#FFF', animation: 'spin 1s linear infinite' }}/>}
-              {!isSaving && isSaved && <Check size={16} />}
-              {isSaving ? 'Saving...' : isSaved ? 'Saved' : 'Save Show'}
+              className="btn btn-primary" style={{ height: '40px', padding: '0 24px', borderRadius: '8px', fontWeight: '600', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'var(--purple-500)', color: '#FFFFFF', border: 'none' }}>
+              {isSaving && <div style={{ width: '14px', height: '14px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#FFF', animation: 'spin 1s linear infinite' }}/>}
+              {!isSaving && isSaved ? <Check size={16} /> : (!isSaving && <Save size={16} />)}
+              {isSaving ? 'Saving...' : isSaved ? 'Saved' : isEditMode ? 'Save Show' : 'Create Show'}
             </button>
+          </div>
+        </div>
+        
+        <div>
+          <h1 style={{ fontSize: '28px', fontWeight: '800', color: 'var(--navy-900)', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
+            {isEditMode ? 'Edit Show' : 'Create New Show'}
+          </h1>
+          <div style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
+            {isEditMode ? "Update the show's information and artwork. All fields marked with * are required." : "Add a new show to your library. All fields marked with * are required."}
           </div>
         </div>
       </div>
