@@ -134,9 +134,19 @@ def test_artwork_upload(client, db_session):
     files = {'file': ('test.jpg', img_bytes, 'image/jpeg')}
     data = {'entity_type': 'show', 'entity_id': show_id, 'type': 'poster'}
     
+    import os
+    from app.core.config import settings
+
     upload_res = client.post("/admin/artwork", data=data, files=files, headers=headers)
     assert upload_res.status_code == 200
     assert upload_res.json()["status"] == "success"
+
+    # Clean up uploaded test file from disk
+    uploaded_url = upload_res.json().get("artwork", {}).get("url", "")
+    if uploaded_url.startswith("/assets/"):
+        test_file_path = os.path.join(settings.ASSETS_DIR, uploaded_url.replace("/assets/", ""))
+        if os.path.exists(test_file_path):
+            os.remove(test_file_path)
     
     # Test invalid aspect ratio (16:9 for poster)
     img_invalid = Image.new('RGB', (1600, 900), color = 'red')

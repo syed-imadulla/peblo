@@ -25,6 +25,7 @@ viewer/dist/
 *.db
 backend/data/*.json
 !backend/data/.gitkeep
+docs/challenge/assets/artwork_*.*
 
 # OS / IDE
 .DS_Store
