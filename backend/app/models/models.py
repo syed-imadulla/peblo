@@ -55,10 +55,14 @@ class Episode(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     season_id = Column(UUID(as_uuid=True), ForeignKey("seasons.id", ondelete="CASCADE"), nullable=False)
     episode_title = Column(String, nullable=False)
+    slug = Column(String, unique=True, nullable=True)
+    episode_number = Column(Integer, nullable=True)
+    synopsis = Column(String, nullable=True)
     status = Column(String, nullable=False) # 'draft' or 'published'
     duration_seconds = Column(Integer, nullable=True)
     language = Column(String, nullable=True)
     content_group = Column(String, nullable=False)
+    availability = Column(String, default="All Regions", nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 

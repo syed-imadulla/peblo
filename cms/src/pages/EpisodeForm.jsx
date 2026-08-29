@@ -353,9 +353,13 @@ const EpisodeForm = () => {
     const submissionData = {
       season_id: formData.season_id,
       episode_title: formData.episode_title,
+      slug: formData.slug || null,
+      episode_number: formData.episode_number ? parseInt(formData.episode_number, 10) : null,
+      synopsis: formData.synopsis || null,
       content_group: formData.content_group,
       language: formData.language,
-      status: formData.status === 'Review' ? 'draft' : formData.status, // Fallback 'Review' to 'draft' as it might not be supported in backend
+      status: formData.status, 
+      availability: formData.availability || "All Regions",
       duration_seconds: isNaN(parsedSeconds) ? null : parsedSeconds
     };
     

@@ -24,10 +24,14 @@ class ArtworkSchema(BaseModel):
 class EpisodeCreate(BaseModel):
     season_id: UUID
     episode_title: str
+    slug: Optional[str] = None
+    episode_number: Optional[int] = None
+    synopsis: Optional[str] = None
     status: str
     duration_seconds: Optional[int] = None
     language: Optional[str] = None
     content_group: str
+    availability: Optional[str] = "All Regions"
 
 class EpisodeSchema(EpisodeCreate):
     id: UUID
