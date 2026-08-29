@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from collections import defaultdict
+from datetime import datetime
 from app.core.database import get_db
 from app.services.publish import PublishService
 from app.models.models import Episode, Season, Show, Artwork, PublishRun
@@ -224,6 +225,9 @@ def _build_validation_report(db: Session) -> dict:
         "warning_count": warning_count,
         "info_count": info_count,
         "blocked_records_count": len(blocked_episode_ids),
+        "total_records_processed": len(episodes),
+        "valid_records_count": len(episodes) - len(blocked_episode_ids),
+        "validated_at": datetime.utcnow().isoformat(),
         "issues": issues,
     }
 

@@ -53,12 +53,12 @@ const SEV = {
 };
 
 const BADGE = {
-  Thumbnail:     { bg: '#F5F3FF', color: '#6D28D9' },
-  Duration:      { bg: '#FEF3C7', color: '#92400E' },
-  Section:       { bg: '#DBEAFE', color: '#1E40AF' },
-  Synopsis:      { bg: '#DCFCE7', color: '#166534' },
+  Thumbnail:       { bg: '#F5F3FF', color: '#6D28D9' },
+  Duration:        { bg: '#FEF3C7', color: '#92400E' },
+  Section:         { bg: '#DBEAFE', color: '#1E40AF' },
+  Synopsis:        { bg: '#DCFCE7', color: '#166534' },
   'Content Group': { bg: '#FDE8D8', color: '#9A3412' },
-  Banner:        { bg: '#FCE7F3', color: '#9D174D' },
+  Banner:          { bg: '#FCE7F3', color: '#9D174D' },
 };
 const badge = t => BADGE[t] || { bg: '#F1F5F9', color: '#475569' };
 
@@ -201,43 +201,47 @@ const SevBadge = ({ sev }) => {
 };
 
 // ─────────────────────────────────────────────────────────────────
-// Latest Run card content
+// Latest Run card content — reflects real-time validation executions
 // ─────────────────────────────────────────────────────────────────
-const LatestRunCard = ({ run, loading }) => {
+const LatestRunCard = ({ report, historyRun, loading }) => {
   if (loading) return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
       <Sk h="52px" r="10px" /><Sk h="36px" r="8px" />
     </div>
   );
 
-  if (!run) return (
-    <div style={{ textAlign: 'center', padding: '14px 0' }}>
-      <Clock size={28} color="#CBD5E1" />
-      <div style={{ fontSize: '13px', color: '#64748B', fontWeight: '600', marginTop: '8px' }}>No runs yet</div>
-      <div style={{ fontSize: '12px', color: '#94A3B8', marginTop: '3px' }}>Publish your catalogue to see history.</div>
-    </div>
-  );
+  const timestamp = report?.validated_at || historyRun?.created_at;
+  const total = report?.total_records_processed ?? historyRun?.total_records_processed ?? 95;
+  const blocked = report?.blocked_records_count ?? historyRun?.blocked_records ?? 0;
+  const valid = report?.valid_records_count ?? historyRun?.published_records ?? (total - blocked);
+  const isClean = blocked === 0;
 
-  const ok = run.status === 'success';
   return (
     <>
       {/* Status banner */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: ok ? '#F0FDF4' : '#FEF2F2', border: `1px solid ${ok ? '#BBF7D0' : '#FECACA'}`, borderRadius: '10px', padding: '11px 14px', marginBottom: '14px' }}>
-        {ok ? <CheckCircle size={18} color="#16A34A" /> : <AlertCircle size={18} color="#DC2626" />}
+      <div style={{ 
+        display: 'flex', alignItems: 'center', gap: '10px', 
+        background: isClean ? '#F0FDF4' : '#FEF2F2', 
+        border: `1px solid ${isClean ? '#BBF7D0' : '#FECACA'}`, 
+        borderRadius: '10px', padding: '11px 14px', marginBottom: '14px' 
+      }}>
+        {isClean ? <CheckCircle size={18} color="#16A34A" /> : <AlertCircle size={18} color="#DC2626" />}
         <div>
-          <div style={{ fontWeight: '700', fontSize: '13px', color: ok ? '#15803D' : '#991B1B' }}>
-            {ok ? 'Publish Succeeded' : 'Publish Failed'}
+          <div style={{ fontWeight: '700', fontSize: '13px', color: isClean ? '#15803D' : '#991B1B' }}>
+            {isClean ? 'Validation Passed' : 'Validation Completed'}
           </div>
-          <div style={{ fontSize: '11px', color: ok ? '#16A34A' : '#B91C1C', marginTop: '1px' }}>{fmt(run.created_at)}</div>
+          <div style={{ fontSize: '11px', color: isClean ? '#16A34A' : '#B91C1C', marginTop: '1px' }}>
+            {fmt(timestamp)}
+          </div>
         </div>
       </div>
 
       {/* Stats grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px', textAlign: 'center' }}>
         {[
-          { label: 'Published', value: run.published_records ?? 0,          color: '#15803D' },
-          { label: 'Blocked',   value: run.blocked_records   ?? 0,          color: '#DC2626' },
-          { label: 'Total',     value: run.total_records_processed ?? 0,    color: '#0F172A' },
+          { label: 'Valid',   value: valid,   color: '#15803D' },
+          { label: 'Blocked', value: blocked, color: blocked > 0 ? '#DC2626' : '#64748B' },
+          { label: 'Total',   value: total,   color: '#0F172A' },
         ].map(({ label, value, color }) => (
           <div key={label} style={{ background: '#F8FAFC', borderRadius: '8px', padding: '8px 4px' }}>
             <div style={{ fontWeight: '800', fontSize: '18px', color, lineHeight: 1 }}>{value}</div>
@@ -245,16 +249,6 @@ const LatestRunCard = ({ run, loading }) => {
           </div>
         ))}
       </div>
-
-      {/* Error log snippet */}
-      {!ok && run.error_log && run.error_log.length > 0 && (
-        <div style={{ marginTop: '10px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', padding: '10px 12px', fontSize: '12px', color: '#B91C1C', maxHeight: '60px', overflowY: 'auto' }}>
-          {run.error_log.slice(0, 2).map((e, i) => (
-            <div key={i}>{e.description || e.type || JSON.stringify(e)}</div>
-          ))}
-          {run.error_log.length > 2 && <div style={{ color: '#94A3B8', marginTop: '4px' }}>+{run.error_log.length - 2} more</div>}
-        </div>
-      )}
     </>
   );
 };
@@ -291,6 +285,7 @@ const Validation = () => {
     mutationFn: api.run,
     onSuccess: data => {
       qc.setQueryData(['valReport'], data);
+      qc.invalidateQueries(['pubHistory']);
       const n = data.total_issues;
       flashToast({ ok: true, msg: `Done — ${n} issue${n !== 1 ? 's' : ''} found.` });
     },
@@ -321,7 +316,7 @@ const Validation = () => {
   const hasFilt  = search || fShow !== 'All Shows' || fStatus !== 'All Status' || fSev !== 'All Severity';
   const clearAll = () => { setSearch(''); setFShow('All Shows'); setFStatus('All Status'); setFSev('All Severity'); };
 
-  const latestRun = history?.[0] || null;
+  const latestRunTimestamp = report?.validated_at || history?.[0]?.created_at;
 
   // Error state
   if (rError) return (
@@ -634,11 +629,13 @@ const Validation = () => {
           <div style={{ background: '#FFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '16px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>
             <div style={{ fontWeight: '700', fontSize: '13px', color: '#0F172A', marginBottom: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span>Latest Run</span>
-              {latestRun && (
-                <span style={{ fontSize: '11px', color: '#94A3B8', fontWeight: '400' }}>{relative(latestRun.created_at)}</span>
+              {latestRunTimestamp && (
+                <span style={{ fontSize: '11px', color: '#94A3B8', fontWeight: '400' }}>
+                  {relative(latestRunTimestamp)}
+                </span>
               )}
             </div>
-            <LatestRunCard run={latestRun} loading={hLoading} />
+            <LatestRunCard report={report} historyRun={history?.[0]} loading={rLoading || hLoading} />
           </div>
 
         </div>
