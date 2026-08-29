@@ -178,6 +178,13 @@ def update_episode(episode_id: UUID, episode_data: EpisodeCreate, db: Session = 
     db.refresh(episode)
     return episode
 
+@router.get("/episodes/{episode_id}", response_model=EpisodeSchema)
+def get_episode(episode_id: UUID, db: Session = Depends(get_db)):
+    episode = db.query(Episode).filter(Episode.id == episode_id).first()
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+    return episode
+
 @router.delete("/episodes/{episode_id}")
 def delete_episode(episode_id: UUID, db: Session = Depends(get_db)):
     episode = db.query(Episode).filter(Episode.id == episode_id).first()
