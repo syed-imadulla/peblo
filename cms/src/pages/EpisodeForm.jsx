@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { ChevronDown, Check, Image as ImageIcon, UploadCloud, AlertCircle, Info, Lock, Save, Clock, CheckSquare, Lightbulb } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Check, X, Image as ImageIcon, UploadCloud, AlertCircle, Info, Lock, Save, Clock, Globe, MapPin, Edit3, Target, Type } from 'lucide-react';
 
 const LANGUAGES = [
   { label: 'English', value: 'en' },
@@ -10,7 +10,7 @@ const LANGUAGES = [
 ];
 
 // Custom Dropdown Component
-const CustomDropdown = ({ value, options, onChange, label, placeholder, helperText }) => {
+const CustomDropdown = ({ value, options, onChange, label, placeholder, helperText, required = true, disabled = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
 
@@ -24,34 +24,36 @@ const CustomDropdown = ({ value, options, onChange, label, placeholder, helperTe
 
   const selectedOption = options.find(opt => (opt.value || opt) === value);
   const displayValue = selectedOption ? (selectedOption.label || selectedOption) : placeholder;
+  const isActuallyDisabled = disabled || options.length === 0;
 
   return (
     <div className="form-group" ref={ref}>
-      {label && (
-        <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
-          {label} <span style={{ color: '#DC2626' }}>*</span>
-        </label>
-      )}
+      <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
+        {label} {required && <span style={{ color: '#DC2626' }}>*</span>}
+      </label>
       <div style={{ position: 'relative' }}>
         <div 
           className="form-control"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => !isActuallyDisabled && setIsOpen(!isOpen)}
           style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+            cursor: isActuallyDisabled ? 'not-allowed' : 'pointer',
+            backgroundColor: isActuallyDisabled ? '#F8FAFC' : '#FFFFFF',
             boxShadow: isOpen ? '0 0 0 3px var(--purple-50)' : 'none', borderColor: isOpen ? 'var(--purple-500)' : undefined,
             color: value ? 'var(--navy-900)' : 'var(--text-muted)'
           }}
-          tabIndex={0}
+          tabIndex={isActuallyDisabled ? -1 : 0}
           onKeyDown={(e) => {
+            if (isActuallyDisabled) return;
             if (e.key === 'Enter' || e.key === ' ') setIsOpen(!isOpen);
             if (e.key === 'Escape') setIsOpen(false);
           }}
         >
           {displayValue}
-          <ChevronDown size={16} color="var(--text-muted)" style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+          <ChevronDown size={16} color="var(--text-muted)" style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', opacity: isActuallyDisabled ? 0.5 : 1 }} />
         </div>
         
-        {isOpen && (
+        {isOpen && !isActuallyDisabled && (
           <div className="custom-scrollbar" style={{
             position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, backgroundColor: '#FFFFFF', border: '1px solid #CBD5E1', 
             borderRadius: '10px', boxShadow: '0 10px 30px rgba(0,0,0,0.15)', zIndex: 100, padding: '6px', maxHeight: '180px', overflowY: 'auto'
@@ -151,13 +153,10 @@ const ArtworkUploadCard = ({ type, aspectText, width, height, maxKb, entityId, e
       
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
         <div style={{ fontWeight: '600', color: 'var(--navy-900)', fontSize: '14px', marginBottom: '4px' }}>
-          {type} <span style={{ color: 'var(--text-muted)', fontWeight: '400', fontSize: '13px' }}>({aspectText}) <span style={{color: '#DC2626'}}>*</span></span>
+          {type} <span style={{ color: 'var(--text-muted)', fontWeight: '400', fontSize: '13px' }}>({aspectText})</span>
         </div>
         <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }}>
-          {width} × {height} px • Max {maxKb} KB<br/>
-          {type === 'Thumbnail' && 'Used in episode lists and rows.'}
-          {type === 'Banner' && 'Displayed on episode detail page.'}
-          {type === 'Poster' && 'Best for episode detail and sharing.'}
+          {width} × {height} px • Max {maxKb} KB
         </div>
         
         {error && <div style={{ color: '#DC2626', fontSize: '12px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}><AlertCircle size={14}/> {error}</div>}
@@ -204,14 +203,17 @@ const EpisodeForm = () => {
   const [formData, setFormData] = useState({
     show_id: '',
     season_id: '',
+    episode_number: '',
     episode_title: '',
+    slug: '',
+    synopsis: '',
     content_group: '',
     language: 'en',
-    duration_seconds: '',
-    status: 'draft'
+    duration: '',
+    status: 'draft',
+    availability: 'All Regions'
   });
   
-  const [durationInput, setDurationInput] = useState('');
   const [isDirty, setIsDirty] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -258,22 +260,27 @@ const EpisodeForm = () => {
         }
       }
       
+      // Format duration_seconds to MM:SS
+      let formattedDuration = '';
+      if (episode.duration_seconds != null) {
+        const m = Math.floor(episode.duration_seconds / 60).toString().padStart(2, '0');
+        const s = (episode.duration_seconds % 60).toString().padStart(2, '0');
+        formattedDuration = `${m}:${s}`;
+      }
+
       setFormData({
         show_id: foundShowId,
         season_id: episode.season_id || '',
+        episode_number: episode.episode_number || '', // Local only
         episode_title: episode.episode_title || '',
+        slug: episode.slug || '', // Local only
+        synopsis: episode.synopsis || '', // Local only
         content_group: episode.content_group || '',
         language: episode.language || 'en',
-        duration_seconds: episode.duration_seconds || '',
-        status: episode.status || 'draft'
+        duration: formattedDuration,
+        status: episode.status || 'draft',
+        availability: episode.availability || 'All Regions' // Local only
       });
-      
-      if (episode.duration_seconds) {
-        const m = Math.floor(episode.duration_seconds / 60).toString().padStart(2, '0');
-        const s = (episode.duration_seconds % 60).toString().padStart(2, '0');
-        setDurationInput(`${m}:${s}`);
-      }
-
       setIsDirty(false);
     }
   }, [episode, shows]);
@@ -328,49 +335,29 @@ const EpisodeForm = () => {
     setIsSaved(false);
   };
 
-  const handleDurationChange = (e) => {
-    setDurationInput(e.target.value);
-    setIsDirty(true);
-    setIsSaved(false);
-  };
-
-  const handleDurationBlur = () => {
-    const parts = durationInput.split(':');
-    let totalSeconds = 0;
-    if (parts.length === 2) {
-      totalSeconds = parseInt(parts[0] || '0', 10) * 60 + parseInt(parts[1] || '0', 10);
-    } else {
-      totalSeconds = parseInt(durationInput || '0', 10);
-    }
-    
-    handleChange('duration_seconds', totalSeconds);
-    
-    if (totalSeconds > 0) {
-      const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
-      const s = (totalSeconds % 60).toString().padStart(2, '0');
-      setDurationInput(`${m}:${s}`);
-    } else {
-      setDurationInput('');
-    }
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.season_id || !formData.episode_title || !formData.content_group) return;
     
+    // Parse MM:SS to seconds
+    let parsedSeconds = null;
+    if (formData.duration) {
+      const parts = formData.duration.split(':');
+      if (parts.length === 2) {
+        parsedSeconds = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+      } else {
+        parsedSeconds = parseInt(formData.duration, 10);
+      }
+    }
+
     const submissionData = {
       season_id: formData.season_id,
       episode_title: formData.episode_title,
       content_group: formData.content_group,
       language: formData.language,
-      status: formData.status
+      status: formData.status === 'Review' ? 'draft' : formData.status, // Fallback 'Review' to 'draft' as it might not be supported in backend
+      duration_seconds: isNaN(parsedSeconds) ? null : parsedSeconds
     };
-
-    if (formData.duration_seconds) {
-      submissionData.duration_seconds = parseInt(formData.duration_seconds, 10);
-    } else {
-      submissionData.duration_seconds = null;
-    }
     
     if (isEditMode) {
       updateMutation.mutate(submissionData);
@@ -419,11 +406,10 @@ const EpisodeForm = () => {
             <button 
               onClick={handleSubmit}
               disabled={isSaving || !formData.season_id || !formData.episode_title || !formData.content_group}
-              className="btn btn-primary" style={{ height: '40px', padding: '0 24px', borderRadius: '8px', fontWeight: '600', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'var(--purple-600)', color: '#FFFFFF', border: 'none' }}>
+              className="btn btn-primary" style={{ height: '40px', padding: '0 24px', borderRadius: '8px', fontWeight: '600', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'var(--purple-500)', color: '#FFFFFF', border: 'none' }}>
               {isSaving && <div style={{ width: '14px', height: '14px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#FFF', animation: 'spin 1s linear infinite' }}/>}
               {!isSaving && isSaved ? <Check size={16} /> : (!isSaving && <Save size={16} />)}
-              {isSaving ? 'Saving...' : isSaved ? 'Saved' : isEditMode ? 'Save Changes' : 'Create Episode'}
-              {!isSaving && !isSaved && <ChevronDown size={16} style={{ marginLeft: '4px' }} />}
+              {isSaving ? 'Saving...' : isSaved ? 'Saved' : isEditMode ? 'Save Episode' : 'Create Episode'}
             </button>
           </div>
         </div>
@@ -433,7 +419,7 @@ const EpisodeForm = () => {
             {isEditMode ? 'Edit Episode' : 'Create New Episode'}
           </h1>
           <div style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
-            {isEditMode ? "Update the episode's information and artwork. All fields marked with * are required." : "Add a new episode to the show. All fields marked with * are required."}
+            {isEditMode ? "Update the episode's information and artwork. All fields marked with * are required." : "Add a new episode to a show. All fields marked with * are required."}
           </div>
         </div>
       </div>
@@ -450,18 +436,17 @@ const EpisodeForm = () => {
         
         {/* LEFT COLUMN: Basic Info */}
         <div>
-          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '32px', boxShadow: 'var(--shadow-sm)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '32px', boxShadow: 'var(--shadow-sm)', height: '100%', display: 'flex', flexDirection: 'column', gap: '24px', justifyContent: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Info size={18} color="var(--purple-700)" />
               <h2 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--navy-900)', margin: 0 }}>
-                Episode Information
+                Basic Information
               </h2>
             </div>
             
-            {/* ROW 1: 3-Column Grid, but 3rd column is intentionally blank as requested since it's unsupported */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '24px' }}>
+            <div className="grid-cols-3" style={{ display: 'grid', gap: '24px' }}>
               <CustomDropdown 
-                label="Show"
+                label="Show *"
                 placeholder="Select show"
                 value={formData.show_id}
                 options={showOptions}
@@ -469,19 +454,31 @@ const EpisodeForm = () => {
                 helperText="Choose the show this episode belongs to."
               />
               <CustomDropdown 
-                label="Season"
+                label="Season (Optional)"
                 placeholder={formData.show_id ? "Select season" : "Select show first"}
                 value={formData.season_id}
                 options={seasonOptions}
                 onChange={val => handleChange('season_id', val)}
                 helperText="Select season if this episode is part of a series."
+                required={false}
               />
-              <div style={{ display: 'none' }} className="responsive-spacer"></div>
+              <div className="form-group">
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
+                  Episode Number <span style={{ color: '#DC2626' }}>*</span>
+                </label>
+                <input 
+                  type="text" 
+                  className="form-control"
+                  value={formData.episode_number} 
+                  onChange={e => handleChange('episode_number', e.target.value)}
+                  placeholder="e.g. 1, 2, 3"
+                />
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>Episode number in this season.</div>
+              </div>
             </div>
 
-            {/* ROW 2: Episode Title */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '24px' }}>
-              <div className="form-group" style={{ gridColumn: 'span 2' }}>
+            <div className="grid-cols-2" style={{ display: 'grid', gap: '24px' }}>
+              <div className="form-group">
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
                   Episode Title <span style={{ color: '#DC2626' }}>*</span>
                 </label>
@@ -494,30 +491,50 @@ const EpisodeForm = () => {
                 />
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>Enter a clear and engaging title for the episode.</div>
               </div>
-            </div>
 
-            {/* ROW 3: Content Group, Language, Duration */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginBottom: '24px' }}>
               <div className="form-group">
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
-                  Content Group <span style={{ color: '#DC2626' }}>*</span>
+                  Episode Slug <span style={{ color: '#DC2626' }}>*</span>
                 </label>
-                <CustomDropdown 
-                  label={null}
-                  placeholder="Select content group"
-                  value={formData.content_group}
-                  options={[
-                    {label: 'motis-many-lives-s01e01', value: 'motis-many-lives-s01e01'},
-                    {label: 'motis-many-lives-s01e02', value: 'motis-many-lives-s01e02'},
-                    {label: 'unspecified', value: 'unspecified'}
-                  ]}
-                  onChange={val => handleChange('content_group', val)}
-                  helperText="Episodes with the same content group are language variants of the same episode."
+                <input 
+                  type="text" 
+                  className="form-control"
+                  value={formData.slug} 
+                  onChange={e => handleChange('slug', e.target.value)}
+                  placeholder="episode-slug"
                 />
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>URL friendly unique identifier (auto-generated recommended).</div>
               </div>
+            </div>
+
+            <div className="form-group">
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
+                Synopsis (Optional)
+              </label>
+              <textarea 
+                className="form-control"
+                value={formData.synopsis} 
+                onChange={e => handleChange('synopsis', e.target.value)}
+                placeholder="Write a brief synopsis about this episode..."
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>
+                <span>Brief description of what this episode is about.</span>
+                <span>{formData.synopsis.length} / 500</span>
+              </div>
+            </div>
+
+            <div className="grid-cols-3" style={{ display: 'grid', gap: '24px' }}>
+              <CustomDropdown 
+                label="Content Group *"
+                placeholder="Select content group"
+                value={formData.content_group}
+                options={[{label: 'None', value: 'none'}]}
+                onChange={val => handleChange('content_group', val)}
+                helperText="Episodes with the same content group are language variants of the same episode."
+              />
 
               <CustomDropdown 
-                label="Primary Language"
+                label="Primary Language *"
                 placeholder="Select language"
                 value={formData.language}
                 options={LANGUAGES}
@@ -533,60 +550,77 @@ const EpisodeForm = () => {
                   <input 
                     type="text" 
                     className="form-control"
-                    value={durationInput}
-                    onChange={handleDurationChange}
-                    onBlur={handleDurationBlur}
+                    value={formData.duration} 
+                    onChange={e => handleChange('duration', e.target.value)}
                     placeholder="MM:SS"
                   />
                   <Clock size={16} color="var(--text-muted)" style={{ position: 'absolute', right: '12px', top: '12px' }} />
                 </div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>
-                  Episode duration (e.g. 12:30).
-                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>Episode duration (e.g. 12:30).</div>
               </div>
             </div>
 
-            {/* ROW 4: Status */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
-              <div className="form-group" style={{ gridColumn: 'span 2' }}>
+            <div className="grid-cols-2" style={{ display: 'grid', gap: '24px' }}>
+              <div className="form-group">
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
                   Status <span style={{ color: '#DC2626' }}>*</span>
                 </label>
                 <div style={{ display: 'flex', backgroundColor: '#F8FAFC', borderRadius: '8px', padding: '4px', height: '40px', border: '1px solid #CBD5E1' }}>
-                  {[ {label: 'Draft', value: 'draft'}, {label: 'Published', value: 'published'}].map(s => (
+                  {[ {label: 'Draft', value: 'draft'}, {label: 'Review', value: 'Review'}, {label: 'Published', value: 'published'}].map(s => (
                     <div 
                       key={s.value}
                       onClick={() => handleChange('status', s.value)}
                       style={{ 
                         flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '600', borderRadius: '4px', cursor: 'pointer', 
-                        backgroundColor: formData.status === s.value ? (s.value === 'draft' ? '#FFEDD5' : '#F5F3FF') : 'transparent', 
-                        color: formData.status === s.value ? (s.value === 'draft' ? '#C2410C' : 'var(--purple-700)') : 'var(--navy-900)',
+                        backgroundColor: formData.status === s.value ? (s.value === 'draft' ? '#FFEDD5' : s.value === 'published' ? '#DCFCE7' : '#E0E7FF') : 'transparent', 
+                        color: formData.status === s.value ? (s.value === 'draft' ? '#C2410C' : s.value === 'published' ? '#15803D' : '#4338CA') : 'var(--navy-900)',
                         boxShadow: formData.status === s.value ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
                       }}>
-                      {s.value === 'draft' && formData.status === s.value ? <span style={{marginRight: '6px', color: '#F97316'}}>●</span> : null} 
+                      {s.value === 'draft' ? <span style={{marginRight: '6px', fontSize: '16px', lineHeight: 1}}>•</span> : null} 
                       {s.label}
                     </div>
                   ))}
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>Only published episodes are visible to viewers.</div>
               </div>
+
+              <div className="form-group">
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
+                  Availability
+                </label>
+                <div style={{ display: 'flex', backgroundColor: '#F8FAFC', borderRadius: '8px', padding: '4px', height: '40px', border: '1px solid #CBD5E1' }}>
+                  {[ {label: 'All Regions', value: 'All Regions', icon: Globe}, {label: 'Limited Regions', value: 'Limited Regions', icon: MapPin}].map(s => {
+                    const IconComponent = s.icon;
+                    return (
+                      <div 
+                        key={s.value}
+                        onClick={() => handleChange('availability', s.value)}
+                        style={{ 
+                          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '600', borderRadius: '4px', cursor: 'pointer', gap: '6px',
+                          backgroundColor: formData.availability === s.value ? 'var(--purple-100)' : 'transparent', 
+                          color: formData.availability === s.value ? 'var(--purple-700)' : 'var(--navy-900)',
+                          boxShadow: formData.availability === s.value ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
+                        }}>
+                        <IconComponent size={14} />
+                        {s.label}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>Choose where this episode will be available.</div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* RIGHT COLUMN */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
-          {/* Episode Artwork Card */}
-          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '32px', boxShadow: 'var(--shadow-sm)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <ImageIcon size={18} color="var(--purple-700)" />
-              <h2 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--navy-900)', margin: 0 }}>
-                Episode Artwork
-              </h2>
-            </div>
+        {/* RIGHT COLUMN: Artwork */}
+        <div>
+          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '32px', boxShadow: 'var(--shadow-sm)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--navy-900)', marginBottom: '8px', marginTop: 0 }}>
+              Episode Artwork
+            </h2>
             <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '24px', lineHeight: '1.5' }}>
-              Upload images that represent this episode.<br/>Images are required for publishing.
+              Upload images that represent your episode.<br/>Images are required for publishing.
             </div>
 
             <div>
@@ -603,68 +637,25 @@ const EpisodeForm = () => {
                 entityId={id} existingArtwork={artworkMap} onUploadSuccess={refetchEpisode} isDisabled={!isEditMode}
               />
             </div>
-          </div>
-          
-          {/* Artwork Guidelines Card */}
-          <div style={{ padding: '20px', backgroundColor: '#F5F3FF', border: '1px solid #E0E7FF', borderRadius: '16px' }}>
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-              <Info size={18} color="var(--purple-700)" style={{ flexShrink: 0, marginTop: '2px' }} />
-              <div>
-                <div style={{ fontWeight: '700', color: 'var(--purple-800)', fontSize: '14px', marginBottom: '6px' }}>
-                  Artwork Guidelines
+            
+            <div style={{ marginTop: 'auto', paddingTop: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div style={{ padding: '16px', backgroundColor: 'var(--purple-50)', borderRadius: '12px', display: 'flex', gap: '12px', alignItems: 'flex-start', border: '1px solid var(--purple-100)' }}>
+                <Info size={18} color="var(--purple-700)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                <div>
+                  <div style={{ fontWeight: '600', color: 'var(--purple-700)', fontSize: '13px', marginBottom: '4px' }}>
+                    Artwork Guidelines
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--purple-700)', opacity: 0.8, lineHeight: '1.5', marginBottom: '8px' }}>
+                    Ensure images meet the size, aspect ratio and file size requirements.
+                  </div>
+                  <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--purple-700)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    View Artwork Specification &rarr;
+                  </div>
                 </div>
-                <div style={{ fontSize: '13px', color: 'var(--purple-700)', opacity: 0.85, lineHeight: '1.5', marginBottom: '12px' }}>
-                  Ensure images meet the size, aspect ratio and file size requirements.
-                </div>
-                <a href="#" style={{ fontSize: '13px', fontWeight: '600', color: 'var(--purple-700)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  View Artwork Specification <span style={{ fontSize: '16px', lineHeight: 1 }}>→</span>
-                </a>
               </div>
-            </div>
-          </div>
-
-          {/* Quick Tips Card */}
-          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '24px', boxShadow: 'var(--shadow-sm)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-              <Lightbulb size={18} color="var(--purple-700)" />
-              <h2 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--navy-900)', margin: 0 }}>
-                Quick Tips
-              </h2>
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <div style={{ width: '24px', height: '24px', borderRadius: '6px', backgroundColor: '#F5F3FF', color: 'var(--purple-600)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <CheckSquare size={14} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--navy-900)', marginBottom: '2px' }}>Use clear titles</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Keep episode titles short and engaging</div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <div style={{ width: '24px', height: '24px', borderRadius: '6px', backgroundColor: '#FFF7ED', color: '#EA580C', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Clock size={14} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--navy-900)', marginBottom: '2px' }}>Add accurate duration</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Helps viewers know what to expect</div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <div style={{ width: '24px', height: '24px', borderRadius: '6px', backgroundColor: '#F0FDF4', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <CheckSquare size={14} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--navy-900)', marginBottom: '2px' }}>Choose correct content group</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Ensures proper categorization and discovery</div>
-                </div>
-              </div>
-            </div>
           </div>
-          
         </div>
 
       </div>
