@@ -111,13 +111,14 @@ const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix,
           {options.map(opt => (
             <div 
               key={opt}
+              title={opt}
               onClick={() => { onChange(opt); setIsOpen(false); }}
-              style={{ padding: '8px 12px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', backgroundColor: value === opt ? 'var(--purple-50)' : 'transparent', color: value === opt ? 'var(--purple-700)' : 'var(--navy-900)', fontWeight: value === opt ? '600' : '400', display: 'flex', alignItems: 'center', justifyContent: 'space-between', whiteSpace: 'nowrap' }}
+              style={{ padding: '8px 12px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', backgroundColor: value === opt ? 'var(--purple-50)' : 'transparent', color: value === opt ? 'var(--purple-700)' : 'var(--navy-900)', fontWeight: value === opt ? '600' : '400', display: 'flex', alignItems: 'center', justifyContent: 'space-between', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
               onMouseOver={e => { if (value !== opt) e.currentTarget.style.backgroundColor = 'var(--gray-50)' }}
               onMouseOut={e => { if (value !== opt) e.currentTarget.style.backgroundColor = 'transparent' }}
             >
-              {opt}
-              {value === opt && <Check size={14} />}
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: '8px' }}>{opt}</span>
+              {value === opt && <Check size={14} style={{ flexShrink: 0 }} />}
             </div>
           ))}
         </div>
@@ -350,19 +351,6 @@ const EpisodesList = () => {
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
       
-      {/* HEADER */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-        <div>
-          <h1 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--navy-900)', margin: '0 0 4px 0', letterSpacing: '-0.5px' }}>Episodes</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '14px', margin: 0 }}>Manage and organize all episodes in your library.</p>
-        </div>
-        <button 
-          onClick={handleCreateClick}
-          className="btn btn-primary" style={{ height: '40px', padding: '0 24px', borderRadius: '8px', fontWeight: '600', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'var(--purple-700)', color: '#FFFFFF', border: 'none', boxShadow: '0 4px 12px rgba(109, 40, 217, 0.25)', cursor: 'pointer' }}>
-          + Add New Episode
-        </button>
-      </div>
-
       {/* FILTER BAR */}
       <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', marginBottom: hasActiveFilters ? '16px' : '24px', flexWrap: 'wrap', position: 'relative', zIndex: 100 }}>
         <div style={{ position: 'relative', flex: 1, minWidth: '240px' }}>
@@ -487,15 +475,15 @@ const EpisodesList = () => {
               <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, textAlign: 'left', minWidth: '1100px' }}>
                 <thead>
                 <tr style={{ backgroundColor: '#FFFFFF', color: '#475569', fontSize: '12px', fontWeight: '700' }}>
-                  <th style={{ padding: '16px 24px', width: '25%', textTransform: 'uppercase', letterSpacing: '0.5px', borderTopLeftRadius: '24px', borderBottom: '1px solid #E2E8F0' }}>Episode</th>
-                  <th style={{ padding: '16px 16px', width: '20%', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Show</th>
-                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Content Group</th>
-                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Language</th>
-                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Duration</th>
-                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Status</th>
-                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Validation</th>
-                  <th style={{ padding: '16px 16px', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Updated</th>
-                  <th style={{ padding: '16px 24px', textAlign: 'right', textTransform: 'uppercase', letterSpacing: '0.5px', borderTopRightRadius: '24px', borderBottom: '1px solid #E2E8F0' }}>Actions</th>
+                  <th style={{ padding: '16px 24px', width: '30%', textTransform: 'uppercase', letterSpacing: '0.5px', borderTopLeftRadius: '24px', borderBottom: '1px solid #E2E8F0' }}>Episode</th>
+                  <th style={{ padding: '16px 16px', width: '22%', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Show</th>
+                  <th style={{ padding: '16px 16px', width: '15%', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Content Group</th>
+                  <th style={{ padding: '16px 16px', width: '8%', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Language</th>
+                  <th style={{ padding: '16px 16px', width: '8%', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Duration</th>
+                  <th style={{ padding: '16px 16px', width: '8%', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Status</th>
+                  <th style={{ padding: '16px 16px', width: '9%', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Validation</th>
+                  <th style={{ padding: '16px 16px', width: '8%', textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: '1px solid #E2E8F0' }}>Updated</th>
+                  <th style={{ padding: '16px 24px', width: '7%', textAlign: 'right', textTransform: 'uppercase', letterSpacing: '0.5px', borderTopRightRadius: '24px', borderBottom: '1px solid #E2E8F0' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -504,27 +492,19 @@ const EpisodesList = () => {
                     <tr key={ep.id} style={{ transition: 'background-color 0.15s ease' }} onMouseOver={e => e.currentTarget.style.backgroundColor = '#FAFAFF'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
                       <td style={{ padding: '16px 24px', borderBottom: idx === paginatedEpisodes.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                          {ep.artwork?.length > 0 ? (
-                            <img 
-                              src={`http://127.0.0.1:8000/content${ep.artwork[0].url}`} 
-                              alt={ep.episode_title} 
-                              style={{ width: '72px', height: '40px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #F1F5F9', flexShrink: 0, boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }} 
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='40' viewBox='0 0 72 40'%3E%3Crect width='72' height='40' fill='%23f5f3ff'/%3E%3Cpath d='M32 20l4 4 8-8' stroke='%23a78bfa' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
-                              }}
-                            />
-                          ) : (
-                            <div style={{ width: '72px', height: '40px', borderRadius: '8px', backgroundColor: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A78BFA', border: 'none', flexShrink: 0 }}>
-                              <ImageIcon size={16} />
-                            </div>
-                          )}
+                          <div style={{ width: '64px', height: '36px', borderRadius: '8px', backgroundColor: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A78BFA', flexShrink: 0, overflow: 'hidden' }}>
+                            {ep.artwork && ep.artwork.length > 0 ? (
+                              <img src={`http://127.0.0.1:8000/content${ep.artwork[0].url}`} alt="thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              <ImageIcon size={18} />
+                            )}
+                          </div>
                           <div style={{ overflow: 'hidden' }}>
-                            <div style={{ fontWeight: '700', fontSize: '14px', color: '#0F172A', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            <div style={{ fontWeight: '700', color: '#0F172A', fontSize: '14px', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               {ep.episode_title}
                             </div>
                             <div style={{ fontSize: '12px', color: '#64748B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              S{ep.seasonNumber} • Episode {idx + 1}
+                              {ep.season_number === 0 ? 'Trailer' : `S${ep.season_number} • Episode ${idx + 1}`}
                             </div>
                           </div>
                         </div>
@@ -534,20 +514,10 @@ const EpisodesList = () => {
                         {ep.showTitle}
                       </td>
 
-                      <td style={{ padding: '16px 16px', fontSize: '13px', color: 'var(--navy-900)', borderBottom: idx === paginatedEpisodes.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
-                        {ep.content_group ? (
-                          <span style={{ 
-                            backgroundColor: getContentGroupColors(ep.content_group).bg, 
-                            color: getContentGroupColors(ep.content_group).text, 
-                            padding: '4px 12px', 
-                            borderRadius: '12px', 
-                            fontWeight: '600' 
-                          }}>
-                            {ep.content_group}
-                          </span>
-                        ) : (
-                          <span style={{ color: 'var(--text-muted)' }}>-</span>
-                        )}
+                      <td style={{ padding: '16px 16px', fontSize: '13px', color: 'var(--text-muted)', borderBottom: idx === paginatedEpisodes.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
+                        <div title={ep.content_group} style={{ maxWidth: '140px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {ep.content_group || '-'}
+                        </div>
                       </td>
 
                       <td style={{ padding: '16px 16px', borderBottom: idx === paginatedEpisodes.length - 1 ? 'none' : '1px solid #F1F5F9' }}>

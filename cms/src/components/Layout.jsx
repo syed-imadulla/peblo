@@ -146,7 +146,7 @@ const Layout = () => {
       {/* Main Content */}
       <div className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', transition: 'margin-left 0.3s ease' }}>
         {!(location.pathname.includes('/new') || location.pathname.includes('/edit')) ? (
-          <header style={{ display: 'flex', alignItems: 'center', padding: '32px 32px 0 32px', gap: '16px', background: 'transparent' }}>
+          <header style={{ display: 'flex', alignItems: 'center', padding: '32px 32px 0 32px', gap: '16px', background: 'transparent', maxWidth: '1400px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
             <button className="mobile-only" onClick={() => setSidebarOpen(true)} style={{ color: 'var(--text-main)', display: 'none' }}>
               <Menu size={24} />
             </button>
@@ -156,17 +156,17 @@ const Layout = () => {
               </div>
               <div style={{ color: 'var(--text-muted)', fontSize: '15px' }}>
                 {location.pathname === '/dashboard' ? 'Here\'s what\'s happening with your content today.' : 
-                 location.pathname.startsWith('/shows') ? 'Manage and organize all your shows in the library.' : ''}
+                 location.pathname.startsWith('/shows') ? 'Manage and organize all your shows in the library.' : 
+                 location.pathname.startsWith('/episodes') ? 'Manage and organize all episodes in your library.' : ''}
               </div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '24px' }}>
-
-              {location.pathname.startsWith('/shows') && (
+              {(location.pathname.startsWith('/shows') || location.pathname.startsWith('/episodes')) && (
                 <button 
-                  onClick={() => navigate('/shows/new')}
-                  className="btn btn-primary" style={{ padding: '0 24px', borderRadius: '22px', height: '44px' }}
+                  onClick={() => navigate(location.pathname.startsWith('/shows') ? '/shows/new' : '/episodes/new')}
+                  className="btn btn-primary" style={{ height: '40px', padding: '0 24px', borderRadius: '8px', fontWeight: '600', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'var(--purple-700)', color: '#FFFFFF', border: 'none', boxShadow: '0 4px 12px rgba(109, 40, 217, 0.25)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
                 >
-                  <Plus size={18} /> Create New
+                  <Plus size={18} /> {location.pathname.startsWith('/shows') ? 'Create New' : 'Add New Episode'}
                 </button>
               )}
             </div>
