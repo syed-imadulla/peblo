@@ -62,14 +62,19 @@ def seed_db(seed_file_path: str):
             # Or just use random UUIDs. The verification just checks counts.
             episode_uuid = uuid.uuid5(uuid.NAMESPACE_OID, item['episode_id'])
 
+            episode_slug = f"{item['content_group']}-{item.get('language', 'en')}-{item['episode_id']}"
             episode = Episode(
                 id=str(episode_uuid),
                 season_id=season.id,
                 episode_title=item['episode_title'],
+                slug=episode_slug,
+                episode_number=item.get('episode_number'),
+                synopsis=None,
                 status=item['status'],
                 duration_seconds=item.get('duration_seconds'),
                 language=item.get('language'),
-                content_group=item['content_group']
+                content_group=item['content_group'],
+                availability="All Regions"
             )
             db.add(episode)
             db.flush()
