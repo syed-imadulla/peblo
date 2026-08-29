@@ -345,14 +345,14 @@ const Validation = () => {
       `}</style>
 
       {/* ── Header ─────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '18px', gap: '12px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '8px', marginBottom: '24px', gap: '16px', flexWrap: 'wrap' }}>
         <div>
-          <h1 style={{ margin: '0 0 3px', fontSize: '26px', fontWeight: '800', color: '#0F172A', letterSpacing: '-0.5px' }}>Validation</h1>
-          <p style={{ margin: 0, color: '#94A3B8', fontSize: '14px' }}>Review and fix issues before publishing content.</p>
+          <h1 style={{ margin: '0 0 4px', fontSize: '28px', fontWeight: '800', color: 'var(--navy-900)', letterSpacing: '-0.5px' }}>Validation</h1>
+          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '15px' }}>Review and fix issues before publishing content.</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: 'auto' }}>
           {toast && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '7px 13px', borderRadius: '10px', background: toast.ok ? '#DCFCE7' : '#FEF2F2', color: toast.ok ? '#15803D' : '#DC2626', fontSize: '13px', fontWeight: '600', animation: 'fin 0.2s ease' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '8px 14px', borderRadius: '10px', background: toast.ok ? '#DCFCE7' : '#FEF2F2', color: toast.ok ? '#15803D' : '#DC2626', fontSize: '13px', fontWeight: '600', animation: 'fin 0.2s ease' }}>
               {toast.ok ? <CheckCircle size={14} /> : <AlertCircle size={14} />}
               {toast.msg}
             </div>
@@ -360,11 +360,12 @@ const Validation = () => {
           <button
             onClick={() => runMut.mutate()}
             disabled={runMut.isPending}
-            style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '9px 20px', background: '#4B27B5', color: '#FFF', border: 'none', borderRadius: '12px', fontWeight: '700', fontSize: '14px', cursor: runMut.isPending ? 'not-allowed' : 'pointer', opacity: runMut.isPending ? 0.75 : 1, boxShadow: '0 4px 14px rgba(75,39,181,0.26)', whiteSpace: 'nowrap', transition: 'opacity 0.2s' }}
+            className="btn btn-primary"
+            style={{ height: '40px', padding: '0 24px', borderRadius: '8px', fontWeight: '600', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'var(--purple-700)', color: '#FFFFFF', border: 'none', boxShadow: '0 4px 12px rgba(109, 40, 217, 0.25)', cursor: runMut.isPending ? 'not-allowed' : 'pointer', opacity: runMut.isPending ? 0.75 : 1, whiteSpace: 'nowrap', flexShrink: 0, transition: 'all 0.2s' }}
           >
             {runMut.isPending
-              ? <RefreshCw size={14} style={{ animation: 'spin 0.8s linear infinite' }} />
-              : <Play size={14} fill="white" style={{ marginLeft: '1px' }} />}
+              ? <RefreshCw size={16} style={{ animation: 'spin 0.8s linear infinite' }} />
+              : <Play size={16} fill="white" style={{ marginLeft: '1px' }} />}
             {runMut.isPending ? 'Running…' : 'Run Validation'}
           </button>
         </div>
