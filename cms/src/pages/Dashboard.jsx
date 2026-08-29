@@ -23,14 +23,27 @@ const fetchPublishHistory = async () => {
   return data;
 };
 
+const parseUtcDate = s => {
+  if (!s) return null;
+  let str = String(s).trim();
+  if (!str.endsWith('Z') && !/[+-]\d{2}:?\d{2}$/.test(str)) {
+    str += 'Z';
+  }
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? null : d;
+};
+
 const safeFormatDate = (dateString, relative = false) => {
-  if (!dateString) return '';
-  const d = new Date(dateString);
-  if (isNaN(d.getTime())) return '';
+  const d = parseUtcDate(dateString);
+  if (!d) return '';
   
   if (relative) {
-    const hours = Math.floor((new Date() - d) / 3600000);
-    if (hours < 1) return 'Just now';
+    const ms = Date.now() - d.getTime();
+    if (ms < 0 && ms > -60000) return 'Just now';
+    const m = Math.floor(ms / 60000);
+    if (m < 1) return 'Just now';
+    if (m < 60) return `${m}m ago`;
+    const hours = Math.floor(ms / 3600000);
     if (hours < 24) return `${hours}h ago`;
     return `${Math.floor(hours/24)}d ago`;
   }
@@ -101,6 +114,9 @@ const Dashboard = () => {
   
   const draftShows = totalShows - publishedShows;
   const validationIssues = validation?.blocked_records_count || 0;
+  const showsWithIssues = validation?.issues 
+    ? new Set(validation.issues.map(i => i.show_title)).size 
+    : 0;
   const publishRuns = history?.length || 0;
   const lastPublish = history?.[0] || null;
 
@@ -213,7 +229,7 @@ const Dashboard = () => {
           <div style={{ flex: 1 }}>
             <RealtimeRow title="Published Episodes" subtitle="Live on catalogue" value={publishedEpisodes} icon={CheckCircle} color="var(--green-500)" />
             <RealtimeRow title="Draft Episodes" subtitle="Not yet published" value={draftEpisodes} icon={FileText} color="var(--amber-500)" />
-            <RealtimeRow title="Shows with Issues" subtitle="Fix validation errors" value={validationIssues} icon={AlertTriangle} color="var(--red-500)" />
+            <RealtimeRow title="Shows with Issues" subtitle="Fix validation errors" value={showsWithIssues} icon={AlertTriangle} color="var(--red-500)" />
             <RealtimeRow title="Episodes without Artwork" subtitle="Add missing artwork" value={episodesWithoutArtwork} icon={Image} color="var(--purple-700)" />
             <RealtimeRow title="Episodes without Duration" subtitle="Add duration to publish" value={episodesWithoutDuration} icon={Clock} color="var(--blue-500)" />
           </div>
@@ -237,8 +253,8 @@ const Dashboard = () => {
               {recentShows.map((show) => {
                 const epCount = show.seasons?.reduce((acc, s) => acc + (s.episodes?.length || 0), 0) || 0;
                 const hasPublished = show.seasons?.some(s => s.episodes?.some(ep => ep.status === 'published'));
-                const thumbnailObj = show.artwork?.find(a => a.type === 'Thumbnail' || a.type === 'thumbnail');
-                const thumbnail = thumbnailObj?.file_path ? `http://127.0.0.1:8000/content${thumbnailObj.file_path}` : null;
+                const thumbnailObj = show.artwork?.find(a => a.type === 'Thumbnail' || a.type === 'thumbnail' || a.type === 'poster' || a.type === 'Poster');
+                const thumbnail = thumbnailObj?.url || null;
                 
                 return (
                   <div key={show.id} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
