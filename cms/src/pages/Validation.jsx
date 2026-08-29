@@ -19,13 +19,23 @@ const api = {
 };
 
 // ─────────────────────────────────────────────────────────────────
-// Date utils
+// Date utils (timezone-safe UTC parser)
 // ─────────────────────────────────────────────────────────────────
-const relative = s => {
+const parseUtcDate = s => {
   if (!s) return null;
-  const d = new Date(s);
-  if (isNaN(d)) return null;
+  let str = String(s).trim();
+  if (!str.endsWith('Z') && !/[+-]\d{2}:?\d{2}$/.test(str)) {
+    str += 'Z';
+  }
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? null : d;
+};
+
+const relative = s => {
+  const d = parseUtcDate(s);
+  if (!d) return null;
   const ms = Date.now() - d.getTime();
+  if (ms < 0 && ms > -60000) return 'Just now';
   const m = Math.floor(ms / 60000);
   if (m < 1)  return 'Just now';
   if (m < 60) return `${m}m ago`;
@@ -37,9 +47,8 @@ const relative = s => {
 };
 
 const fmt = s => {
-  if (!s) return '—';
-  const d = new Date(s);
-  if (isNaN(d)) return '—';
+  const d = parseUtcDate(s);
+  if (!d) return '—';
   return d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 };
 
