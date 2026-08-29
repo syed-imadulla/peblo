@@ -460,7 +460,7 @@ const ShowsList = () => {
           </div>
         ) : (
           <>
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'auto', width: '100%', maxWidth: '100%', minWidth: 0 }}>
               <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, textAlign: 'left', minWidth: '950px' }}>
                 <thead>
                 <tr style={{ backgroundColor: '#FFFFFF', color: '#475569', fontSize: '12px', fontWeight: '700' }}>

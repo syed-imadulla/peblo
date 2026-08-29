@@ -471,7 +471,7 @@ const EpisodesList = () => {
           </div>
         ) : (
           <>
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'auto', width: '100%', maxWidth: '100%', minWidth: 0 }}>
               <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, textAlign: 'left', minWidth: '1100px' }}>
                 <thead>
                 <tr style={{ backgroundColor: '#FFFFFF', color: '#475569', fontSize: '12px', fontWeight: '700' }}>
@@ -491,7 +491,7 @@ const EpisodesList = () => {
                   return (
                     <tr key={ep.id} style={{ transition: 'background-color 0.15s ease' }} onMouseOver={e => e.currentTarget.style.backgroundColor = '#FAFAFF'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
                       <td style={{ padding: '16px 24px', borderBottom: idx === paginatedEpisodes.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
                           <div style={{ width: '64px', height: '36px', borderRadius: '8px', backgroundColor: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A78BFA', flexShrink: 0, overflow: 'hidden' }}>
                             {ep.artwork && ep.artwork.length > 0 ? (
                               <img src={`http://127.0.0.1:8000/content${ep.artwork[0].url}`} alt="thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -499,7 +499,7 @@ const EpisodesList = () => {
                               <ImageIcon size={18} />
                             )}
                           </div>
-                          <div style={{ overflow: 'hidden' }}>
+                          <div style={{ overflow: 'hidden', minWidth: 0 }}>
                             <div style={{ fontWeight: '700', color: '#0F172A', fontSize: '14px', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               {ep.episode_title}
                             </div>
@@ -510,13 +510,19 @@ const EpisodesList = () => {
                         </div>
                       </td>
                       
-                      <td style={{ padding: '16px 16px', fontSize: '13px', color: 'var(--navy-900)', borderBottom: idx === paginatedEpisodes.length - 1 ? 'none' : '1px solid #F1F5F9', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {ep.showTitle}
+                      <td style={{ padding: '16px 16px', fontSize: '13px', color: 'var(--navy-900)', borderBottom: idx === paginatedEpisodes.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
+                        <div style={{ display: 'flex', minWidth: 0 }}>
+                          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%' }}>
+                            {ep.showTitle}
+                          </span>
+                        </div>
                       </td>
 
                       <td style={{ padding: '16px 16px', fontSize: '13px', color: 'var(--text-muted)', borderBottom: idx === paginatedEpisodes.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
-                        <div title={ep.content_group} style={{ maxWidth: '140px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {ep.content_group || '-'}
+                        <div style={{ display: 'flex', minWidth: 0 }}>
+                          <span title={ep.content_group} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%' }}>
+                            {ep.content_group || '-'}
+                          </span>
                         </div>
                       </td>
 

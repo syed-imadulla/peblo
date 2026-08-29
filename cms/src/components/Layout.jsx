@@ -69,14 +69,11 @@ const Layout = () => {
       <div 
         style={{ 
           width: '250px', 
+          flexShrink: 0,
           backgroundColor: '#FFFFFF',
           padding: '24px 0', 
           display: 'flex', 
           flexDirection: 'column',
-          position: 'fixed',
-          top: 0,
-          bottom: 0,
-          left: sidebarOpen ? 0 : '-100%',
           zIndex: 50,
           transition: 'left 0.3s ease',
           backgroundImage: 'linear-gradient(to bottom, rgba(255,255,255,1) 60%, rgba(255,255,255,0.7) 80%), url(/sidebar_bg.jpg)',
@@ -85,7 +82,7 @@ const Layout = () => {
           boxShadow: '4px 0 24px rgba(0,0,0,0.02)',
           borderRight: '1px solid var(--border)'
         }}
-        className="sidebar"
+        className={`sidebar ${sidebarOpen ? 'open' : ''}`}
       >
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '32px', padding: '0 24px' }}>
           <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, flexDirection: 'column' }}>
@@ -133,18 +130,31 @@ const Layout = () => {
 
       {/* Responsive Adjustments */}
       <style>{`
-        .sidebar { left: 0 !important; }
+        .sidebar { 
+          position: sticky; 
+          top: 0; 
+          height: 100vh; 
+        }
         .mobile-only { display: none !important; }
-        .main-content { margin-left: 250px; }
+        .main-content { 
+          flex: 1; 
+          min-width: 0; 
+          box-sizing: border-box; 
+        }
         @media (max-width: 1024px) {
-          .sidebar { left: -100% !important; }
-          .main-content { margin-left: 0; }
+          .sidebar { 
+            position: fixed; 
+            left: -100%; 
+          }
+          .sidebar.open {
+            left: 0 !important;
+          }
           .mobile-only { display: block !important; }
         }
       `}</style>
 
       {/* Main Content */}
-      <div className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', transition: 'margin-left 0.3s ease' }}>
+      <div className="main-content" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         {!(location.pathname.includes('/new') || location.pathname.includes('/edit')) ? (
           <header style={{ display: 'flex', alignItems: 'center', padding: '32px 32px 0 32px', gap: '16px', background: 'transparent', maxWidth: '1400px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
             <button className="mobile-only" onClick={() => setSidebarOpen(true)} style={{ color: 'var(--text-main)', display: 'none' }}>
