@@ -155,7 +155,7 @@ const Layout = () => {
 
       {/* Main Content */}
       <div className="main-content" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        {!(location.pathname.includes('/new') || location.pathname.includes('/edit')) ? (
+        {!(location.pathname.includes('/new') || location.pathname.includes('/edit') || location.pathname === '/validation') ? (
           <header style={{ display: 'flex', alignItems: 'center', padding: '32px 32px 0 32px', gap: '16px', background: 'transparent', maxWidth: '1400px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
             <button className="mobile-only" onClick={() => setSidebarOpen(true)} style={{ color: 'var(--text-main)', display: 'none' }}>
               <Menu size={24} />
@@ -167,7 +167,10 @@ const Layout = () => {
               <div style={{ color: 'var(--text-muted)', fontSize: '15px' }}>
                 {location.pathname === '/dashboard' ? 'Here\'s what\'s happening with your content today.' : 
                  location.pathname.startsWith('/shows') ? 'Manage and organize all your shows in the library.' : 
-                 location.pathname.startsWith('/episodes') ? 'Manage and organize all episodes in your library.' : ''}
+                 location.pathname.startsWith('/episodes') ? 'Manage and organize all episodes in your library.' : 
+                 location.pathname.startsWith('/validation') ? 'Review and fix issues before publishing content.' :
+                 location.pathname.startsWith('/publish-history') ? 'View past publish runs and their outcomes.' :
+                 location.pathname.startsWith('/publish') ? 'Publish validated content to the live catalogue.' : ''}
               </div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '24px' }}>
