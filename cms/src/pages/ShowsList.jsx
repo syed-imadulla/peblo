@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
@@ -216,50 +217,85 @@ const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix,
 
 const ActionMenu = ({ show, onDeleteClick }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [menuStyle, setMenuStyle] = useState({});
   const ref = useRef(null);
+  const menuRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setIsOpen(false);
+      if (ref.current && !ref.current.contains(e.target) &&
+          menuRef.current && !menuRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    
+    const handleScroll = () => {
+      if (isOpen) setIsOpen(false);
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      window.addEventListener('scroll', handleScroll, true);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('scroll', handleScroll, true);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      
+      let top, bottom;
+      if (spaceBelow < 120) {
+        bottom = window.innerHeight - rect.top + 4;
+        setMenuStyle({ bottom: `${bottom}px`, left: `${rect.right - 160}px` });
+      } else {
+        top = rect.bottom + 4;
+        setMenuStyle({ top: `${top}px`, left: `${rect.right - 160}px` });
+      }
+    }
+  }, [isOpen]);
 
   return (
-    <div ref={ref} style={{ position: 'relative', display: 'inline-block' }}>
-      <button 
-        onClick={() => setIsOpen(!isOpen)} 
-        style={{ 
-          background: isOpen ? '#F5F3FF' : '#FFFFFF', 
-          border: isOpen ? '1px solid #C4B5FD' : '1px solid #E2E8F0', 
-          borderRadius: '10px', 
-          width: '32px', 
-          height: '32px', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          color: isOpen ? '#6D28D9' : '#64748B', 
-          cursor: 'pointer', 
-          transition: 'all 0.2s ease',
-          boxShadow: isOpen ? '0 0 0 2px rgba(109, 40, 217, 0.1)' : '0 1px 2px rgba(0,0,0,0.03)'
-        }}
-        onMouseOver={e => { if(!isOpen) { e.currentTarget.style.background = '#F8F9FF'; e.currentTarget.style.borderColor = '#CBD5E1'; } }}
-        onMouseOut={e => { if(!isOpen) { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.borderColor = '#E2E8F0'; } }}
-        title="Actions"
-      >
-        <MoreHorizontal size={14} />
-      </button>
-      {isOpen && (
-        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0, width: '160px', backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', zIndex: 50, padding: '6px' }}>
+    <>
+      <div ref={ref} style={{ display: 'inline-block' }}>
+        <button 
+          onClick={() => setIsOpen(!isOpen)} 
+          style={{ 
+            background: isOpen ? '#F5F3FF' : '#FFFFFF', 
+            border: isOpen ? '1px solid #C4B5FD' : '1px solid #E2E8F0', 
+            borderRadius: '10px', 
+            width: '32px', 
+            height: '32px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            color: isOpen ? '#6D28D9' : '#64748B', 
+            cursor: 'pointer', 
+            transition: 'all 0.2s ease',
+            boxShadow: isOpen ? '0 0 0 2px rgba(109, 40, 217, 0.1)' : '0 1px 2px rgba(0,0,0,0.03)'
+          }}
+          onMouseOver={e => { if(!isOpen) { e.currentTarget.style.background = '#F8F9FF'; e.currentTarget.style.borderColor = '#CBD5E1'; } }}
+          onMouseOut={e => { if(!isOpen) { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.borderColor = '#E2E8F0'; } }}
+          title="Actions"
+        >
+          <MoreHorizontal size={14} />
+        </button>
+      </div>
+      {isOpen && ReactDOM.createPortal(
+        <div ref={menuRef} style={{ position: 'fixed', ...menuStyle, width: '160px', backgroundColor: '#FFFFFF', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', zIndex: 9999, padding: '6px' }}>
           <button 
             onClick={() => { setIsOpen(false); navigate(`/shows/${show.id}/edit`); }}
             style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', backgroundColor: 'transparent', border: 'none', color: 'var(--navy-900)', fontSize: '13px', fontWeight: '500', cursor: 'pointer', textAlign: 'left', marginBottom: '2px' }}
             onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--gray-100)'}
             onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            Edit Show
+            <Edit2 size={14} /> Edit Show
           </button>
           <button 
             onClick={() => { setIsOpen(false); onDeleteClick(show); }}
@@ -269,9 +305,10 @@ const ActionMenu = ({ show, onDeleteClick }) => {
           >
             <Trash2 size={14} /> Delete
           </button>
-        </div>
+        </div>,
+        document.body
       )}
-    </div>
+    </>
   );
 };
 
