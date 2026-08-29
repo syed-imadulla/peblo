@@ -547,7 +547,7 @@ const EpisodesList = () => {
                               {ep.episode_title}
                             </div>
                             <div style={{ fontSize: '12px', color: '#64748B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              {ep.season_number === 0 ? 'Trailer' : `S${ep.season_number} • Episode ${idx + 1}`}
+                              {ep.seasonNumber === 0 ? 'Trailer' : `S${ep.seasonNumber} • Episode ${ep.episode_number || idx + 1}`}
                             </div>
                           </div>
                         </div>
