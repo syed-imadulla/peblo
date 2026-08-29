@@ -69,7 +69,7 @@ def seed_db(seed_file_path: str):
                 episode_title=item['episode_title'],
                 slug=episode_slug,
                 episode_number=item.get('episode_number'),
-                synopsis=None,
+                synopsis=item.get('synopsis'),
                 status=item['status'],
                 duration_seconds=item.get('duration_seconds'),
                 language=item.get('language'),
