@@ -81,7 +81,26 @@ const getShowMetrics = (show) => {
 
 const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix, placement = 'bottom', height = '42px', padding = '0 12px 0 16px' }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [dynamicPlacement, setDynamicPlacement] = useState(placement);
   const ref = useRef(null);
+
+  useEffect(() => {
+    if (isOpen && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      // Dropdown max-height is 280px + search box ~45px = ~325px.
+      // If we don't have 325px below, but have more space above, open upwards.
+      if (spaceBelow < 325 && spaceAbove > spaceBelow) {
+        setDynamicPlacement('top');
+      } else {
+        setDynamicPlacement('bottom');
+      }
+    } else {
+      setSearchQuery(''); // reset search when closed
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -97,6 +116,10 @@ const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix,
       document.removeEventListener('keydown', handleEscape);
     };
   }, []);
+
+  const filteredOptions = options.filter(opt => 
+    opt.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div ref={ref} style={{ position: 'relative', minWidth, flexShrink: 0 }}>
@@ -120,28 +143,49 @@ const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix,
       {isOpen && (
         <div style={{ 
           position: 'absolute', 
-          ...(placement === 'top' ? { bottom: 'calc(100% + 6px)' } : { top: 'calc(100% + 6px)' }), 
+          ...(dynamicPlacement === 'top' ? { bottom: 'calc(100% + 6px)' } : { top: 'calc(100% + 6px)' }), 
           left: 0, 
           minWidth: '100%', 
           backgroundColor: '#FFFFFF', 
-          border: 'none', 
-          borderRadius: '20px', 
+          border: '1px solid #E2E8F0', 
+          borderRadius: '16px', 
           boxShadow: '0 10px 40px -10px rgba(109, 40, 217, 0.15)', 
-          zIndex: 50, 
-          padding: '6px' 
+          zIndex: 50,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
         }}>
-          {options.map(opt => (
-            <div 
-              key={opt}
-              onClick={() => { onChange(opt); setIsOpen(false); }}
-              style={{ padding: '8px 12px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', backgroundColor: value === opt ? 'var(--purple-50)' : 'transparent', color: value === opt ? 'var(--purple-700)' : 'var(--navy-900)', fontWeight: value === opt ? '600' : '400', display: 'flex', alignItems: 'center', justifyContent: 'space-between', whiteSpace: 'nowrap' }}
-              onMouseOver={e => { if (value !== opt) e.currentTarget.style.backgroundColor = 'var(--gray-50)' }}
-              onMouseOut={e => { if (value !== opt) e.currentTarget.style.backgroundColor = 'transparent' }}
-            >
-              {opt}
-              {value === opt && <Check size={14} />}
+          {options.length > 10 && (
+            <div style={{ padding: '8px', borderBottom: '1px solid #F1F5F9', backgroundColor: '#F8FAFC' }}>
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E2E8F0', fontSize: '13px', outline: 'none', boxSizing: 'border-box' }}
+              />
             </div>
-          ))}
+          )}
+          <div style={{ maxHeight: '280px', overflowY: 'auto', padding: '6px' }} className="custom-scrollbar">
+            {filteredOptions.length > 0 ? filteredOptions.map(opt => (
+              <div 
+                key={opt}
+                title={opt}
+                onClick={() => { onChange(opt); setIsOpen(false); }}
+                style={{ padding: '8px 12px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', backgroundColor: value === opt ? 'var(--purple-50)' : 'transparent', color: value === opt ? 'var(--purple-700)' : 'var(--navy-900)', fontWeight: value === opt ? '600' : '400', display: 'flex', alignItems: 'center', justifyContent: 'space-between', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                onMouseOver={e => { if (value !== opt) e.currentTarget.style.backgroundColor = 'var(--gray-50)' }}
+                onMouseOut={e => { if (value !== opt) e.currentTarget.style.backgroundColor = 'transparent' }}
+              >
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: '8px' }}>{opt}</span>
+                {value === opt && <Check size={14} style={{ flexShrink: 0 }} />}
+              </div>
+            )) : (
+              <div style={{ padding: '12px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
+                No results found
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -350,7 +394,7 @@ const ShowsList = () => {
 
       {/* FILTER BAR */}
       <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', marginBottom: hasActiveFilters ? '16px' : '24px', flexWrap: 'wrap', position: 'relative', zIndex: 100 }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: '240px' }}>
+        <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
           <Search size={16} style={{ position: 'absolute', left: '16px', top: '13px', color: 'var(--text-muted)' }} />
           <input 
             type="text" 
@@ -484,7 +528,7 @@ const ShowsList = () => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                           {show.artwork?.length > 0 ? (
                             <img 
-                              src={`http://127.0.0.1:8000/content${show.artwork[0].file_path}`} 
+                              src={show.artwork[0].url || show.artwork[0].file_path} 
                               alt={show.title} 
                               style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '16px', border: '1px solid #F1F5F9', flexShrink: 0, boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }} 
                               onError={(e) => {
