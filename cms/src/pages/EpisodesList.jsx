@@ -211,6 +211,7 @@ const DeleteModal = ({ episode, onClose, onConfirm, isDeleting }) => {
 
 const EpisodesList = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [filterShow, setFilterShow] = useState('All Shows');
   const [filterContentGroup, setFilterContentGroup] = useState('All Groups');
@@ -316,11 +317,11 @@ const EpisodesList = () => {
   };
 
   const handleEditClick = (episode) => {
-    alert("Episode editing is not yet implemented.");
+    navigate(`/episodes/${episode.id}/edit`);
   };
 
   const handleCreateClick = () => {
-    alert("Episode creation is not yet implemented.");
+    navigate('/episodes/new');
   };
 
   if (isLoadingShows || isLoadingValidation) return (
