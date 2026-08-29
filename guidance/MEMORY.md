@@ -42,19 +42,18 @@ To be recorded here as implementation progresses.
 
 Format:
 
-### [DATE] Decision
+### 2026-08-29 Validation Reporting & Publishing Integrity
 
 Decision:
-...
+Implement multi-tier validation reporting (`critical`, `warning`, `info`) in the backend scanning both published and draft episodes, while maintaining strict adherence to challenge.md constraints (blocking issues preventing catalog publishing).
 
 Reason:
-...
-
-Alternatives considered:
-...
+Editors and Admins need real-time clarity on what is actively blocking catalog publishing (`missing_artwork`, `missing_duration`, `duplicate_variant` on published episodes) vs upcoming issues on drafts or informational fields.
 
 Consequences:
-...
+- `GET /admin/validation-report` and `POST /admin/run-validation` return deterministic, real-time results directly derived from the database.
+- The CMS Validation page cleanly renders live metrics, charts, and actionable links without mock or synthetic data.
+- Duplicate `content_group` + `language` variants present in seed fixtures (e.g. `motis-many-lives-s01e02 + hi`) are surfaced as critical validation items.
 
 ## Known Risks
 
