@@ -353,13 +353,12 @@ const EpisodeForm = () => {
     const submissionData = {
       season_id: formData.season_id,
       episode_title: formData.episode_title,
-      slug: formData.slug || null,
+      slug: formData.slug || `${formData.content_group}-${formData.language}`,
       episode_number: formData.episode_number ? parseInt(formData.episode_number, 10) : null,
       synopsis: formData.synopsis || null,
       content_group: formData.content_group,
       language: formData.language,
-      status: formData.status, 
-      availability: formData.availability || "All Regions",
+      status: formData.status,
       duration_seconds: isNaN(parsedSeconds) ? null : parsedSeconds
     };
     
@@ -498,16 +497,16 @@ const EpisodeForm = () => {
 
               <div className="form-group">
                 <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
-                  Episode Slug <span style={{ color: '#DC2626' }}>*</span>
+                  Content Group <span style={{ color: '#DC2626' }}>*</span>
                 </label>
                 <input 
                   type="text" 
                   className="form-control"
-                  value={formData.slug} 
-                  onChange={e => handleChange('slug', e.target.value)}
-                  placeholder="episode-slug"
+                  value={formData.content_group} 
+                  onChange={e => handleChange('content_group', e.target.value)}
+                  placeholder="e.g. motis-many-lives-s01e01"
                 />
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>URL friendly unique identifier (auto-generated recommended).</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>Episodes with the same content group are language variants of the same episode.</div>
               </div>
             </div>
 
@@ -527,15 +526,7 @@ const EpisodeForm = () => {
               </div>
             </div>
 
-            <div className="grid-cols-3" style={{ display: 'grid', gap: '24px' }}>
-              <CustomDropdown 
-                label="Content Group *"
-                placeholder="Select content group"
-                value={formData.content_group}
-                options={[{label: 'None', value: 'none'}]}
-                onChange={val => handleChange('content_group', val)}
-                helperText="Episodes with the same content group are language variants of the same episode."
-              />
+            <div className="grid-cols-2" style={{ display: 'grid', gap: '24px' }}>
 
               <CustomDropdown 
                 label="Primary Language *"
@@ -588,31 +579,7 @@ const EpisodeForm = () => {
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>Only published episodes are visible to viewers.</div>
               </div>
 
-              <div className="form-group">
-                <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--navy-900)' }}>
-                  Availability
-                </label>
-                <div style={{ display: 'flex', backgroundColor: '#F8FAFC', borderRadius: '8px', padding: '4px', height: '40px', border: '1px solid #CBD5E1' }}>
-                  {[ {label: 'All Regions', value: 'All Regions', icon: Globe}, {label: 'Limited Regions', value: 'Limited Regions', icon: MapPin}].map(s => {
-                    const IconComponent = s.icon;
-                    return (
-                      <div 
-                        key={s.value}
-                        onClick={() => handleChange('availability', s.value)}
-                        style={{ 
-                          flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '600', borderRadius: '4px', cursor: 'pointer', gap: '6px',
-                          backgroundColor: formData.availability === s.value ? 'var(--purple-100)' : 'transparent', 
-                          color: formData.availability === s.value ? 'var(--purple-700)' : 'var(--navy-900)',
-                          boxShadow: formData.availability === s.value ? '0 1px 2px rgba(0,0,0,0.05)' : 'none'
-                        }}>
-                        <IconComponent size={14} />
-                        {s.label}
-                      </div>
-                    );
-                  })}
-                </div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>Choose where this episode will be available.</div>
-              </div>
+
             </div>
           </div>
         </div>
