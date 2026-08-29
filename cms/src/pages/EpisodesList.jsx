@@ -344,15 +344,13 @@ const EpisodesList = () => {
           if (episode.content_group) groupSet.add(episode.content_group);
           if (episode.language) langSet.add(episode.language.toUpperCase());
           
-          let validationState = 'neutral';
+          let validationState = 'valid';
           if (validationReport && validationReport.issues) {
             const hasIssue = validationReport.issues.some(
               issue => issue.affected_episode_id === episode.id || issue.episode_id === episode.id
             );
-            if (episode.status === 'published') {
-              validationState = hasIssue ? 'issues' : 'valid';
-            } else {
-              validationState = hasIssue ? 'issues' : 'neutral';
+            if (hasIssue) {
+              validationState = 'issues';
             }
           }
           
