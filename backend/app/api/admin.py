@@ -19,7 +19,7 @@ def _build_validation_report(db: Session) -> dict:
     Severity tiers (aligned with challenge rules):
       critical  – missing artwork OR missing duration on a PUBLISHED episode
                   OR duplicate content_group + language pair (catalogue uniqueness)
-      warning   – same issues on DRAFT episodes; OR missing section on a published show
+      warning   – same issues on DRAFT episodes; OR missing section on a show
       info      – missing synopsis (informational, never blocks publish)
 
     The blocked_records_count reflects episodes that would be rejected by
@@ -67,9 +67,10 @@ def _build_validation_report(db: Session) -> dict:
                     ),
                     "content_type": "Content Group",
                     "episode_id": ep_id,
-                    "episode_title": ep.episode_title,
+                    "affected_episode_id": ep_id,
                     "show_title": show.title if show else "Unknown Show",
                     "season_number": season.season_number if season else None,
+                    "episode_title": ep.episode_title,
                     "language": ep.language,
                     "status": "open",
                     "created_at": ts,
@@ -97,9 +98,10 @@ def _build_validation_report(db: Session) -> dict:
                     "description": "Published episode is missing artwork. A thumbnail is required before publishing.",
                     "content_type": "Thumbnail",
                     "episode_id": ep_id,
-                    "episode_title": ep.episode_title,
+                    "affected_episode_id": ep_id,
                     "show_title": show_title,
                     "season_number": season_number,
+                    "episode_title": ep.episode_title,
                     "language": ep.language,
                     "status": "open",
                     "created_at": ts,
@@ -112,9 +114,10 @@ def _build_validation_report(db: Session) -> dict:
                     "description": "Draft episode has no artwork. Required before publishing.",
                     "content_type": "Thumbnail",
                     "episode_id": ep_id,
-                    "episode_title": ep.episode_title,
+                    "affected_episode_id": ep_id,
                     "show_title": show_title,
                     "season_number": season_number,
+                    "episode_title": ep.episode_title,
                     "language": ep.language,
                     "status": "open",
                     "created_at": ts,
@@ -132,9 +135,10 @@ def _build_validation_report(db: Session) -> dict:
                     "description": "Published episode has no duration. Duration is required.",
                     "content_type": "Duration",
                     "episode_id": ep_id,
-                    "episode_title": ep.episode_title,
+                    "affected_episode_id": ep_id,
                     "show_title": show_title,
                     "season_number": season_number,
+                    "episode_title": ep.episode_title,
                     "language": ep.language,
                     "status": "open",
                     "created_at": ts,
@@ -147,32 +151,50 @@ def _build_validation_report(db: Session) -> dict:
                     "description": "Draft episode has no duration. Required before publishing.",
                     "content_type": "Duration",
                     "episode_id": ep_id,
-                    "episode_title": ep.episode_title,
+                    "affected_episode_id": ep_id,
                     "show_title": show_title,
                     "season_number": season_number,
+                    "episode_title": ep.episode_title,
                     "language": ep.language,
                     "status": "open",
                     "created_at": ts,
                 })
 
-        # ── Missing section on published show ──────────────────────────────────
-        # Not a hard per-episode publish block, but the show will be silently
-        # excluded from all catalogue sections (viewer cannot find it).
-        if show and not show.section and is_published:
-            issues.append({
-                "id": f"missing_section_{ep_id}",
-                "severity": "warning",
-                "issue_type": "Missing Show Section",
-                "description": "This show has no section assigned. It won't appear in any catalogue category.",
-                "content_type": "Section",
-                "episode_id": ep_id,
-                "episode_title": ep.episode_title,
-                "show_title": show_title,
-                "season_number": season_number,
-                "language": ep.language,
-                "status": "open",
-                "created_at": ts,
-            })
+        # ── Missing section on show ────────────────────────────────────────────
+        if show and not show.section:
+            if is_published:
+                blocked_episode_ids.add(ep_id)
+                issues.append({
+                    "id": f"missing_section_{ep_id}",
+                    "severity": "critical",
+                    "issue_type": "Missing Show Section",
+                    "description": "Published show must have a section assigned for catalogue grouping.",
+                    "content_type": "Section",
+                    "episode_id": ep_id,
+                    "affected_episode_id": ep_id,
+                    "show_title": show_title,
+                    "season_number": season_number,
+                    "episode_title": ep.episode_title,
+                    "language": ep.language,
+                    "status": "open",
+                    "created_at": ts,
+                })
+            else:
+                issues.append({
+                    "id": f"missing_section_draft_{ep_id}",
+                    "severity": "warning",
+                    "issue_type": "Missing Show Section",
+                    "description": f"Show '{show_title}' has no section assigned. It won't appear in catalogue categories when published.",
+                    "content_type": "Section",
+                    "episode_id": ep_id,
+                    "affected_episode_id": ep_id,
+                    "show_title": show_title,
+                    "season_number": season_number,
+                    "episode_title": ep.episode_title,
+                    "language": ep.language,
+                    "status": "open",
+                    "created_at": ts,
+                })
 
         # ── Missing synopsis ───────────────────────────────────────────────────
         if not ep.synopsis:
@@ -183,9 +205,10 @@ def _build_validation_report(db: Session) -> dict:
                 "description": "Synopsis is recommended for better content discovery.",
                 "content_type": "Synopsis",
                 "episode_id": ep_id,
-                "episode_title": ep.episode_title,
+                "affected_episode_id": ep_id,
                 "show_title": show_title,
                 "season_number": season_number,
+                "episode_title": ep.episode_title,
                 "language": ep.language,
                 "status": "open",
                 "created_at": ts,

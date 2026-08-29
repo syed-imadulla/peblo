@@ -345,9 +345,15 @@ const EpisodesList = () => {
           if (episode.language) langSet.add(episode.language.toUpperCase());
           
           let validationState = 'neutral';
-          if (episode.status === 'published' && validationReport) {
-            const hasIssue = validationReport.issues.some(issue => issue.affected_episode_id === episode.id);
-            validationState = hasIssue ? 'issues' : 'valid';
+          if (validationReport && validationReport.issues) {
+            const hasIssue = validationReport.issues.some(
+              issue => issue.affected_episode_id === episode.id || issue.episode_id === episode.id
+            );
+            if (episode.status === 'published') {
+              validationState = hasIssue ? 'issues' : 'valid';
+            } else {
+              validationState = hasIssue ? 'issues' : 'neutral';
+            }
           }
           
           episodes.push({
