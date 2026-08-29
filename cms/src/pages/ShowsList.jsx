@@ -53,6 +53,28 @@ const getLanguageColors = (lang) => {
   }
 };
 
+const getShowArtwork = (show) => {
+  if (show.artwork && show.artwork.length > 0) {
+    return show.artwork[0].url || show.artwork[0].file_path;
+  }
+  
+  if (show.seasons && show.seasons.length > 0) {
+    for (const season of show.seasons) {
+      if (season.artwork && season.artwork.length > 0) {
+        return season.artwork[0].url || season.artwork[0].file_path;
+      }
+      if (season.episodes && season.episodes.length > 0) {
+        for (const ep of season.episodes) {
+          if (ep.artwork && ep.artwork.length > 0) {
+            return ep.artwork[0].url || ep.artwork[0].file_path;
+          }
+        }
+      }
+    }
+  }
+  return null;
+};
+
 const getShowMetrics = (show) => {
   let isPublished = false;
   let totalEpisodes = 0;
@@ -526,21 +548,30 @@ const ShowsList = () => {
                     <tr key={show.id} style={{ transition: 'background-color 0.15s ease' }} onMouseOver={e => e.currentTarget.style.backgroundColor = '#FAFAFF'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
                       <td style={{ padding: '16px 24px', borderBottom: idx === paginatedShows.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                          {show.artwork?.length > 0 ? (
-                            <img 
-                              src={show.artwork[0].url || show.artwork[0].file_path} 
-                              alt={show.title} 
-                              style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '16px', border: '1px solid #F1F5F9', flexShrink: 0, boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }} 
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Crect width='56' height='56' fill='%23f5f3ff'/%3E%3Cpath d='M20 28l4 4 8-8' stroke='%23a78bfa' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
-                              }}
-                            />
-                          ) : (
-                            <div style={{ width: '56px', height: '56px', borderRadius: '16px', backgroundColor: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A78BFA', border: 'none', flexShrink: 0 }}>
-                              <ImageIcon size={20} />
-                            </div>
-                          )}
+                          {(() => {
+                            const artworkUrl = getShowArtwork(show);
+                            if (artworkUrl) {
+                              return (
+                                <div style={{ width: '64px', height: '36px', borderRadius: '8px', backgroundColor: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A78BFA', flexShrink: 0, overflow: 'hidden' }}>
+                                  <img 
+                                    src={artworkUrl} 
+                                    alt={show.title} 
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                    onError={(e) => {
+                                      e.target.onerror = null;
+                                      e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='36' viewBox='0 0 64 36'%3E%3Crect width='64' height='36' fill='%23f5f3ff'/%3E%3Cpath d='M22 18l4 4 8-8' stroke='%23a78bfa' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+                                    }}
+                                  />
+                                </div>
+                              );
+                            } else {
+                              return (
+                                <div style={{ width: '64px', height: '36px', borderRadius: '8px', backgroundColor: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A78BFA', flexShrink: 0, overflow: 'hidden' }}>
+                                  <ImageIcon size={18} />
+                                </div>
+                              );
+                            }
+                          })()}
                           <div style={{ overflow: 'hidden' }}>
                             <div style={{ fontWeight: '700', fontSize: '14px', color: '#0F172A', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               {show.title}
