@@ -302,7 +302,11 @@ def get_publish_history(
 
     # Search logic matching existing JS client-side behavior
     if search:
-        search_term = f"%{search.lower()}%"
+        raw_search = search.lower()
+        if raw_search.startswith("pub_"):
+            raw_search = raw_search[4:]
+            
+        search_term = f"%{raw_search}%"
         query = query.filter(
             or_(
                 cast(PublishRun.id, String).ilike(search_term),
