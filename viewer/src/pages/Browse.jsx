@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Compass, Filter, Sparkles } from 'lucide-react';
 import { getCatalog } from '../api';
 import { ShowCard } from '../components/ShowCard';
+import { CustomDropdown } from '../components/CustomDropdown';
 import { LoadingState, ErrorState, EmptyState } from '../components/States';
 import { getAllShows } from '../utils/catalogue';
 
@@ -257,25 +258,17 @@ const Browse = () => {
             <span style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--navy-900)' }}>
               Language:
             </span>
-            <select
+            <CustomDropdown
               value={selectedLanguage}
-              onChange={(e) => setSelectedLanguage(e.target.value)}
-              style={{
-                padding: '0.45rem 0.9rem',
-                borderRadius: '10px',
-                border: '1px solid var(--border)',
-                backgroundColor: 'var(--bg-secondary)',
-                color: 'var(--text-main)',
-                fontSize: '0.85rem',
-                fontWeight: 700,
-                outline: 'none',
-              }}
-              aria-label="Filter shows by language"
-            >
-              <option value="all">All Languages</option>
-              <option value="en">English (EN)</option>
-              <option value="hi">Hindi (HI)</option>
-            </select>
+              onChange={setSelectedLanguage}
+              minWidth="150px"
+              ariaLabel="Filter shows by language"
+              options={[
+                { value: 'all', label: 'All Languages' },
+                { value: 'en', label: 'English (EN)' },
+                { value: 'hi', label: 'Hindi (HI)' },
+              ]}
+            />
           </div>
         </div>
       </div>

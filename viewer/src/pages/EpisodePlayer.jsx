@@ -20,6 +20,7 @@ import {
 import { getCatalog } from '../api';
 import { CatalogueRow } from '../components/CatalogueRow';
 import { EpisodeCard } from '../components/EpisodeCard';
+import { CustomDropdown } from '../components/CustomDropdown';
 import { LoadingState, ErrorState, EmptyState } from '../components/States';
 import { FallbackImage } from '../components/ShowCard';
 import { findEpisodeByContentGroup, formatDuration, resolveAssetUrl } from '../utils/catalogue';
@@ -380,27 +381,19 @@ const EpisodePlayer = () => {
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               {/* Speed Selector */}
-              <select
-                value={playbackSpeed}
-                onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value))}
-                style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '2px 6px',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  outline: 'none',
-                  cursor: 'pointer',
-                }}
-                aria-label="Playback speed"
-              >
-                <option value="0.75" style={{ color: '#000' }}>0.75x</option>
-                <option value="1" style={{ color: '#000' }}>1.0x</option>
-                <option value="1.25" style={{ color: '#000' }}>1.25x</option>
-                <option value="1.5" style={{ color: '#000' }}>1.5x</option>
-              </select>
+              <CustomDropdown
+                value={String(playbackSpeed)}
+                onChange={(val) => setPlaybackSpeed(parseFloat(val))}
+                minWidth="85px"
+                size="sm"
+                ariaLabel="Playback speed"
+                options={[
+                  { value: '0.75', label: '0.75x' },
+                  { value: '1', label: '1.0x' },
+                  { value: '1.25', label: '1.25x' },
+                  { value: '1.5', label: '1.5x' },
+                ]}
+              />
 
               {/* Fullscreen Button */}
               <button

@@ -214,38 +214,172 @@ h1, h2, h3, h4, h5, h6 {
   pointer-events: auto;
 }
 
-/* Streaming OTT Hover Card Animation */
+/* ─── Prime Video & JioHotstar Style OTT Expandable Card ─────────────────── */
+.show-card-container, .episode-card-container {
+  position: relative;
+}
+
 .show-card, .episode-card {
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.22s ease;
+  position: relative;
   display: flex;
   flex-direction: column;
-  position: relative;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.24s ease, border-color 0.24s ease;
   z-index: 1;
+  text-decoration: none;
+  color: inherit;
 }
 
 .show-card:hover, .episode-card:hover {
-  z-index: 10;
+  transform: translateY(-8px) scale(1.06);
+  z-index: 80;
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(124, 58, 237, 0.4);
+  border-color: rgba(124, 58, 237, 0.35);
 }
 
 .show-card-thumb, .episode-card-thumb {
   position: relative;
-  border-radius: 16px;
+  aspect-ratio: 16/9;
+  width: 100%;
+  background-color: #121225;
   overflow: hidden;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--border);
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), filter 0.22s ease;
 }
 
-.show-card:hover .show-card-thumb,
-.episode-card:hover .episode-card-thumb {
-  transform: translateY(-6px) scale(1.035);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 4px 14px rgba(124, 58, 237, 0.25);
-  border-color: rgba(124, 58, 237, 0.3);
-}
-
-.show-card:hover img,
-.episode-card:hover img {
+.show-card:hover .show-card-thumb img,
+.episode-card:hover .episode-card-thumb img {
   filter: brightness(1.08);
+}
+
+.show-card-base-info, .episode-card-base-info {
+  padding: 0.65rem 0.85rem 0.4rem 0.85rem;
+}
+
+.show-card-title, .episode-card-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--navy-900);
+  margin: 0 0 0.25rem 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+.show-card-subline, .episode-card-subline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Expanded Card Hover Drawer */
+.card-hover-drawer {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, padding 0.22s ease;
+  padding: 0 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  background-color: var(--surface);
+}
+
+.show-card:hover .card-hover-drawer,
+.episode-card:hover .card-hover-drawer {
+  max-height: 160px;
+  opacity: 1;
+  padding: 0.35rem 0.85rem 0.85rem 0.85rem;
+}
+
+.card-hover-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-play-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--purple-700);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
+}
+
+.btn-info-circle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+}
+
+.card-hover-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-nav);
+  flex-wrap: wrap;
+}
+
+.meta-badge-purple {
+  background-color: rgba(124, 58, 237, 0.2);
+  color: var(--purple-500);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.meta-dot {
+  color: var(--text-muted);
+}
+
+.card-hover-synopsis {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-duration-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background-color: rgba(8, 8, 23, 0.85);
+  backdrop-filter: blur(4px);
+  color: #F8F7FF;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .play-badge-overlay {

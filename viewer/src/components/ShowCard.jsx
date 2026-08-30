@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Film, Play } from 'lucide-react';
-import { getShowBanner, getShowPoster, getShowLanguages } from '../utils/catalogue';
+import { Film, Play, Info } from 'lucide-react';
+import { getShowBanner, getShowPoster, getShowLanguages, getShowTotalEpisodes } from '../utils/catalogue';
 
 export const FallbackImage = ({ aspect = '16/9' }) => (
   <div
@@ -70,86 +70,113 @@ export const ShowCard = ({ show, width = '100%', typeLabel = 'Series' }) => {
   const image = getShowBanner(show) || getShowPoster(show);
   const languages = getShowLanguages(show);
   const category = show.categories && show.categories.length > 0 ? show.categories[0] : 'Adventure';
+  const totalEpisodes = getShowTotalEpisodes(show);
 
   return (
-    <Link
-      to={`/show/${show.slug || show.show_id}`}
+    <div
       style={{
         width: width,
         flexShrink: 0,
-        outline: 'none',
-        textDecoration: 'none',
+        position: 'relative',
       }}
-      className="show-card"
-      aria-label={`View ${show.title}`}
+      className="show-card-container"
     >
-      <div
-        className="show-card-thumb"
-        style={{
-          backgroundColor: '#121225',
-          aspectRatio: '16/9',
-          borderRadius: '16px',
-        }}
+      <Link
+        to={`/show/${show.slug || show.show_id}`}
+        className="show-card"
+        aria-label={`View ${show.title}`}
       >
-        {image ? (
-          <img
-            src={image}
-            alt={show.title}
-            loading="lazy"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              display: 'block',
-              transition: 'filter 0.18s ease',
-            }}
-            onError={(e) => {
-              e.target.style.display = 'none';
-              const fb = e.target.nextElementSibling;
-              if (fb) fb.style.display = 'flex';
-            }}
-          />
-        ) : null}
-        <div style={{ display: image ? 'none' : 'flex', width: '100%', height: '100%' }}>
-          <FallbackImage aspect="16/9" />
-        </div>
+        <div className="show-card-thumb">
+          {image ? (
+            <img
+              src={image}
+              alt={show.title}
+              loading="lazy"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: 'block',
+                transition: 'filter 0.18s ease',
+              }}
+              onError={(e) => {
+                e.target.style.display = 'none';
+                const fb = e.target.nextElementSibling;
+                if (fb) fb.style.display = 'flex';
+              }}
+            />
+          ) : null}
+          <div style={{ display: image ? 'none' : 'flex', width: '100%', height: '100%' }}>
+            <FallbackImage aspect="16/9" />
+          </div>
 
-        {/* Hover play icon overlay */}
-        <div className="play-badge-overlay">
-          <div className="play-badge-btn">
-            <Play size={18} fill="var(--purple-700)" color="var(--purple-700)" style={{ marginLeft: '2px' }} />
+          {/* Hover play icon overlay */}
+          <div className="play-badge-overlay">
+            <div className="play-badge-btn">
+              <Play size={18} fill="var(--purple-700)" color="var(--purple-700)" style={{ marginLeft: '2px' }} />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div style={{ marginTop: '0.6rem' }}>
-        <h3
-          style={{
-            fontSize: '1.02rem',
-            fontWeight: 800,
-            color: 'var(--navy-900)',
-            marginBottom: '0.2rem',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            lineHeight: 1.3,
-          }}
-          title={show.title}
-        >
-          {show.title}
-        </h3>
+        {/* Base Visible Title & Metadata */}
+        <div className="show-card-base-info">
+          <h3 className="show-card-title" title={show.title}>
+            {show.title}
+          </h3>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-          <span style={{ textTransform: 'capitalize', fontWeight: 600 }}>{typeLabel}</span>
-          <span>·</span>
-          <span style={{ textTransform: 'capitalize' }}>{category}</span>
-          <span>·</span>
-          <div style={{ display: 'inline-flex', gap: '4px' }}>
-            <span className="lang-chip">EN</span>
-            <span className="lang-chip">HI</span>
+          <div className="show-card-subline">
+            <span style={{ textTransform: 'capitalize', fontWeight: 600 }}>{typeLabel}</span>
+            <span>·</span>
+            <span style={{ textTransform: 'capitalize' }}>{category}</span>
+            <span>·</span>
+            <div style={{ display: 'inline-flex', gap: '4px' }}>
+              {languages.length > 0 ? (
+                languages.map((l) => (
+                  <span key={l} className="lang-chip">{l}</span>
+                ))
+              ) : (
+                <>
+                  <span className="lang-chip">EN</span>
+                  <span className="lang-chip">HI</span>
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </Link>
+
+        {/* Expanded Hover Drawer (Amazon Prime Video & JioHotstar Style) */}
+        <div className="card-hover-drawer">
+          {/* Action Row */}
+          <div className="card-hover-actions">
+            <span className="btn-play-mini">
+              <Play size={12} fill="#ffffff" /> Watch Now
+            </span>
+            <span className="btn-info-circle" title="View details">
+              <Info size={13} />
+            </span>
+          </div>
+
+          {/* Detailed Metadata */}
+          <div className="card-hover-meta">
+            <span className="meta-badge-purple">{typeLabel}</span>
+            <span className="meta-dot">•</span>
+            <span>{category}</span>
+            {totalEpisodes > 0 && (
+              <>
+                <span className="meta-dot">•</span>
+                <span>{totalEpisodes} Ep{totalEpisodes > 1 ? 's' : ''}</span>
+              </>
+            )}
+          </div>
+
+          {/* 2-line Synopsis */}
+          {show.synopsis && (
+            <p className="card-hover-synopsis">
+              {show.synopsis}
+            </p>
+          )}
+        </div>
+      </Link>
+    </div>
   );
 };

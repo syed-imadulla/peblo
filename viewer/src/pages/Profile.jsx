@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { User, Volume2, Play, CheckCircle, Info, Sparkles, Sliders, Shield } from 'lucide-react';
 import { getCatalog } from '../api';
+import { CustomDropdown } from '../components/CustomDropdown';
 import { getAllShows, getShowTotalEpisodes } from '../utils/catalogue';
 
 const Profile = () => {
@@ -194,24 +195,17 @@ const Profile = () => {
             </div>
           </div>
 
-          <select
+          <CustomDropdown
             value={videoQuality}
-            onChange={(e) => setVideoQuality(e.target.value)}
-            style={{
-              padding: '0.4rem 0.85rem',
-              borderRadius: '8px',
-              border: '1px solid var(--border)',
-              backgroundColor: 'var(--background)',
-              color: 'var(--navy-900)',
-              fontSize: '0.88rem',
-              fontWeight: 600,
-              outline: 'none',
-            }}
-          >
-            <option value="auto">Auto (Adaptive)</option>
-            <option value="hd">High Definition (HD)</option>
-            <option value="saver">Data Saver</option>
-          </select>
+            onChange={setVideoQuality}
+            minWidth="180px"
+            ariaLabel="Streaming Quality"
+            options={[
+              { value: 'auto', label: 'Auto (Adaptive)' },
+              { value: 'hd', label: 'High Definition (HD)' },
+              { value: 'saver', label: 'Data Saver' },
+            ]}
+          />
         </div>
 
         {/* Save Button & Feedback */}

@@ -407,8 +407,8 @@ const Home = () => {
                   display: 'flex',
                   gap: '18px',
                   overflowX: 'auto',
-                  padding: '12px 6px 16px 6px',
-                  margin: '-12px -6px 0 -6px',
+                  padding: '16px 8px 36px 8px',
+                  margin: '-16px -8px 0 -8px',
                   scrollSnapType: 'x proximity',
                 }}
               >

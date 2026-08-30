@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
-import { Home, LayoutGrid, Search, Globe, ChevronDown, Menu, X } from 'lucide-react';
+import { Home, LayoutGrid, Search, Globe, ChevronDown, Check, Menu, X } from 'lucide-react';
 
 const Layout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState('EN');
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const langRef = useRef(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -17,9 +18,23 @@ const Layout = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close language dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (langRef.current && !langRef.current.contains(event.target)) {
+        setLangDropdownOpen(false);
+      }
+    };
+    if (langDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [langDropdownOpen]);
+
   // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
+    setLangDropdownOpen(false);
   }, [location.pathname]);
 
   const navItems = [
@@ -167,17 +182,18 @@ const Layout = () => {
           {/* Right: Language Selector & Profile Avatar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             {/* Language Selector */}
-            <div style={{ position: 'relative' }}>
+            <div ref={langRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '5px',
-                  padding: '0.35rem 0.8rem',
+                  gap: '6px',
+                  padding: '0.38rem 0.85rem',
                   borderRadius: 'var(--radius-pill)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid',
+                  borderColor: langDropdownOpen ? 'var(--purple-600)' : 'rgba(255, 255, 255, 0.1)',
+                  backgroundColor: langDropdownOpen ? 'var(--bg-surface-hover)' : 'rgba(255, 255, 255, 0.06)',
                   backdropFilter: 'blur(8px)',
                   color: 'var(--text-main)',
                   fontSize: '0.82rem',
@@ -190,7 +206,14 @@ const Layout = () => {
               >
                 <Globe size={13} color="var(--purple-500)" />
                 <span>{selectedLang}</span>
-                <ChevronDown size={12} color="var(--text-muted)" />
+                <ChevronDown
+                  size={12}
+                  color="var(--text-muted)"
+                  style={{
+                    transform: langDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
+                />
               </button>
 
               {langDropdownOpen && (
@@ -202,53 +225,62 @@ const Layout = () => {
                     backgroundColor: '#121225',
                     backdropFilter: 'blur(20px)',
                     WebkitBackdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '14px',
-                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
-                    padding: '5px',
-                    minWidth: '125px',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '12px',
+                    boxShadow: '0 16px 36px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(124, 58, 237, 0.15)',
+                    padding: '6px',
+                    minWidth: '145px',
                     zIndex: 110,
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '2px',
                   }}
                 >
-                  <button
-                    onClick={() => {
-                      setSelectedLang('EN');
-                      setLangDropdownOpen(false);
-                    }}
-                    style={{
-                      padding: '7px 10px',
-                      borderRadius: '8px',
-                      fontSize: '0.82rem',
-                      fontWeight: selectedLang === 'EN' ? 700 : 500,
-                      color: selectedLang === 'EN' ? 'var(--purple-500)' : 'var(--text-main)',
-                      backgroundColor: selectedLang === 'EN' ? 'rgba(124, 58, 237, 0.2)' : 'transparent',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    English (EN)
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedLang('HI');
-                      setLangDropdownOpen(false);
-                    }}
-                    style={{
-                      padding: '7px 10px',
-                      borderRadius: '8px',
-                      fontSize: '0.82rem',
-                      fontWeight: selectedLang === 'HI' ? 700 : 500,
-                      color: selectedLang === 'HI' ? 'var(--purple-500)' : 'var(--text-main)',
-                      backgroundColor: selectedLang === 'HI' ? 'rgba(124, 58, 237, 0.2)' : 'transparent',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Hindi (HI)
-                  </button>
+                  {[
+                    { code: 'EN', name: 'English (EN)' },
+                    { code: 'HI', name: 'Hindi (HI)' },
+                  ].map((lang) => {
+                    const isSelected = selectedLang === lang.code;
+                    return (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          setSelectedLang(lang.code);
+                          setLangDropdownOpen(false);
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '8px',
+                          padding: '0.45rem 0.75rem',
+                          borderRadius: '8px',
+                          fontSize: '0.82rem',
+                          fontWeight: isSelected ? 800 : 600,
+                          color: isSelected ? '#ffffff' : 'var(--text-nav)',
+                          backgroundColor: isSelected ? 'rgba(124, 58, 237, 0.22)' : 'transparent',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.12s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isSelected) {
+                            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.06)';
+                            e.currentTarget.style.color = '#ffffff';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isSelected) {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                            e.currentTarget.style.color = 'var(--text-nav)';
+                          }
+                        }}
+                      >
+                        <span>{lang.name}</span>
+                        {isSelected && <Check size={14} color="var(--purple-500)" strokeWidth={2.5} />}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
