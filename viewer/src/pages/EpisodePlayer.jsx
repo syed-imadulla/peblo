@@ -22,7 +22,7 @@ import { CatalogueRow } from '../components/CatalogueRow';
 import { EpisodeCard } from '../components/EpisodeCard';
 import { LoadingState, ErrorState, EmptyState } from '../components/States';
 import { FallbackImage } from '../components/ShowCard';
-import { findEpisodeByContentGroup, formatDuration } from '../utils/catalogue';
+import { findEpisodeByContentGroup, formatDuration, resolveAssetUrl } from '../utils/catalogue';
 
 const EpisodePlayer = () => {
   const { contentGroup } = useParams();
@@ -76,7 +76,8 @@ const EpisodePlayer = () => {
   const { episode, show, season, episodeIndex, isTrailer } = episodeData;
   const totalDuration = episode.duration_seconds || 300;
 
-  const thumbnail = episode.artwork?.thumbnail || episode.artwork?.banner || episode.artwork?.poster;
+  const rawThumbnail = episode.artwork?.thumbnail || episode.artwork?.banner || episode.artwork?.poster;
+  const thumbnail = resolveAssetUrl(rawThumbnail);
 
   // Calculate Previous and Next Episode
   const currentSeasonEpisodes = season?.episodes || (isTrailer ? show?.trailers : []);

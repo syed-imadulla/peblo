@@ -2,10 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Play, Clock } from 'lucide-react';
 import { FallbackImage } from './ShowCard';
-import { formatDuration } from '../utils/catalogue';
+import { formatDuration, resolveAssetUrl } from '../utils/catalogue';
 
 export const EpisodeCard = ({ episode, width = '260px' }) => {
-  const thumbnail = episode.artwork?.thumbnail || episode.artwork?.banner || episode.artwork?.poster;
+  const rawThumbnail = episode.artwork?.thumbnail || episode.artwork?.banner || episode.artwork?.poster;
+  const thumbnail = resolveAssetUrl(rawThumbnail);
 
   return (
     <Link

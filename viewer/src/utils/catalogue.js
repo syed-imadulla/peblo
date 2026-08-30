@@ -1,6 +1,19 @@
 /**
- * Catalogue Utility Helpers for Peblo Viewer
+ * Catalogue Utility Helpers & Asset URL Resolver for Peblo Viewer
  */
+
+export const resolveAssetUrl = (assetPath) => {
+  if (!assetPath) return null;
+  // If already absolute URL (http:// or https://), return as-is
+  if (assetPath.startsWith('http://') || assetPath.startsWith('https://')) {
+    return assetPath;
+  }
+  // If VITE_API_URL is configured (e.g. http://localhost:8000), resolve against it.
+  // Otherwise, use relative path (e.g. /assets/...) which is proxied by Vite in dev and served by Nginx in prod.
+  const apiOrigin = typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL ? import.meta.env.VITE_API_URL : '';
+  const cleanPath = assetPath.startsWith('/') ? assetPath : `/${assetPath}`;
+  return apiOrigin ? `${apiOrigin.replace(/\/$/, '')}${cleanPath}` : cleanPath;
+};
 
 export const getAllShows = (catalog) => {
   if (!catalog) return [];
@@ -81,7 +94,7 @@ export const getShowPoster = (show) => {
     ...(show.seasons?.flatMap((s) => s.episodes || []) || []),
   ];
   for (const ep of allEpisodes) {
-    if (ep.artwork?.poster) return ep.artwork.poster;
+    if (ep.artwork?.poster) return resolveAssetUrl(ep.artwork.poster);
   }
   return null;
 };
@@ -93,7 +106,19 @@ export const getShowBanner = (show) => {
     ...(show.seasons?.flatMap((s) => s.episodes || []) || []),
   ];
   for (const ep of allEpisodes) {
-    if (ep.artwork?.banner) return ep.artwork.banner;
+    if (ep.artwork?.banner) return resolveAssetUrl(ep.artwork.banner);
+  }
+  return null;
+};
+
+export const getShowThumbnail = (show) => {
+  if (!show) return null;
+  const allEpisodes = [
+    ...(show.trailers || []),
+    ...(show.seasons?.flatMap((s) => s.episodes || []) || []),
+  ];
+  for (const ep of allEpisodes) {
+    if (ep.artwork?.thumbnail) return resolveAssetUrl(ep.artwork.thumbnail);
   }
   return null;
 };

@@ -48,8 +48,24 @@ const Layout = () => {
             }}
             aria-label="Peblo TV Home"
           >
+            <img
+              src="/peblo-logo.avif"
+              alt="PeBlo"
+              style={{
+                height: '32px',
+                width: 'auto',
+                display: 'block',
+                objectFit: 'contain',
+              }}
+              onError={(e) => {
+                e.target.style.display = 'none';
+                const textFallback = e.target.nextElementSibling;
+                if (textFallback) textFallback.style.display = 'inline-block';
+              }}
+            />
             <span
               style={{
+                display: 'none',
                 fontSize: '1.65rem',
                 fontWeight: 900,
                 color: 'var(--purple-700)',
