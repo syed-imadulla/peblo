@@ -42,27 +42,6 @@ const ShowDetails = () => {
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-      {/* Back to Browse Button */}
-      <div>
-        <Link
-          to="/browse"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            color: 'var(--purple-700)',
-            fontWeight: 700,
-            fontSize: '0.92rem',
-            padding: '0.45rem 0.95rem',
-            borderRadius: 'var(--radius-pill)',
-            backgroundColor: 'var(--purple-100)',
-            transition: 'background-color 0.15s ease',
-          }}
-        >
-          <ArrowLeft size={16} strokeWidth={2.5} /> Back to Browse
-        </Link>
-      </div>
-
       {/* Hero Showcase Container */}
       <div
         style={{
@@ -74,6 +53,44 @@ const ShowDetails = () => {
           border: '1px solid #ECE4F6',
         }}
       >
+        {/* Floating Frosted Glass Back Button */}
+        <Link
+          to="/browse"
+          style={{
+            position: 'absolute',
+            top: '20px',
+            left: '24px',
+            zIndex: 10,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            color: '#ffffff',
+            fontWeight: 700,
+            fontSize: '0.88rem',
+            padding: '0.45rem 1.05rem',
+            borderRadius: 'var(--radius-pill)',
+            backgroundColor: 'rgba(21, 27, 79, 0.5)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255, 255, 255, 0.25)',
+            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2)',
+            transition: 'all 0.2s ease',
+            textDecoration: 'none',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(21, 27, 79, 0.75)';
+            e.currentTarget.style.transform = 'translateX(-2px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(21, 27, 79, 0.5)';
+            e.currentTarget.style.transform = 'none';
+          }}
+          aria-label="Back to Browse"
+        >
+          <ArrowLeft size={16} strokeWidth={2.5} />
+          <span>Back</span>
+        </Link>
+
         {/* Banner Backdrop */}
         <div style={{ position: 'relative', width: '100%', height: '280px', backgroundColor: 'var(--navy-950)' }}>
           {banner ? (
@@ -96,7 +113,7 @@ const ShowDetails = () => {
             style={{
               position: 'absolute',
               inset: 0,
-              background: 'linear-gradient(180deg, rgba(20, 9, 41, 0.15) 0%, rgba(20, 9, 41, 0.75) 100%)',
+              background: 'linear-gradient(180deg, rgba(20, 9, 41, 0.2) 0%, rgba(20, 9, 41, 0.75) 100%)',
             }}
           />
         </div>
@@ -139,7 +156,7 @@ const ShowDetails = () => {
               />
             ) : null}
             <div style={{ display: poster ? 'none' : 'flex', width: '100%', height: '100%' }}>
-              <FallbackImage aspect="2/3" title={show.title} />
+              <FallbackImage aspect="2/3" />
             </div>
           </div>
 

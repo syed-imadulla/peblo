@@ -45,23 +45,23 @@ const Layout = () => {
         <div
           style={{
             pointerEvents: 'auto',
-            width: 'calc(100% - 48px)',
+            width: 'calc(100% - 40px)',
             maxWidth: '1440px',
-            backgroundColor: scrolled ? 'rgba(255, 255, 255, 0.88)' : 'rgba(255, 255, 255, 0.80)',
-            backdropFilter: 'blur(28px) saturate(190%)',
-            WebkitBackdropFilter: 'blur(28px) saturate(190%)',
-            borderRadius: '0 0 24px 24px',
-            border: '1px solid rgba(230, 222, 246, 0.85)',
+            backgroundColor: scrolled ? 'rgba(255, 255, 255, 0.90)' : 'rgba(255, 255, 255, 0.82)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            borderRadius: '0 0 22px 22px',
+            border: '1px solid rgba(230, 222, 246, 0.8)',
             borderTop: 'none',
             boxShadow: scrolled
-              ? '0 10px 32px rgba(21, 27, 79, 0.08), 0 2px 8px rgba(109, 53, 232, 0.04), inset 0 -1px 0 rgba(255, 255, 255, 0.9)'
-              : '0 6px 24px rgba(21, 27, 79, 0.05), inset 0 -1px 0 rgba(255, 255, 255, 0.9)',
-            padding: '0.65rem 2rem',
+              ? '0 8px 24px rgba(21, 27, 79, 0.06), 0 2px 6px rgba(109, 53, 232, 0.03), inset 0 -1px 0 rgba(255, 255, 255, 0.9)'
+              : '0 4px 18px rgba(21, 27, 79, 0.04), inset 0 -1px 0 rgba(255, 255, 255, 0.9)',
+            padding: '0.5rem 1.75rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '1.5rem',
-            transition: 'all 0.25s ease',
+            gap: '1.25rem',
+            transition: 'all 0.2s ease',
           }}
         >
           {/* Left: PeBlo Logo + TV Pill Badge */}
@@ -80,7 +80,7 @@ const Layout = () => {
               src="/peblo-logo.avif"
               alt="PeBlo"
               style={{
-                height: '30px',
+                height: '28px',
                 width: 'auto',
                 display: 'block',
                 objectFit: 'contain',
@@ -94,7 +94,7 @@ const Layout = () => {
             <span
               style={{
                 display: 'none',
-                fontSize: '1.5rem',
+                fontSize: '1.45rem',
                 fontWeight: 900,
                 color: 'var(--purple-700)',
                 letterSpacing: '-0.75px',
@@ -106,9 +106,9 @@ const Layout = () => {
               style={{
                 backgroundColor: 'rgba(109, 53, 232, 0.12)',
                 color: 'var(--purple-700)',
-                fontSize: '0.72rem',
+                fontSize: '0.7rem',
                 fontWeight: 800,
-                padding: '2px 7px',
+                padding: '2px 6px',
                 borderRadius: 'var(--radius-pill)',
                 letterSpacing: '0.5px',
                 lineHeight: 1.2,
@@ -124,11 +124,11 @@ const Layout = () => {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.4rem',
-              backgroundColor: 'rgba(241, 236, 255, 0.5)',
-              padding: '4px',
+              gap: '0.35rem',
+              backgroundColor: 'rgba(241, 236, 255, 0.45)',
+              padding: '3px',
               borderRadius: '999px',
-              border: '1px solid rgba(230, 222, 246, 0.7)',
+              border: '1px solid rgba(230, 222, 246, 0.65)',
               backdropFilter: 'blur(12px)',
             }}
             className="desktop-nav"
@@ -141,30 +141,30 @@ const Layout = () => {
                 style={({ isActive }) => ({
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '7px',
-                  padding: '0.45rem 1.2rem',
+                  gap: '6px',
+                  padding: '0.4rem 1.1rem',
                   borderRadius: 'var(--radius-pill)',
-                  fontSize: '0.92rem',
+                  fontSize: '0.9rem',
                   fontWeight: isActive ? 700 : 600,
                   color: isActive ? '#ffffff' : 'var(--navy-900)',
                   background: isActive
                     ? 'linear-gradient(180deg, #7E45F2 0%, #632BD9 100%)'
                     : 'transparent',
                   boxShadow: isActive
-                    ? '0 3px 12px rgba(109, 53, 232, 0.32), inset 0 1px 1px rgba(255, 255, 255, 0.35)'
+                    ? '0 2px 10px rgba(109, 53, 232, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.3)'
                     : 'none',
-                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                  transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                   textDecoration: 'none',
                 })}
               >
-                <Icon size={16} strokeWidth={2.2} />
+                <Icon size={15} strokeWidth={2.2} />
                 <span>{label}</span>
               </NavLink>
             ))}
           </nav>
 
           {/* Right: Language Selector & Profile Avatar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             {/* Language Selector */}
             <div style={{ position: 'relative' }}>
               <button
@@ -172,14 +172,14 @@ const Layout = () => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  padding: '0.4rem 0.85rem',
+                  gap: '5px',
+                  padding: '0.35rem 0.8rem',
                   borderRadius: 'var(--radius-pill)',
                   border: '1px solid rgba(230, 222, 246, 0.8)',
                   backgroundColor: 'rgba(255, 255, 255, 0.85)',
                   backdropFilter: 'blur(8px)',
                   color: 'var(--navy-900)',
-                  fontSize: '0.84rem',
+                  fontSize: '0.82rem',
                   fontWeight: 700,
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
@@ -187,9 +187,9 @@ const Layout = () => {
                 }}
                 aria-label="Select Language"
               >
-                <Globe size={14} color="var(--purple-700)" />
+                <Globe size={13} color="var(--purple-700)" />
                 <span>{selectedLang}</span>
-                <ChevronDown size={13} color="var(--text-muted)" />
+                <ChevronDown size={12} color="var(--text-muted)" />
               </button>
 
               {langDropdownOpen && (
@@ -203,9 +203,9 @@ const Layout = () => {
                     WebkitBackdropFilter: 'blur(20px)',
                     border: '1px solid rgba(230, 222, 246, 0.9)',
                     borderRadius: '14px',
-                    boxShadow: '0 8px 28px rgba(21, 27, 79, 0.12)',
-                    padding: '6px',
-                    minWidth: '130px',
+                    boxShadow: '0 8px 24px rgba(21, 27, 79, 0.1)',
+                    padding: '5px',
+                    minWidth: '125px',
                     zIndex: 110,
                     display: 'flex',
                     flexDirection: 'column',
@@ -218,9 +218,9 @@ const Layout = () => {
                       setLangDropdownOpen(false);
                     }}
                     style={{
-                      padding: '8px 12px',
+                      padding: '7px 10px',
                       borderRadius: '8px',
-                      fontSize: '0.85rem',
+                      fontSize: '0.82rem',
                       fontWeight: selectedLang === 'EN' ? 700 : 500,
                       color: selectedLang === 'EN' ? 'var(--purple-700)' : 'var(--navy-900)',
                       backgroundColor: selectedLang === 'EN' ? 'rgba(109, 53, 232, 0.1)' : 'transparent',
@@ -236,9 +236,9 @@ const Layout = () => {
                       setLangDropdownOpen(false);
                     }}
                     style={{
-                      padding: '8px 12px',
+                      padding: '7px 10px',
                       borderRadius: '8px',
-                      fontSize: '0.85rem',
+                      fontSize: '0.82rem',
                       fontWeight: selectedLang === 'HI' ? 700 : 500,
                       color: selectedLang === 'HI' ? 'var(--purple-700)' : 'var(--navy-900)',
                       backgroundColor: selectedLang === 'HI' ? 'rgba(109, 53, 232, 0.1)' : 'transparent',
@@ -256,8 +256,8 @@ const Layout = () => {
             <Link
               to="/profile"
               style={{
-                width: '36px',
-                height: '36px',
+                width: '34px',
+                height: '34px',
                 borderRadius: '50%',
                 overflow: 'hidden',
                 border: '2px solid rgba(230, 222, 246, 0.9)',
@@ -265,7 +265,7 @@ const Layout = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 2px 8px rgba(21, 27, 79, 0.08)',
+                boxShadow: '0 2px 6px rgba(21, 27, 79, 0.06)',
                 flexShrink: 0,
                 transition: 'transform 0.15s ease',
               }}
@@ -273,7 +273,7 @@ const Layout = () => {
               onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
               aria-label="Viewer Profile"
             >
-              <svg width="26" height="26" viewBox="0 0 36 36" fill="none">
+              <svg width="24" height="24" viewBox="0 0 36 36" fill="none">
                 <circle cx="18" cy="18" r="16" fill="#FFDFC6" />
                 <path d="M10 14C10 9.58 13.58 6 18 6C22.42 6 26 9.58 26 14C26 15 25 15.5 24 14C23 12.5 21 11 18 11C15 11 13 12.5 12 14C11 15.5 10 15 10 14Z" fill="#5A3921" />
                 <circle cx="14" cy="18" r="2" fill="#2A1B12" />
@@ -291,7 +291,7 @@ const Layout = () => {
               className="mobile-menu-btn"
               style={{
                 display: 'none',
-                padding: '6px',
+                padding: '5px',
                 borderRadius: '8px',
                 backgroundColor: 'rgba(241, 236, 255, 0.6)',
                 border: '1px solid rgba(230, 222, 246, 0.8)',
@@ -310,18 +310,18 @@ const Layout = () => {
             style={{
               position: 'absolute',
               top: '100%',
-              width: 'calc(100% - 48px)',
+              width: 'calc(100% - 40px)',
               maxWidth: '1440px',
-              padding: '0.85rem 1.5rem',
+              padding: '0.75rem 1.25rem',
               backgroundColor: 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(20px)',
               borderRadius: '0 0 20px 20px',
               border: '1px solid rgba(230, 222, 246, 0.9)',
               borderTop: 'none',
-              boxShadow: '0 8px 24px rgba(21, 27, 79, 0.12)',
+              boxShadow: '0 8px 24px rgba(21, 27, 79, 0.1)',
               display: 'flex',
               flexDirection: 'column',
-              gap: '0.4rem',
+              gap: '0.35rem',
               pointerEvents: 'auto',
             }}
           >
@@ -335,16 +335,16 @@ const Layout = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px',
-                  padding: '0.65rem 0.9rem',
+                  padding: '0.6rem 0.85rem',
                   borderRadius: 'var(--radius-md)',
-                  fontSize: '0.95rem',
+                  fontSize: '0.92rem',
                   fontWeight: 700,
                   color: isActive ? 'var(--purple-700)' : 'var(--navy-900)',
                   backgroundColor: isActive ? 'var(--purple-100)' : 'transparent',
                   textDecoration: 'none',
                 })}
               >
-                <Icon size={18} />
+                <Icon size={17} />
                 <span>{label}</span>
               </NavLink>
             ))}
@@ -353,8 +353,8 @@ const Layout = () => {
       </header>
 
       {/* Main Content Area */}
-      <main style={{ flex: 1, padding: '2rem 0 3.5rem 0' }}>
-        <div className="container" style={{ padding: '0 2.5rem' }}>
+      <main style={{ flex: 1, padding: '1.75rem 0 3rem 0' }}>
+        <div className="container" style={{ padding: '0 2rem' }}>
           <Outlet />
         </div>
       </main>

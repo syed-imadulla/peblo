@@ -75,37 +75,19 @@ export const ShowCard = ({ show, width = '280px', typeLabel = 'Series' }) => {
     <Link
       to={`/show/${show.slug || show.show_id}`}
       style={{
-        display: 'flex',
-        flexDirection: 'column',
         width: width,
         flexShrink: 0,
         outline: 'none',
         textDecoration: 'none',
       }}
-      className="show-card group"
+      className="show-card"
       aria-label={`View ${show.title}`}
     >
       <div
+        className="show-card-thumb"
         style={{
-          position: 'relative',
-          borderRadius: '18px',
-          overflow: 'hidden',
           backgroundColor: '#EDE6FF',
           aspectRatio: '16/9',
-          boxShadow: '0 4px 14px rgba(21, 27, 79, 0.05)',
-          transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-5px) scale(1.025)';
-          e.currentTarget.style.boxShadow = '0 12px 28px rgba(109, 53, 232, 0.14)';
-          const overlay = e.currentTarget.querySelector('.play-overlay');
-          if (overlay) overlay.style.opacity = '1';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'none';
-          e.currentTarget.style.boxShadow = '0 4px 14px rgba(21, 27, 79, 0.05)';
-          const overlay = e.currentTarget.querySelector('.play-overlay');
-          if (overlay) overlay.style.opacity = '0';
         }}
       >
         {image ? (
@@ -118,6 +100,7 @@ export const ShowCard = ({ show, width = '280px', typeLabel = 'Series' }) => {
               height: '100%',
               objectFit: 'cover',
               display: 'block',
+              transition: 'filter 0.25s ease',
             }}
             onError={(e) => {
               e.target.style.display = 'none';
@@ -131,33 +114,9 @@ export const ShowCard = ({ show, width = '280px', typeLabel = 'Series' }) => {
         </div>
 
         {/* Hover play icon overlay */}
-        <div
-          className="play-overlay"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: 'rgba(21, 27, 79, 0.32)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: 0,
-            transition: 'opacity 0.2s ease',
-          }}
-        >
-          <div
-            style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--purple-700)',
-              color: '#ffffff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 6px 16px rgba(0,0,0,0.3)',
-            }}
-          >
-            <Play size={20} fill="#ffffff" style={{ marginLeft: '2px' }} />
+        <div className="play-badge-overlay">
+          <div className="play-badge-btn">
+            <Play size={20} fill="var(--purple-700)" color="var(--purple-700)" style={{ marginLeft: '2px' }} />
           </div>
         </div>
       </div>
