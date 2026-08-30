@@ -35,6 +35,7 @@ class PublishService:
         published_records = len(valid_episodes)
         
         status = "failed"
+        stats = None
         if published_records > 0:
             catalogue = PublishService._generate_catalogue(valid_episodes)
             catalogue_json = json.dumps(catalogue, indent=2, sort_keys=True)
@@ -46,6 +47,26 @@ class PublishService:
             storage.rename(temp_name, final_name)
             
             status = "success"
+            
+            # Calculate stats
+            unique_shows = set()
+            unique_languages = set()
+            unique_sections = set()
+            unique_content_groups = set()
+            
+            for ep in valid_episodes:
+                unique_shows.add(ep.season.show_id)
+                unique_languages.add(ep.language)
+                unique_content_groups.add(ep.content_group)
+                if ep.season.show.section:
+                    unique_sections.add(ep.season.show.section)
+                    
+            stats = {
+                "shows": len(unique_shows),
+                "episodes": len(unique_content_groups),
+                "languages": len(unique_languages),
+                "sections": len(unique_sections)
+            }
         else:
             error_log.append({"type": "empty_catalogue", "description": "No valid records to publish"})
 
@@ -56,7 +77,8 @@ class PublishService:
             total_records_processed=total_processed,
             published_records=published_records,
             blocked_records=blocked,
-            error_log=error_log
+            error_log=error_log,
+            stats=stats
         )
         if triggered_by:
             run.triggered_by = triggered_by

@@ -106,4 +106,5 @@ class PublishRun(Base):
     published_records = Column(Integer, nullable=False)
     blocked_records = Column(Integer, nullable=False)
     error_log = Column(JSONB, nullable=True)
+    stats = Column(JSONB, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

@@ -306,6 +306,7 @@ def get_publish_history(
             "published_records": run.published_records,
             "blocked_records": run.blocked_records,
             "error_log": run.error_log,
+            "stats": run.stats,
             "created_at": run.created_at.isoformat(),
             "triggered_by": str(run.triggered_by) if run.triggered_by else None,
         }
