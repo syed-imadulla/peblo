@@ -13,6 +13,9 @@ export default defineConfig({
       },
       '/assets': 'http://localhost:8000',
     }
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
   }
 })
 

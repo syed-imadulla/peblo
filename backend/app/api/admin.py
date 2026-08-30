@@ -253,6 +253,19 @@ def run_validation(
     return _build_validation_report(db)
 
 
+@router.get("/catalog/preview")
+def preview_catalog(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    try:
+        return PublishService.preview_catalogue(db)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/catalog/publish")
 def publish_catalog(
     db: Session = Depends(get_db),

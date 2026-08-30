@@ -67,6 +67,22 @@ class PublishService:
         return run
 
     @staticmethod
+    def preview_catalogue(db: Session) -> Dict[str, Any]:
+        episodes = db.query(Episode).options(
+            joinedload(Episode.season).joinedload(Season.show)
+        ).filter(Episode.status == 'published').all()
+        
+        valid_episodes = []
+        for ep in episodes:
+            errors = ValidationService.validate_for_publish(db, ep)
+            if not errors.has_blocking_errors():
+                valid_episodes.append(ep)
+                
+        if len(valid_episodes) > 0:
+            return PublishService._generate_catalogue(valid_episodes)
+        return {}
+
+    @staticmethod
     def _generate_catalogue(episodes: List[Episode]) -> Dict[str, Any]:
         catalogue = {
             "featured": [],
