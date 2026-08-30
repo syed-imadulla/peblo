@@ -1,10 +1,17 @@
 :root {
   /* Colors */
+  --purple-900: #1c0a35;
+  --purple-800: #3b1872;
   --purple-700: #6B35C8;
   --purple-600: #7B45D1;
+  --purple-500: #8c52ff;
+  --purple-200: #e5d7fa;
   --purple-100: #F0E8FF;
+  --purple-50: #f8f4fe;
 
+  --navy-950: #140929;
   --navy-900: #29134F;
+  --navy-800: #361c63;
   --navy-700: #42266B;
 
   --yellow-500: #FFB718;
@@ -16,14 +23,20 @@
   --red-500: #D9536F;
   --red-100: #FCE8ED;
 
+  --blue-500: #3b82f6;
   --blue-100: #EAF5FF;
 
   --surface: #FFFFFF;
+  --surface-hover: #F6F4FA;
   --background: #FAF9FD;
+  --text-main: #29134F;
   --text-muted: #756B82;
+  --text-light: #9d94aa;
   --border: #E9E3F1;
+  --border-focus: #7B45D1;
 
   /* Shapes */
+  --radius-xs: 6px;
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
@@ -32,9 +45,9 @@
 
   /* Shadows */
   --shadow-sm: 0 2px 8px rgba(41, 19, 79, 0.04);
-  --shadow-md: 0 4px 12px rgba(41, 19, 79, 0.06), 0 2px 4px rgba(41, 19, 79, 0.04);
-  --shadow-lg: 0 12px 24px rgba(41, 19, 79, 0.08), 0 4px 8px rgba(41, 19, 79, 0.04);
-  --shadow-focus: 0 0 0 3px rgba(107, 53, 200, 0.2);
+  --shadow-md: 0 6px 16px rgba(41, 19, 79, 0.08), 0 2px 6px rgba(41, 19, 79, 0.04);
+  --shadow-lg: 0 16px 32px rgba(41, 19, 79, 0.12), 0 4px 12px rgba(41, 19, 79, 0.06);
+  --shadow-focus: 0 0 0 3px rgba(107, 53, 200, 0.25);
 }
 
 * {
@@ -44,10 +57,13 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: var(--background);
-  color: var(--navy-900);
+  color: var(--text-main);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  overflow-x: hidden;
 }
 
 a {
@@ -60,28 +76,41 @@ button {
   border: none;
   background: none;
   font-family: inherit;
+  font-size: inherit;
 }
 
 /* Typography */
-h1, h2, h3, h4 {
+h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
+  color: var(--navy-900);
 }
 
 h1 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
+  font-size: 2.25rem;
+  line-height: 1.2;
 }
 
 h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  line-height: 1.3;
 }
 
-/* Utility Classes */
+h3 {
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+/* Layout Utilities */
 .container {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
 }
 
 .sr-only {
@@ -94,4 +123,108 @@ h2 {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: var(--radius-pill);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  line-height: 1;
+}
+
+.btn-primary {
+  background-color: var(--purple-700);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(107, 53, 200, 0.25);
+}
+
+.btn-primary:hover {
+  background-color: var(--purple-600);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(107, 53, 200, 0.35);
+}
+
+.btn-secondary {
+  background-color: var(--surface);
+  color: var(--navy-900);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--purple-200);
+}
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Badge Styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  line-height: 1.2;
+}
+
+.badge-purple {
+  background-color: var(--purple-100);
+  color: var(--purple-700);
+}
+
+.badge-yellow {
+  background-color: var(--yellow-100);
+  color: #925400;
+}
+
+.badge-blue {
+  background-color: var(--blue-100);
+  color: var(--blue-500);
+}
+
+.badge-green {
+  background-color: var(--green-100);
+  color: var(--green-500);
+}
+
+.badge-gray {
+  background-color: var(--surface-hover);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+/* Custom Scrollbars */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

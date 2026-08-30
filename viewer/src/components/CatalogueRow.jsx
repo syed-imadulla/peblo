@@ -1,17 +1,111 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-export const CatalogueRow = ({ title, children }) => {
+export const CatalogueRow = ({ title, count, children }) => {
+  const scrollRef = useRef(null);
+
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === 'left' ? -400 : 400;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section style={{ marginBottom: '3rem' }}>
-      {title && <h2 style={{ color: 'var(--navy-900)', marginBottom: '1rem', textTransform: 'capitalize' }}>{title}</h2>}
-      <div style={{
-        display: 'flex',
-        gap: '1.5rem',
-        overflowX: 'auto',
-        paddingBottom: '1rem',
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none'
-      }}>
+    <section style={{ marginBottom: '2.75rem', position: 'relative' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '1rem',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {title && (
+            <h2
+              style={{
+                color: 'var(--navy-900)',
+                textTransform: 'capitalize',
+                fontSize: '1.4rem',
+                fontWeight: 700,
+                margin: 0,
+              }}
+            >
+              {title}
+            </h2>
+          )}
+          {typeof count === 'number' && (
+            <span
+              style={{
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                backgroundColor: 'var(--purple-100)',
+                padding: '2px 8px',
+                borderRadius: 'var(--radius-pill)',
+              }}
+            >
+              {count}
+            </span>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', gap: '6px' }}>
+          <button
+            onClick={() => scroll('left')}
+            aria-label={`Scroll ${title} left`}
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--surface)',
+              border: '1px solid var(--border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--navy-900)',
+              transition: 'background-color 0.2s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--purple-100)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface)')}
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            onClick={() => scroll('right')}
+            aria-label={`Scroll ${title} right`}
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--surface)',
+              border: '1px solid var(--border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--navy-900)',
+              transition: 'background-color 0.2s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--purple-100)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface)')}
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
+      </div>
+
+      <div
+        ref={scrollRef}
+        className="hide-scrollbar"
+        style={{
+          display: 'flex',
+          gap: '1.25rem',
+          overflowX: 'auto',
+          paddingBottom: '0.75rem',
+          scrollSnapType: 'x proximity',
+        }}
+      >
         {children}
       </div>
     </section>
