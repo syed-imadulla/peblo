@@ -218,7 +218,12 @@ h1, h2, h3, h4, h5, h6 {
 .ott-card-slot {
   position: relative;
   display: block;
-  height: 226px; /* Strict fixed footprint: prevents any lane/row below from shifting */
+  height: 242px; /* Ample fixed footprint: guarantees title + meta are 100% visible in normal state */
+  z-index: 0;
+}
+
+.ott-card-slot:hover {
+  z-index: 50; /* Lift the slot so its floating popover renders over neighbor slots */
 }
 
 .ott-floating-card {
@@ -226,28 +231,34 @@ h1, h2, h3, h4, h5, h6 {
   top: 0;
   left: 0;
   width: 100%;
-  height: 226px;
+  height: 242px;
   display: flex;
   flex-direction: column;
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   text-decoration: none;
   color: inherit;
   z-index: 1;
-  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.24s ease, border-color 0.24s ease;
+  transform-origin: top center; /* Anchor top so hover never shoots wildly up or into headers */
+  transition:
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.22s ease,
+    background-color 0.22s ease;
 }
 
-/* On hover, pop OVER neighbor cards and the row below without moving anything */
+/* On hover, smoothly pop down over the lane below while keeping top & sides perfectly contained */
 .ott-card-slot:hover .ott-floating-card {
   height: auto;
-  min-height: 226px;
-  transform: scale(1.15) translateY(-8px);
-  z-index: 1000;
-  box-shadow: 0 28px 65px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(124, 58, 237, 0.45);
-  border-color: rgba(124, 58, 237, 0.4);
+  min-height: 242px;
+  transform: scale(1.05) translateY(-4px); /* Subtle, premium OTT scale that stays within bounds */
+  z-index: 100;
+  background-color: #16162E;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(124, 58, 237, 0.45);
+  border-color: rgba(124, 58, 237, 0.45);
+  border-radius: 16px;
 }
 
 .ott-thumb-box {
@@ -255,6 +266,7 @@ h1, h2, h3, h4, h5, h6 {
   aspect-ratio: 16/9;
   width: 100%;
   background-color: #121225;
+  border-radius: 15px 15px 0 0; /* Keep top corners always cleanly rounded */
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -267,14 +279,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .ott-info-box {
-  padding: 0.65rem 0.85rem 0.75rem 0.85rem;
+  padding: 0.6rem 0.85rem 0.75rem 0.85rem;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.35rem;
+  flex: 1;
 }
 
 .ott-card-title {
-  font-size: 0.98rem;
+  font-size: 0.96rem;
   font-weight: 800;
   color: var(--navy-900);
   margin: 0;
@@ -291,6 +304,9 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.78rem;
   color: var(--text-muted);
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Expanded Quick Peek Drawer: Renders seamlessly on hover inside the floating card */
@@ -298,7 +314,9 @@ h1, h2, h3, h4, h5, h6 {
   display: none;
   flex-direction: column;
   gap: 0.45rem;
-  margin-top: 0.25rem;
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .ott-card-slot:hover .ott-hover-drawer {

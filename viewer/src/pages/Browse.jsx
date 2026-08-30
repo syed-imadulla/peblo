@@ -116,7 +116,7 @@ const Browse = () => {
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--purple-500)', fontSize: '0.85rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.35rem' }}>
             <Compass size={16} /> Explore Catalogue
           </div>
-          <h1 style={{ margin: 0, fontSize: '2.2rem', color: 'var(--navy-900)' }}>
+          <h1 style={{ margin: 0, fontSize: '2.2rem', color: 'var(--text-main)' }}>
             Browse Shows
           </h1>
           <p style={{ color: 'var(--text-muted)', marginTop: '0.35rem', fontSize: '1rem' }}>
@@ -280,8 +280,11 @@ const Browse = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
             gap: '1.75rem',
+            overflow: 'visible',
+            paddingBottom: '120px',
+            marginBottom: '-120px',
           }}
         >
           {filteredShows.map((show) => (
