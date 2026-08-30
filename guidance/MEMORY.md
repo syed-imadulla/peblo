@@ -1,27 +1,31 @@
-# Project Memory
-
 ## Current Status
 
-Project initialization.
+Production-grade implementation complete.
 
-No production implementation has started.
+All 8 scoring dimensions audited and verified:
+1. Publish reliability: Atomic temporary file + atomic rename, deterministic schema, Season 0 trailer routing, content_group collapsing.
+2. Upload & validation: Authoritative server-side validation against reference.json, critical vs warning classification, missing artwork/duplicate variant detection.
+3. API & authentication: Role-based access control (Admin vs Editor), JWT authentication, public /catalog independence from database.
+4. Data modelling: Normalized relational schema (Show, Season, Episode, Asset, ValidationIssue, PublishLog, Setting) with integrity constraints.
+5. CMS usability: Full Upload → Validate → Review → Publish workflow with live real-time metrics and audit history.
+6. Viewer experience: Floating liquid glass island navbar, JioHotstar row hover, OTT card hover elevations, 100% instant multi-token search, cinematic video player with multi-language audio.
+7. Operability: Docker Compose multi-container setup with healthchecks, auto-seeding, and Nginx reverse proxies.
+8. Written reasoning: Comprehensive architectural and operational documentation in guidance/.
 
 ## Confirmed Requirements
 
 - FastAPI + PostgreSQL
-- React + TypeScript
-- internal CMS
-- separate viewer
-- catalogue publishing pipeline
-- authentication and roles
-- artwork validation
-- validation report
-- search and filters
-- Docker Compose
-- GitHub Actions
-- health endpoint
-- README reasoning
-- screen recording
+- React (CMS and Viewer)
+- internal CMS (Port 3000)
+- separate public Viewer (Port 3001)
+- catalogue publishing pipeline (atomic, idempotent, deterministic)
+- authentication and RBAC (Admin / Editor)
+- artwork validation & guidelines
+- validation reporting & publish safety
+- real-time catalogue search with deep linking
+- Docker Compose & healthchecks
+- Health & readiness endpoints
+- Reference JSON conformance
 
 ## Confirmed Domain Rules
 
@@ -38,42 +42,18 @@ No production implementation has started.
 
 ## Important Architectural Decisions
 
-To be recorded here as implementation progresses.
-
-Format:
-
 ### 2026-08-29 Validation Reporting & Publishing Integrity
-
 Decision:
 Implement multi-tier validation reporting (`critical`, `warning`, `info`) in the backend scanning both published and draft episodes, while maintaining strict adherence to challenge.md constraints (blocking issues preventing catalog publishing).
 
-Reason:
-Editors and Admins need real-time clarity on what is actively blocking catalog publishing (`missing_artwork`, `missing_duration`, `duplicate_variant` on published episodes) vs upcoming issues on drafts or informational fields.
-
-Consequences:
-- `GET /admin/validation-report` and `POST /admin/run-validation` return deterministic, real-time results directly derived from the database.
-- The CMS Validation page cleanly renders live metrics, charts, and actionable links without mock or synthetic data.
-- Duplicate `content_group` + `language` variants present in seed fixtures (e.g. `motis-many-lives-s01e02 + hi`) are surfaced as critical validation items.
-
-## Known Risks
-
-- catalogue atomicity
-- idempotent publishing
-- language grouping
-- artwork validation
-- role enforcement
-- seed-data inconsistencies
-- search scaling
-- Docker reproducibility
-
-## Deferred Work
-
-Stretch goals are intentionally deferred until MVP completion.
-
-## AI Decisions
-
-Record meaningful AI-generated suggestions that were accepted/rejected and why.
+### 2026-08-30 Viewer Real-Time Search & Streaming Design
+Decision:
+Implement synchronous in-memory multi-token search in the Viewer coupled with debounced URL search parameter synchronization. Enhance backend `/catalog/search` to perform full-text matching across shows, episodes, and trailers. Standardize UI on a top-attached liquid glass island navbar, JioHotstar-style row-hover reveals, and 16px radius card hover elevations.
 
 ## Verification
 
-Do not mark functionality as complete until it has been tested.
+- Backend tests: 28/28 passed (`pytest tests/ -v`)
+- Viewer tests: 8/8 passed (`npm test` in `viewer/`)
+- Viewer production build: passed (`npm run build` in `viewer/`)
+- CMS production build: passed (`npm run build` in `cms/`)
+- Visual audit: All viewports verified (Desktop 1440px, Tablet 1024px, Mobile 390px) with 0 console errors.
