@@ -4,7 +4,7 @@ import { Play, Clock } from 'lucide-react';
 import { FallbackImage } from './ShowCard';
 import { formatDuration, resolveAssetUrl } from '../utils/catalogue';
 
-export const EpisodeCard = ({ episode, width = '290px' }) => {
+export const EpisodeCard = ({ episode, width = '100%' }) => {
   const rawThumbnail = episode.artwork?.thumbnail || episode.artwork?.banner || episode.artwork?.poster;
   const thumbnail = resolveAssetUrl(rawThumbnail);
 
@@ -25,6 +25,7 @@ export const EpisodeCard = ({ episode, width = '290px' }) => {
         style={{
           aspectRatio: '16/9',
           backgroundColor: '#EDE6FF',
+          borderRadius: '16px',
         }}
       >
         {thumbnail ? (
@@ -37,7 +38,7 @@ export const EpisodeCard = ({ episode, width = '290px' }) => {
               height: '100%',
               objectFit: 'cover',
               display: 'block',
-              transition: 'filter 0.25s ease',
+              transition: 'filter 0.18s ease',
             }}
             onError={(e) => {
               e.target.style.display = 'none';
@@ -53,7 +54,7 @@ export const EpisodeCard = ({ episode, width = '290px' }) => {
         {/* Hover play icon overlay */}
         <div className="play-badge-overlay">
           <div className="play-badge-btn">
-            <Play size={20} fill="var(--purple-700)" color="var(--purple-700)" style={{ marginLeft: '2px' }} />
+            <Play size={18} fill="var(--purple-700)" color="var(--purple-700)" style={{ marginLeft: '2px' }} />
           </div>
         </div>
 
@@ -62,44 +63,45 @@ export const EpisodeCard = ({ episode, width = '290px' }) => {
           <div
             style={{
               position: 'absolute',
-              bottom: '10px',
-              right: '10px',
+              bottom: '8px',
+              right: '8px',
               backgroundColor: 'rgba(16, 20, 58, 0.85)',
               backdropFilter: 'blur(4px)',
               color: '#ffffff',
-              fontSize: '0.72rem',
+              fontSize: '0.7rem',
               fontWeight: 700,
-              padding: '3px 8px',
-              borderRadius: '6px',
+              padding: '2px 7px',
+              borderRadius: '5px',
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
               zIndex: 2,
             }}
           >
-            <Clock size={11} />
+            <Clock size={10} />
             {formatDuration(episode.duration_seconds)}
           </div>
         )}
       </div>
 
-      <div style={{ marginTop: '0.65rem' }}>
+      <div style={{ marginTop: '0.6rem' }}>
         <h4
           style={{
             fontSize: '1rem',
             fontWeight: 800,
             color: 'var(--navy-900)',
-            margin: '0 0 0.3rem 0',
+            margin: '0 0 0.25rem 0',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
+            lineHeight: 1.3,
           }}
           title={episode.title}
         >
           {episode.title}
         </h4>
 
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
           {episode.languages && episode.languages.length > 0 && (
             <div style={{ display: 'flex', gap: '4px' }}>
               {episode.languages.map((lang) => (

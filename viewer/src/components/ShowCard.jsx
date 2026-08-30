@@ -14,7 +14,7 @@ export const FallbackImage = ({ aspect = '16/9' }) => (
       alignItems: 'center',
       justifyContent: 'center',
       color: '#ffffff',
-      borderRadius: '18px',
+      borderRadius: '16px',
       position: 'relative',
       overflow: 'hidden',
       padding: '1rem',
@@ -49,8 +49,8 @@ export const FallbackImage = ({ aspect = '16/9' }) => (
 
     <div
       style={{
-        width: '42px',
-        height: '42px',
+        width: '40px',
+        height: '40px',
         borderRadius: '50%',
         backgroundColor: 'rgba(255, 255, 255, 0.15)',
         backdropFilter: 'blur(6px)',
@@ -60,12 +60,12 @@ export const FallbackImage = ({ aspect = '16/9' }) => (
         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
       }}
     >
-      <Film size={20} color="#ffffff" opacity={0.9} />
+      <Film size={18} color="#ffffff" opacity={0.9} />
     </div>
   </div>
 );
 
-export const ShowCard = ({ show, width = '280px', typeLabel = 'Series' }) => {
+export const ShowCard = ({ show, width = '100%', typeLabel = 'Series' }) => {
   // Use banner (16:9) first, fallback to poster
   const image = getShowBanner(show) || getShowPoster(show);
   const languages = getShowLanguages(show);
@@ -88,6 +88,7 @@ export const ShowCard = ({ show, width = '280px', typeLabel = 'Series' }) => {
         style={{
           backgroundColor: '#EDE6FF',
           aspectRatio: '16/9',
+          borderRadius: '16px',
         }}
       >
         {image ? (
@@ -100,7 +101,7 @@ export const ShowCard = ({ show, width = '280px', typeLabel = 'Series' }) => {
               height: '100%',
               objectFit: 'cover',
               display: 'block',
-              transition: 'filter 0.25s ease',
+              transition: 'filter 0.18s ease',
             }}
             onError={(e) => {
               e.target.style.display = 'none';
@@ -116,18 +117,18 @@ export const ShowCard = ({ show, width = '280px', typeLabel = 'Series' }) => {
         {/* Hover play icon overlay */}
         <div className="play-badge-overlay">
           <div className="play-badge-btn">
-            <Play size={20} fill="var(--purple-700)" color="var(--purple-700)" style={{ marginLeft: '2px' }} />
+            <Play size={18} fill="var(--purple-700)" color="var(--purple-700)" style={{ marginLeft: '2px' }} />
           </div>
         </div>
       </div>
 
-      <div style={{ marginTop: '0.65rem' }}>
+      <div style={{ marginTop: '0.6rem' }}>
         <h3
           style={{
             fontSize: '1.02rem',
             fontWeight: 800,
             color: 'var(--navy-900)',
-            marginBottom: '0.25rem',
+            marginBottom: '0.2rem',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',

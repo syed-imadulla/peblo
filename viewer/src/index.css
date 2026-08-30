@@ -148,6 +148,23 @@ h1, h2, h3, h4, h5, h6 {
   animation: fadeIn 0.2s ease-out forwards;
 }
 
+/* Search Chips Scroll Container */
+.chips-scroll-container {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  overflow-x: auto;
+  max-width: 100%;
+  padding: 4px 2px;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .chips-scroll-container {
+    justify-content: flex-start;
+  }
+}
+
 /* Streaming Card Hover Styles */
 .show-card, .episode-card {
   transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Search as SearchIcon, X, Sparkles, TrendingUp, Film, Tv, SlidersHorizontal } from 'lucide-react';
+import { Search as SearchIcon, X, Sparkles, TrendingUp, Film, Tv } from 'lucide-react';
 import { searchCatalog, getCatalog } from '../api';
 import { EpisodeCard } from '../components/EpisodeCard';
 import { ShowCard } from '../components/ShowCard';
@@ -27,7 +27,7 @@ const Search = () => {
   const [filterTab, setFilterTab] = useState('all'); // 'all' | 'shows' | 'episodes'
   const inputRef = useRef(null);
 
-  // Sync state if URL param changes via browser navigation
+  // Sync state if URL param changes via browser back/forward
   useEffect(() => {
     const urlQ = searchParams.get('q') || '';
     setInputValue(urlQ);
@@ -188,33 +188,33 @@ const Search = () => {
         unique.push(s);
       }
     });
-    return unique.slice(0, 6);
+    return unique.slice(0, 8);
   }, [catalog]);
 
   const activeQuery = inputValue.trim();
   const isLoading = !!activeQuery && isApiSearchLoading && isCatalogLoading;
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-      {/* ─── Search Hero Card ─────────────────────────────────────────────────── */}
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      {/* ─── 1. Search Hero Card ──────────────────────────────────────────────── */}
       <div
         style={{
           backgroundColor: 'var(--surface)',
-          padding: '2.25rem 2rem',
-          borderRadius: '24px',
-          boxShadow: '0 6px 24px rgba(21, 27, 79, 0.05)',
+          padding: '1.5rem 1.75rem',
+          borderRadius: '20px',
+          boxShadow: '0 4px 20px rgba(21, 27, 79, 0.04)',
           border: '1px solid #ECE4F6',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '1.25rem',
+          gap: '1rem',
         }}
       >
         <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontSize: '2.2rem', color: 'var(--navy-900)', margin: '0 0 0.4rem 0', fontWeight: 900, letterSpacing: '-0.5px' }}>
+          <h1 style={{ fontSize: '1.75rem', color: 'var(--navy-900)', margin: '0 0 0.25rem 0', fontWeight: 800, letterSpacing: '-0.4px' }}>
             Find Shows & Episodes
           </h1>
-          <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '1rem' }}>
+          <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.92rem' }}>
             Search shows, episodes, characters, learning topics, and languages.
           </p>
         </div>
@@ -222,7 +222,7 @@ const Search = () => {
         {/* Real-time Search Input Bar */}
         <form
           onSubmit={handleSearchSubmit}
-          style={{ position: 'relative', width: '100%', maxWidth: '720px', marginTop: '0.25rem' }}
+          style={{ position: 'relative', width: '100%', maxWidth: '680px' }}
         >
           <input
             ref={inputRef}
@@ -232,36 +232,36 @@ const Search = () => {
             onChange={(e) => setInputValue(e.target.value)}
             style={{
               width: '100%',
-              height: '56px',
-              padding: '0 3.8rem 0 3.2rem',
-              borderRadius: '999px',
+              height: '52px',
+              padding: '0 3.6rem 0 3.1rem',
+              borderRadius: '18px',
               border: '2px solid #E6DEF4',
               backgroundColor: '#FAF9FE',
-              fontSize: '1.05rem',
+              fontSize: '1rem',
               fontWeight: 600,
               outline: 'none',
               color: 'var(--navy-900)',
-              transition: 'all 0.2s ease',
-              boxShadow: 'inset 0 2px 4px rgba(21, 27, 79, 0.02)',
+              transition: 'all 0.18s ease',
+              boxShadow: 'inset 0 1px 3px rgba(21, 27, 79, 0.02)',
             }}
             onFocus={(e) => {
               e.target.style.borderColor = 'var(--purple-700)';
               e.target.style.backgroundColor = '#ffffff';
-              e.target.style.boxShadow = '0 0 0 4px rgba(109, 53, 232, 0.12)';
+              e.target.style.boxShadow = '0 0 0 3px rgba(109, 53, 232, 0.12)';
             }}
             onBlur={(e) => {
               e.target.style.borderColor = '#E6DEF4';
               e.target.style.backgroundColor = '#FAF9FE';
-              e.target.style.boxShadow = 'inset 0 2px 4px rgba(21, 27, 79, 0.02)';
+              e.target.style.boxShadow = 'inset 0 1px 3px rgba(21, 27, 79, 0.02)';
             }}
             aria-label="Search catalogue"
           />
 
           <SearchIcon
-            size={20}
+            size={18}
             style={{
               position: 'absolute',
-              left: '18px',
+              left: '16px',
               top: '50%',
               transform: 'translateY(-50%)',
               color: 'var(--purple-700)',
@@ -275,11 +275,11 @@ const Search = () => {
               onClick={clearSearch}
               style={{
                 position: 'absolute',
-                right: '16px',
+                right: '14px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                width: '28px',
-                height: '28px',
+                width: '26px',
+                height: '26px',
                 borderRadius: '50%',
                 backgroundColor: '#EDE6FF',
                 color: 'var(--purple-700)',
@@ -290,20 +290,20 @@ const Search = () => {
               }}
               aria-label="Clear search"
             >
-              <X size={16} strokeWidth={2.5} />
+              <X size={15} strokeWidth={2.5} />
             </button>
           ) : (
             <div
               style={{
                 position: 'absolute',
-                right: '18px',
+                right: '16px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                padding: '2px 8px',
-                borderRadius: '6px',
+                padding: '2px 7px',
+                borderRadius: '5px',
                 backgroundColor: '#EDE6FF',
                 color: 'var(--purple-700)',
-                fontSize: '0.75rem',
+                fontSize: '0.72rem',
                 fontWeight: 800,
                 pointerEvents: 'none',
               }}
@@ -313,10 +313,10 @@ const Search = () => {
           )}
         </form>
 
-        {/* Suggestion Chips */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-          <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-            <Sparkles size={14} color="var(--purple-700)" /> Try searching:
+        {/* Suggestion Chips (Horizontally scrollable on mobile) */}
+        <div className="chips-scroll-container hide-scrollbar">
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+            <Sparkles size={13} color="var(--purple-700)" /> Try searching:
           </span>
           {POPULAR_SEARCHES.map((term) => {
             const isActive = activeQuery.toLowerCase() === term.toLowerCase();
@@ -325,14 +325,16 @@ const Search = () => {
                 key={term}
                 onClick={() => handleQuickSearch(term)}
                 style={{
-                  padding: '0.35rem 0.85rem',
+                  padding: '0.3rem 0.8rem',
                   borderRadius: 'var(--radius-pill)',
                   backgroundColor: isActive ? 'var(--purple-700)' : '#F5F2FC',
                   border: '1px solid',
                   borderColor: isActive ? 'var(--purple-700)' : '#EAE4F6',
                   color: isActive ? '#ffffff' : 'var(--navy-900)',
-                  fontSize: '0.82rem',
+                  fontSize: '0.8rem',
                   fontWeight: 700,
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
                   transition: 'all 0.15s ease',
                 }}
                 onMouseEnter={(e) => {
@@ -355,26 +357,26 @@ const Search = () => {
         </div>
       </div>
 
-      {/* ─── Search Results or Initial State ───────────────────────────────────── */}
+      {/* ─── 2. Search Results or Initial State ───────────────────────────────── */}
       {isLoading && <LoadingState message={`Searching for "${activeQuery}"...`} />}
       {apiSearchError && <ErrorState message="Could not complete the search. Please check if the backend is running." />}
 
-      {/* 1. Results View (when query exists and results found) */}
+      {/* Results View (when query exists and results found) */}
       {!isLoading && !apiSearchError && hasSearched && totalResultsCount > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.25rem' }}>
-          {/* Results Header + Category Filter Tabs */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #ECE4F6', paddingBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <h2 style={{ color: 'var(--navy-900)', margin: 0, fontSize: '1.5rem', fontWeight: 900 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          {/* Results Header + Filter Tabs */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #ECE4F6', paddingBottom: '0.85rem', flexWrap: 'wrap', gap: '0.85rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <h2 style={{ color: 'var(--navy-900)', margin: 0, fontSize: '1.35rem', fontWeight: 800 }}>
                 Search results for "{activeQuery}"
               </h2>
               <span
                 style={{
-                  fontSize: '0.85rem',
+                  fontSize: '0.8rem',
                   color: 'var(--purple-700)',
                   backgroundColor: 'var(--purple-100)',
                   fontWeight: 700,
-                  padding: '4px 12px',
+                  padding: '3px 10px',
                   borderRadius: 'var(--radius-pill)',
                 }}
               >
@@ -383,13 +385,13 @@ const Search = () => {
             </div>
 
             {/* Filter Tabs: All / Shows / Episodes */}
-            <div style={{ display: 'flex', gap: '6px', backgroundColor: '#FAF8FE', padding: '3px', borderRadius: 'var(--radius-pill)', border: '1px solid #ECE4F6' }}>
+            <div style={{ display: 'flex', gap: '4px', backgroundColor: '#FAF8FE', padding: '3px', borderRadius: 'var(--radius-pill)', border: '1px solid #ECE4F6' }}>
               <button
                 onClick={() => setFilterTab('all')}
                 style={{
-                  padding: '0.35rem 0.85rem',
+                  padding: '0.3rem 0.8rem',
                   borderRadius: 'var(--radius-pill)',
-                  fontSize: '0.82rem',
+                  fontSize: '0.8rem',
                   fontWeight: 700,
                   backgroundColor: filterTab === 'all' ? 'var(--purple-700)' : 'transparent',
                   color: filterTab === 'all' ? '#ffffff' : 'var(--text-muted)',
@@ -402,9 +404,9 @@ const Search = () => {
                 <button
                   onClick={() => setFilterTab('shows')}
                   style={{
-                    padding: '0.35rem 0.85rem',
+                    padding: '0.3rem 0.8rem',
                     borderRadius: 'var(--radius-pill)',
-                    fontSize: '0.82rem',
+                    fontSize: '0.8rem',
                     fontWeight: 700,
                     backgroundColor: filterTab === 'shows' ? 'var(--purple-700)' : 'transparent',
                     color: filterTab === 'shows' ? '#ffffff' : 'var(--text-muted)',
@@ -418,9 +420,9 @@ const Search = () => {
                 <button
                   onClick={() => setFilterTab('episodes')}
                   style={{
-                    padding: '0.35rem 0.85rem',
+                    padding: '0.3rem 0.8rem',
                     borderRadius: 'var(--radius-pill)',
-                    fontSize: '0.82rem',
+                    fontSize: '0.8rem',
                     fontWeight: 700,
                     backgroundColor: filterTab === 'episodes' ? 'var(--purple-700)' : 'transparent',
                     color: filterTab === 'episodes' ? '#ffffff' : 'var(--text-muted)',
@@ -436,17 +438,17 @@ const Search = () => {
           {/* Matched Shows Section */}
           {(filterTab === 'all' || filterTab === 'shows') && matchedShows.length > 0 && (
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.25rem' }}>
-                <Tv size={18} color="var(--purple-700)" />
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--navy-900)', margin: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+                <Tv size={17} color="var(--purple-700)" />
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--navy-900)', margin: 0 }}>
                   Shows ({matchedShows.length})
                 </h3>
               </div>
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                  gap: '1.75rem',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                  gap: '1.5rem',
                 }}
               >
                 {matchedShows.map((show) => (
@@ -459,17 +461,17 @@ const Search = () => {
           {/* Matched Episodes Section */}
           {(filterTab === 'all' || filterTab === 'episodes') && matchedEpisodes.length > 0 && (
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.25rem' }}>
-                <Film size={18} color="var(--purple-700)" />
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--navy-900)', margin: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+                <Film size={17} color="var(--purple-700)" />
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--navy-900)', margin: 0 }}>
                   Episodes & Clips ({matchedEpisodes.length})
                 </h3>
               </div>
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                  gap: '1.75rem',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                  gap: '1.5rem',
                 }}
               >
                 {matchedEpisodes.map((ep) => (
@@ -481,24 +483,25 @@ const Search = () => {
         </div>
       )}
 
-      {/* 2. Zero Results Empty State (Only shown AFTER an actual query with 0 results) */}
+      {/* 3. Zero Results Empty State (Only shown AFTER an actual query with 0 results) */}
       {!isLoading && !apiSearchError && hasSearched && totalResultsCount === 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem', padding: '2rem 1rem' }}>
           <EmptyState message={`No results found for "${activeQuery}".`} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <span style={{ fontSize: '0.88rem', color: 'var(--text-muted)', fontWeight: 600 }}>Try searching for:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Try searching for:</span>
             {['Moti', 'Adventure', 'Science', 'Music'].map((term) => (
               <button
                 key={term}
                 onClick={() => handleQuickSearch(term)}
                 style={{
-                  padding: '0.35rem 0.9rem',
+                  padding: '0.3rem 0.8rem',
                   borderRadius: 'var(--radius-pill)',
                   backgroundColor: 'var(--purple-100)',
                   color: 'var(--purple-700)',
-                  fontSize: '0.85rem',
+                  fontSize: '0.82rem',
                   fontWeight: 700,
                   border: '1px solid var(--purple-200)',
+                  transition: 'all 0.15s ease',
                 }}
               >
                 {term}
@@ -508,13 +511,13 @@ const Search = () => {
         </div>
       )}
 
-      {/* 3. Initial Search Page (When no query entered yet) */}
+      {/* 4. Initial Search Page (When no query entered yet) */}
       {!hasSearched && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.25rem' }}>
-              <TrendingUp size={18} color="var(--purple-700)" />
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--navy-900)', margin: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+              <TrendingUp size={17} color="var(--purple-700)" />
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--navy-900)', margin: 0 }}>
                 Popular on PeBlo
               </h2>
             </div>
@@ -523,8 +526,8 @@ const Search = () => {
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                  gap: '1.75rem',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                  gap: '1.5rem',
                 }}
               >
                 {initialPopularShows.map((show) => (
