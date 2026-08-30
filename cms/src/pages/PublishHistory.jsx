@@ -278,8 +278,18 @@ const PublishHistory = () => {
                     const date = parseUtcDate(run.created_at);
                     const formattedDate = format(date, 'MMM d, yyyy');
                     const formattedTime = format(date, 'hh:mm a');
-                    const userRole = run.user?.role === 'admin' ? 'Admin User' : run.user?.role === 'editor' ? 'Editor User' : 'System';
-                    const userEmail = run.user?.email || 'admin@peblo.tv';
+                    
+                    let displayRole = 'System';
+                    let displayEmail = 'system@peblo.tv';
+                    
+                    if (run.user) {
+                      displayRole = run.user.role ? run.user.role.charAt(0).toUpperCase() + run.user.role.slice(1) : 'Unknown Role';
+                      displayEmail = run.user.email;
+                    } else if (run.triggered_by) {
+                      displayRole = 'Deleted User';
+                      displayEmail = `ID: ${run.triggered_by.substring(0, 8)}...`;
+                    }
+
                     const isSuccess = run.status === 'success';
 
                     return (
@@ -296,8 +306,8 @@ const PublishHistory = () => {
                           </div>
                         </td>
                         <td style={{ padding: '16px 0' }}>
-                          <div style={{ fontWeight: 600, color: 'var(--navy-900)' }}>{userRole}</div>
-                          <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{userEmail}</div>
+                          <div style={{ fontWeight: 600, color: 'var(--navy-900)' }}>{displayRole}</div>
+                          <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{displayEmail}</div>
                         </td>
                         <td style={{ padding: '16px 0' }}>
                            <span style={{ 
@@ -484,7 +494,7 @@ const PublishHistory = () => {
                       {latestRun.status === 'success' ? 'Published Successfully' : 'Publish Failed'}
                     </div>
                     <div style={{ fontSize: '11px', color: latestRun.status === 'success' ? '#15803d' : '#7f1d1d', marginTop: '2px' }}>
-                      {format(parseUtcDate(latestRun.created_at), 'MMM d, yyyy h:mm a')} by {latestRun.user?.role === 'admin' ? 'Admin User' : 'Editor User'}
+                      {format(parseUtcDate(latestRun.created_at), 'MMM d, yyyy h:mm a')} by {latestRun.user ? (latestRun.user.role ? latestRun.user.role.charAt(0).toUpperCase() + latestRun.user.role.slice(1) : 'Unknown User') : (latestRun.triggered_by ? 'Deleted User' : 'System')}
                     </div>
                   </div>
                 </div>
@@ -615,7 +625,7 @@ const PublishHistory = () => {
                 </div>
                 <div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>TRIGGERED BY</div>
-                  <div style={{ fontSize: '14px', color: 'var(--navy-900)' }}>{selectedRun.user?.email || 'Unknown User'}</div>
+                  <div style={{ fontSize: '14px', color: 'var(--navy-900)' }}>{selectedRun.user ? selectedRun.user.email : (selectedRun.triggered_by ? `ID: ${selectedRun.triggered_by}` : 'System')}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>DURATION</div>
