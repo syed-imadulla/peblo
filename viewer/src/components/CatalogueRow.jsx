@@ -59,8 +59,8 @@ export const CatalogueRow = ({ title, count, children }) => {
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              backgroundColor: '#121225',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              backgroundColor: 'var(--surface)',
+              border: '1px solid var(--border)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -69,7 +69,7 @@ export const CatalogueRow = ({ title, count, children }) => {
               transition: 'background-color 0.15s ease',
             }}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface-hover)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#121225')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface)')}
           >
             <ChevronLeft size={17} />
           </button>
@@ -80,8 +80,8 @@ export const CatalogueRow = ({ title, count, children }) => {
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              backgroundColor: '#121225',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              backgroundColor: 'var(--surface)',
+              border: '1px solid var(--border)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -90,7 +90,7 @@ export const CatalogueRow = ({ title, count, children }) => {
               transition: 'background-color 0.15s ease',
             }}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface-hover)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#121225')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface)')}
           >
             <ChevronRight size={17} />
           </button>

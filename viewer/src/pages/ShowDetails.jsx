@@ -52,7 +52,7 @@ const ShowDetails = () => {
           position: 'relative',
           borderRadius: '26px',
           overflow: 'hidden',
-          backgroundColor: '#0D0D1F',
+          backgroundColor: 'var(--surface)',
           boxShadow: 'var(--shadow-sm)',
           border: '1px solid var(--border)',
         }}
@@ -144,7 +144,7 @@ const ShowDetails = () => {
               boxShadow: '0 16px 36px rgba(0, 0, 0, 0.5)',
               backgroundColor: 'var(--surface)',
               flexShrink: 0,
-              border: '4px solid #191933',
+              border: '4px solid var(--border)',
             }}
           >
             {poster ? (

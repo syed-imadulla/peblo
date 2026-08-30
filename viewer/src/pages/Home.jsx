@@ -77,10 +77,10 @@ const Home = () => {
           position: 'relative',
           borderRadius: '26px',
           overflow: 'hidden',
-          backgroundColor: '#0D0D1F',
+          backgroundColor: 'var(--surface)',
           minHeight: '380px',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          border: '1px solid var(--border)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -123,7 +123,7 @@ const Home = () => {
             style={{
               position: 'absolute',
               inset: 0,
-              background: 'linear-gradient(90deg, #0D0D1F 0%, rgba(13, 13, 31, 0.95) 24%, rgba(13, 13, 31, 0) 65%)',
+              background: 'linear-gradient(90deg, #171727 0%, rgba(23, 23, 39, 0.95) 24%, rgba(23, 23, 39, 0) 65%)',
             }}
           />
         </div>
@@ -297,8 +297,8 @@ const Home = () => {
                 width: '38px',
                 height: '38px',
                 borderRadius: '50%',
-                backgroundColor: '#121225',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backgroundColor: 'var(--surface)',
+                border: '1px solid var(--border)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -358,8 +358,8 @@ const Home = () => {
                         width: '32px',
                         height: '32px',
                         borderRadius: '50%',
-                        backgroundColor: '#121225',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        backgroundColor: 'var(--surface)',
+                        border: '1px solid var(--border)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -368,7 +368,7 @@ const Home = () => {
                         transition: 'background-color 0.15s ease',
                       }}
                       onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface-hover)')}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#121225')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface)')}
                       aria-label={`Scroll ${section} left`}
                     >
                       <ChevronLeft size={17} />
@@ -379,8 +379,8 @@ const Home = () => {
                         width: '32px',
                         height: '32px',
                         borderRadius: '50%',
-                        backgroundColor: '#121225',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        backgroundColor: 'var(--surface)',
+                        border: '1px solid var(--border)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -389,7 +389,7 @@ const Home = () => {
                         transition: 'background-color 0.15s ease',
                       }}
                       onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface-hover)')}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#121225')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface)')}
                       aria-label={`Scroll ${section} right`}
                     >
                       <ChevronRight size={17} />
