@@ -94,6 +94,7 @@ const Publish = () => {
       queryClient.invalidateQueries({ queryKey: ['publishHistory'] });
       queryClient.invalidateQueries({ queryKey: ['catalogPreview'] });
       queryClient.invalidateQueries({ queryKey: ['shows'] });
+      queryClient.invalidateQueries({ queryKey: ['episodes'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     },
     onError: (error) => {
@@ -125,7 +126,9 @@ const Publish = () => {
             show.trailers.forEach(t => {
                 if (t.languages) t.languages.forEach(l => { langs.add(l); showLangs.add(l); });
                 episodes.push({ ...t, showTitle: show.title, season: 0 });
-                if (!artworkUrl && t.artwork && t.artwork['16x9']) artworkUrl = t.artwork['16x9'];
+                if (!artworkUrl && t.artwork) {
+                    artworkUrl = t.artwork['thumbnail'] || t.artwork['poster'] || Object.values(t.artwork)[0] || null;
+                }
             });
         }
         
@@ -136,7 +139,9 @@ const Publish = () => {
                     season.episodes.forEach(e => {
                         if (e.languages) e.languages.forEach(l => { langs.add(l); showLangs.add(l); });
                         episodes.push({ ...e, showTitle: show.title, season: season.season_number });
-                        if (!artworkUrl && e.artwork && e.artwork['16x9']) artworkUrl = e.artwork['16x9'];
+                        if (!artworkUrl && e.artwork) {
+                            artworkUrl = e.artwork['thumbnail'] || e.artwork['poster'] || Object.values(e.artwork)[0] || null;
+                        }
                     });
                 }
             });
@@ -461,7 +466,20 @@ const Publish = () => {
                       <tr key={show.id}>
                         <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                            <div style={{ width: '64px', height: '36px', borderRadius: '8px', backgroundColor: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A78BFA', flexShrink: 0, overflow: 'hidden' }}>
+                            <div 
+                              style={{ 
+                                width: '64px', 
+                                height: '36px', 
+                                borderRadius: '8px', 
+                                backgroundColor: show.artwork ? '#f1f5f9' : '#F5F3FF', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center', 
+                                color: '#A78BFA', 
+                                flexShrink: 0, 
+                                overflow: 'hidden' 
+                              }}
+                            >
                               {show.artwork ? (
                                 <img 
                                   src={show.artwork} 
@@ -470,7 +488,10 @@ const Publish = () => {
                                   onError={(e) => {
                                     e.target.onerror = null;
                                     e.target.style.display = 'none';
-                                    e.target.parentNode.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-film"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>';
+                                    e.target.parentNode.style.backgroundColor = '#F5F3FF';
+                                    const svgStr = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-film"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>';
+                                    // Use insertAdjacentHTML instead of innerHTML to not destroy the image element which is the target, though destroying it is fine.
+                                    e.target.parentNode.innerHTML = svgStr;
                                   }}
                                 />
                               ) : (
