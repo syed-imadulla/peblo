@@ -385,7 +385,7 @@ const PublishHistory = () => {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '7fr 3fr', gap: '24px', alignItems: 'start' }}>
+      <div className="show-form-layout" style={{ alignItems: 'start' }}>
         
         {/* Main Table */}
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -393,12 +393,12 @@ const PublishHistory = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  <th style={{ padding: '16px 0', fontWeight: 700 }}>RUN ID</th>
-                  <th style={{ padding: '16px 0', fontWeight: 700 }}>PUBLISHED BY</th>
-                  <th style={{ padding: '16px 0', fontWeight: 700 }}>STATUS</th>
-                  <th style={{ padding: '16px 0', fontWeight: 700 }}>CONTENT INCLUDED</th>
-                  <th style={{ padding: '16px 0', fontWeight: 700 }}>DURATION</th>
-                  <th style={{ padding: '16px 0', fontWeight: 700 }}>PUBLISHED AT</th>
+                  <th style={{ padding: '16px 24px 16px 0', fontWeight: 700 }}>RUN ID</th>
+                  <th style={{ padding: '16px 24px 16px 0', fontWeight: 700 }}>PUBLISHED BY</th>
+                  <th style={{ padding: '16px 24px 16px 0', fontWeight: 700 }}>STATUS</th>
+                  <th style={{ padding: '16px 24px 16px 0', fontWeight: 700 }}>CONTENT INCLUDED</th>
+                  <th style={{ padding: '16px 24px 16px 0', fontWeight: 700 }}>DURATION</th>
+                  <th style={{ padding: '16px 24px 16px 0', fontWeight: 700 }}>PUBLISHED AT</th>
                   <th style={{ padding: '16px 0', fontWeight: 700, textAlign: 'right' }}>ACTIONS</th>
                 </tr>
               </thead>
@@ -443,24 +443,23 @@ const PublishHistory = () => {
 
                     return (
                       <tr key={run.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                        <td style={{ padding: '16px 0' }}>
+                        <td style={{ padding: '16px 24px 16px 0' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: isSuccess ? '#F5F3FF' : '#fff1f2', color: isSuccess ? '#8b5cf6' : '#f43f5e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                               <Send size={16} />
                             </div>
                             <div>
                               <div style={{ fontWeight: 700, color: 'var(--navy-900)' }}>pub_{run.id.substring(0, 8)}</div>
-                              <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{formattedDate} {formattedTime}</div>
                             </div>
                           </div>
                         </td>
-                        <td style={{ padding: '16px 0' }}>
+                        <td style={{ padding: '16px 24px 16px 0' }}>
                           <div style={{ fontWeight: 600, color: 'var(--navy-900)' }}>{displayRole}</div>
                           {displayEmail && (
                             <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{displayEmail}</div>
                           )}
                         </td>
-                        <td style={{ padding: '16px 0' }}>
+                        <td style={{ padding: '16px 24px 16px 0' }}>
                            <span style={{ 
                              backgroundColor: isSuccess ? '#dcfce7' : '#fee2e2', 
                              color: isSuccess ? '#166534' : '#991b1b', 
@@ -481,7 +480,7 @@ const PublishHistory = () => {
                              </div>
                            )}
                         </td>
-                        <td style={{ padding: '16px 0', fontSize: '12px', lineHeight: '1.4' }}>
+                        <td style={{ padding: '16px 24px 16px 0', fontSize: '12px', lineHeight: '1.4' }}>
                           {run.stats ? (
                             <>
                               <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{run.stats.shows}</span> Shows<br/>
@@ -492,10 +491,10 @@ const PublishHistory = () => {
                             <span style={{ color: 'var(--text-muted)' }}>—</span>
                           )}
                         </td>
-                        <td style={{ padding: '16px 0', color: 'var(--navy-900)', fontWeight: 500 }}>
+                        <td style={{ padding: '16px 24px 16px 0', color: 'var(--navy-900)', fontWeight: 500 }}>
                           {formatDuration(run.duration_seconds)}
                         </td>
-                        <td style={{ padding: '16px 0' }}>
+                        <td style={{ padding: '16px 24px 16px 0' }}>
                           <div style={{ fontWeight: 600, color: 'var(--navy-900)' }}>{formattedDate}</div>
                           <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{formattedTime}</div>
                         </td>
