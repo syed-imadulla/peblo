@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthProvider';
-import { LayoutDashboard, Film, UploadCloud, LogOut, FileText, Menu, X, PlaySquare, History, Plus } from 'lucide-react';
+import { LayoutDashboard, Film, UploadCloud, LogOut, FileText, Menu, X, PlaySquare, History, Plus, Settings } from 'lucide-react';
 
 const Layout = () => {
   const { user, logout } = useAuth();
@@ -16,6 +16,7 @@ const Layout = () => {
     { name: 'Validation', path: '/validation', icon: FileText },
     { name: 'Publish', path: '/publish', icon: UploadCloud },
     { name: 'Publish History', path: '/publish-history', icon: History },
+    { name: 'Settings', path: '/settings', icon: Settings },
   ];
 
   const activeStyle = {
@@ -169,7 +170,7 @@ const Layout = () => {
 
       {/* Main Content */}
       <div className="main-content" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        {!(location.pathname.includes('/new') || location.pathname.includes('/edit') || location.pathname === '/validation' || location.pathname === '/publish' || location.pathname === '/publish-history') ? (
+        {!(location.pathname.includes('/new') || location.pathname.includes('/edit') || location.pathname === '/validation' || location.pathname === '/publish' || location.pathname === '/publish-history' || location.pathname === '/settings') ? (
           <header style={{ display: 'flex', alignItems: 'center', padding: '32px 32px 0 32px', gap: '16px', background: 'transparent', maxWidth: '1400px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
             <button className="mobile-only" onClick={() => setSidebarOpen(true)} style={{ color: 'var(--text-main)', display: 'none' }}>
               <Menu size={24} />

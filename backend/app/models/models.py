@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Index, CheckConstraint, UniqueConstraint
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Index, CheckConstraint, UniqueConstraint, Boolean
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 from app.core.database import Base
@@ -109,3 +109,30 @@ class PublishRun(Base):
     stats = Column(JSONB, nullable=True)
     duration_seconds = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class SystemSettings(Base):
+    __tablename__ = "system_settings"
+    
+    id = Column(Integer, primary_key=True, default=1)
+    
+    # Site Info
+    site_name = Column(String, nullable=False, default="PeBLo CMS")
+    admin_email = Column(String, nullable=False, default="admin@peblo.tv")
+    site_url = Column(String, nullable=False, default="http://localhost:5173")
+    timezone = Column(String, nullable=False, default="Asia/Kolkata (GMT+05:30)")
+    
+    # Default Content Settings
+    default_section = Column(String, nullable=False, default="featured")
+    default_languages = Column(JSONB, nullable=False, default=["EN", "HI"])
+    default_status = Column(String, nullable=False, default="Draft")
+    season_0_handling = Column(String, nullable=False, default="Reserved for trailers (hidden in viewer)")
+    content_grouping = Column(String, nullable=False, default="Group language variants into single episode")
+    
+    # Publishing Preferences
+    auto_publish = Column(Boolean, nullable=False, default=False)
+    generate_backup = Column(Boolean, nullable=False, default=True)
+    catalogue_format = Column(String, nullable=False, default="JSON")
+    atomic_publish = Column(Boolean, nullable=False, default=True)
+    
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
