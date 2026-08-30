@@ -25,7 +25,13 @@ const Browse = () => {
   const { allShows, categories, sections } = useMemo(() => {
     if (!catalog) return { allShows: [], categories: [], sections: [] };
 
+    const preferredOrder = ['featured', 'minisodes', 'series', 'songs'];
     const rawSections = Object.keys(catalog);
+    const orderedSections = [
+      ...preferredOrder.filter((s) => rawSections.includes(s)),
+      ...rawSections.filter((s) => !preferredOrder.includes(s)),
+    ];
+
     const shows = getAllShows(catalog);
 
     const cats = new Set();
@@ -36,7 +42,7 @@ const Browse = () => {
     return {
       allShows: shows,
       categories: Array.from(cats).sort(),
-      sections: rawSections,
+      sections: orderedSections,
     };
   }, [catalog]);
 
@@ -100,17 +106,17 @@ const Browse = () => {
   if (error) return <ErrorState message="Could not load the catalogue. Please check if the server is active." />;
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2.25rem' }}>
       {/* Page Header */}
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1rem' }}>
         <div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--purple-700)', fontSize: '0.88rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.25rem' }}>
-            <Compass size={16} /> Explore
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--purple-700)', fontSize: '0.85rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+            <Compass size={16} /> Explore Catalogue
           </div>
-          <h1 style={{ margin: 0, fontSize: '2rem', color: 'var(--navy-900)' }}>
+          <h1 style={{ margin: 0, fontSize: '2.2rem', color: 'var(--navy-900)' }}>
             Browse Shows
           </h1>
-          <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem', fontSize: '0.95rem' }}>
+          <p style={{ color: 'var(--text-muted)', marginTop: '0.35rem', fontSize: '1rem' }}>
             Discover educational adventures, animated stories, and fun songs.
           </p>
         </div>
@@ -118,13 +124,14 @@ const Browse = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span
             style={{
-              fontSize: '0.85rem',
-              fontWeight: 600,
+              fontSize: '0.88rem',
+              fontWeight: 700,
               backgroundColor: 'var(--surface)',
-              border: '1px solid var(--border)',
-              padding: '0.4rem 0.9rem',
+              border: '1px solid #ECE4F6',
+              padding: '0.45rem 1rem',
               borderRadius: 'var(--radius-pill)',
               color: 'var(--navy-900)',
+              boxShadow: '0 2px 6px rgba(21, 27, 79, 0.03)',
             }}
           >
             Showing {filteredShows.length} of {allShows.length} Shows
@@ -136,30 +143,31 @@ const Browse = () => {
       <div
         style={{
           backgroundColor: 'var(--surface)',
-          padding: '1.25rem 1.5rem',
-          borderRadius: 'var(--radius-lg)',
-          boxShadow: 'var(--shadow-sm)',
+          padding: '1.5rem 1.75rem',
+          borderRadius: '24px',
+          boxShadow: '0 4px 18px rgba(21, 27, 79, 0.04)',
+          border: '1px solid #ECE4F6',
           display: 'flex',
           flexDirection: 'column',
-          gap: '1rem',
+          gap: '1.25rem',
         }}
       >
         {/* Section Filters */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy-900)', marginRight: '0.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--navy-900)', marginRight: '0.35rem' }}>
             Section:
           </span>
           <button
             onClick={() => handleSectionChange('all')}
             style={{
-              padding: '0.35rem 0.9rem',
+              padding: '0.45rem 1.1rem',
               borderRadius: 'var(--radius-pill)',
-              fontSize: '0.85rem',
-              fontWeight: 600,
+              fontSize: '0.88rem',
+              fontWeight: 700,
               backgroundColor: selectedSection === 'all' ? 'var(--purple-700)' : 'var(--background)',
               color: selectedSection === 'all' ? '#ffffff' : 'var(--navy-900)',
               border: '1px solid',
-              borderColor: selectedSection === 'all' ? 'var(--purple-700)' : 'var(--border)',
+              borderColor: selectedSection === 'all' ? 'var(--purple-700)' : '#ECE4F6',
               transition: 'all 0.15s ease',
             }}
           >
@@ -170,15 +178,15 @@ const Browse = () => {
               key={sec}
               onClick={() => handleSectionChange(sec)}
               style={{
-                padding: '0.35rem 0.9rem',
+                padding: '0.45rem 1.1rem',
                 borderRadius: 'var(--radius-pill)',
-                fontSize: '0.85rem',
-                fontWeight: 600,
+                fontSize: '0.88rem',
+                fontWeight: 700,
                 textTransform: 'capitalize',
                 backgroundColor: selectedSection === sec ? 'var(--purple-700)' : 'var(--background)',
                 color: selectedSection === sec ? '#ffffff' : 'var(--navy-900)',
                 border: '1px solid',
-                borderColor: selectedSection === sec ? 'var(--purple-700)' : 'var(--border)',
+                borderColor: selectedSection === sec ? 'var(--purple-700)' : '#ECE4F6',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -193,27 +201,28 @@ const Browse = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '1rem',
+            gap: '1.25rem',
             flexWrap: 'wrap',
-            paddingTop: '0.75rem',
-            borderTop: '1px solid var(--border)',
+            paddingTop: '1rem',
+            borderTop: '1px solid #F0ECF8',
           }}
         >
           {/* Categories Horizontal Scroll */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: '240px', overflowX: 'auto' }} className="hide-scrollbar">
-            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy-900)', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: '260px', overflowX: 'auto' }} className="hide-scrollbar">
+            <span style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--navy-900)', flexShrink: 0 }}>
               Category:
             </span>
             <button
               onClick={() => handleCategoryChange('all')}
               style={{
-                padding: '0.25rem 0.75rem',
+                padding: '0.35rem 0.9rem',
                 borderRadius: 'var(--radius-pill)',
-                fontSize: '0.8rem',
-                fontWeight: 600,
+                fontSize: '0.82rem',
+                fontWeight: 700,
                 flexShrink: 0,
-                backgroundColor: selectedCategory === 'all' ? 'var(--navy-900)' : 'transparent',
+                backgroundColor: selectedCategory === 'all' ? 'var(--navy-900)' : '#F5F2FC',
                 color: selectedCategory === 'all' ? '#ffffff' : 'var(--text-muted)',
+                transition: 'all 0.15s ease',
               }}
             >
               All
@@ -223,14 +232,15 @@ const Browse = () => {
                 key={cat}
                 onClick={() => handleCategoryChange(cat)}
                 style={{
-                  padding: '0.25rem 0.75rem',
+                  padding: '0.35rem 0.9rem',
                   borderRadius: 'var(--radius-pill)',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
                   textTransform: 'capitalize',
                   flexShrink: 0,
-                  backgroundColor: selectedCategory === cat ? 'var(--navy-900)' : 'transparent',
+                  backgroundColor: selectedCategory === cat ? 'var(--navy-900)' : '#F5F2FC',
                   color: selectedCategory === cat ? '#ffffff' : 'var(--text-muted)',
+                  transition: 'all 0.15s ease',
                 }}
               >
                 {cat}
@@ -239,21 +249,21 @@ const Browse = () => {
           </div>
 
           {/* Language Selector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--navy-900)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexShrink: 0 }}>
+            <span style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--navy-900)' }}>
               Language:
             </span>
             <select
               value={selectedLanguage}
               onChange={(e) => setSelectedLanguage(e.target.value)}
               style={{
-                padding: '0.35rem 0.75rem',
-                borderRadius: '8px',
-                border: '1px solid var(--border)',
+                padding: '0.45rem 0.9rem',
+                borderRadius: '10px',
+                border: '1px solid #ECE4F6',
                 backgroundColor: 'var(--surface)',
                 color: 'var(--navy-900)',
                 fontSize: '0.85rem',
-                fontWeight: 600,
+                fontWeight: 700,
                 outline: 'none',
               }}
               aria-label="Filter shows by language"
@@ -266,13 +276,13 @@ const Browse = () => {
         </div>
       </div>
 
-      {/* Shows Grid */}
+      {/* Shows Grid - Prominent Sizing */}
       {filteredShows.length > 0 ? (
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-            gap: '1.5rem',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '1.75rem',
           }}
         >
           {filteredShows.map((show) => (

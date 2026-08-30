@@ -8,19 +8,64 @@ export const FallbackImage = ({ aspect = '16/9' }) => (
     style={{
       width: '100%',
       aspectRatio: aspect,
-      backgroundColor: '#F1ECFF',
+      background: 'linear-gradient(140deg, #6C35E6 0%, #4D20A6 100%)',
       display: 'flex',
+      flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      color: 'var(--purple-700)',
-      borderRadius: 'var(--radius-md)',
+      color: '#ffffff',
+      borderRadius: '18px',
+      position: 'relative',
+      overflow: 'hidden',
+      padding: '1rem',
+      textAlign: 'center',
     }}
   >
-    <Film size={32} opacity={0.4} />
+    {/* Subtle soft backdrop glowing accents */}
+    <div
+      style={{
+        position: 'absolute',
+        top: '-15%',
+        right: '-15%',
+        width: '110px',
+        height: '110px',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(255, 230, 160, 0.25) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }}
+    />
+    <div
+      style={{
+        position: 'absolute',
+        bottom: '-20%',
+        left: '-10%',
+        width: '120px',
+        height: '120px',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(160, 120, 255, 0.3) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }}
+    />
+
+    <div
+      style={{
+        width: '42px',
+        height: '42px',
+        borderRadius: '50%',
+        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+        backdropFilter: 'blur(6px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+      }}
+    >
+      <Film size={20} color="#ffffff" opacity={0.9} />
+    </div>
   </div>
 );
 
-export const ShowCard = ({ show, width = '225px', typeLabel = 'Series' }) => {
+export const ShowCard = ({ show, width = '280px', typeLabel = 'Series' }) => {
   // Use banner (16:9) first, fallback to poster
   const image = getShowBanner(show) || getShowPoster(show);
   const languages = getShowLanguages(show);
@@ -43,22 +88,22 @@ export const ShowCard = ({ show, width = '225px', typeLabel = 'Series' }) => {
       <div
         style={{
           position: 'relative',
-          borderRadius: 'var(--radius-md)',
+          borderRadius: '18px',
           overflow: 'hidden',
           backgroundColor: '#EDE6FF',
           aspectRatio: '16/9',
-          boxShadow: 'var(--shadow-sm)',
-          transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease',
+          boxShadow: '0 4px 14px rgba(21, 27, 79, 0.05)',
+          transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
-          e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+          e.currentTarget.style.transform = 'translateY(-5px) scale(1.025)';
+          e.currentTarget.style.boxShadow = '0 12px 28px rgba(109, 53, 232, 0.14)';
           const overlay = e.currentTarget.querySelector('.play-overlay');
           if (overlay) overlay.style.opacity = '1';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'none';
-          e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+          e.currentTarget.style.boxShadow = '0 4px 14px rgba(21, 27, 79, 0.05)';
           const overlay = e.currentTarget.querySelector('.play-overlay');
           if (overlay) overlay.style.opacity = '0';
         }}
@@ -91,7 +136,7 @@ export const ShowCard = ({ show, width = '225px', typeLabel = 'Series' }) => {
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundColor: 'rgba(21, 27, 79, 0.35)',
+            backgroundColor: 'rgba(21, 27, 79, 0.32)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -101,29 +146,29 @@ export const ShowCard = ({ show, width = '225px', typeLabel = 'Series' }) => {
         >
           <div
             style={{
-              width: '38px',
-              height: '38px',
+              width: '44px',
+              height: '44px',
               borderRadius: '50%',
               backgroundColor: 'var(--purple-700)',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+              boxShadow: '0 6px 16px rgba(0,0,0,0.3)',
             }}
           >
-            <Play size={17} fill="#ffffff" style={{ marginLeft: '2px' }} />
+            <Play size={20} fill="#ffffff" style={{ marginLeft: '2px' }} />
           </div>
         </div>
       </div>
 
-      <div style={{ marginTop: '0.6rem' }}>
+      <div style={{ marginTop: '0.65rem' }}>
         <h3
           style={{
-            fontSize: '0.94rem',
+            fontSize: '1.02rem',
             fontWeight: 800,
             color: 'var(--navy-900)',
-            marginBottom: '0.2rem',
+            marginBottom: '0.25rem',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -134,8 +179,8 @@ export const ShowCard = ({ show, width = '225px', typeLabel = 'Series' }) => {
           {show.title}
         </h3>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-          <span style={{ textTransform: 'capitalize' }}>{typeLabel}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+          <span style={{ textTransform: 'capitalize', fontWeight: 600 }}>{typeLabel}</span>
           <span>·</span>
           <span style={{ textTransform: 'capitalize' }}>{category}</span>
           <span>·</span>

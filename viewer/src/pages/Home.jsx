@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -14,6 +14,9 @@ import { LoadingState, ErrorState, EmptyState } from '../components/States';
 import { getShowBanner, getShowPoster } from '../utils/catalogue';
 
 const Home = () => {
+  const [heroIndex, setHeroIndex] = useState(0);
+  const rowRefs = useRef({});
+
   const { data: catalog, isLoading, error } = useQuery({
     queryKey: ['catalog'],
     queryFn: getCatalog,
@@ -22,15 +25,24 @@ const Home = () => {
   if (isLoading) return <LoadingState />;
   if (error) return <ErrorState message="Could not load the catalogue. Is the backend running?" />;
 
-  const sections = Object.keys(catalog || {});
-  if (sections.length === 0) return <EmptyState message="The catalogue is currently empty. Publish shows in the CMS to see them here!" />;
+  const rawSections = Object.keys(catalog || {});
+  if (rawSections.length === 0) return <EmptyState message="The catalogue is currently empty. Publish shows in the CMS to see them here!" />;
 
-  // Real-time Hero Show: Pick first featured show, or first available catalogue show
+  // Intended section ordering
+  const preferredOrder = ['featured', 'minisodes', 'series', 'songs'];
+  const sections = [
+    ...preferredOrder.filter((s) => rawSections.includes(s)),
+    ...rawSections.filter((s) => !preferredOrder.includes(s)),
+  ];
+
+  // Real-time Hero Shows: Pick featured list, or all catalog shows
+  const featuredList = catalog.featured && catalog.featured.length > 0 ? catalog.featured : [];
   const allCatalogShows = Object.values(catalog).flat().filter(Boolean);
   if (allCatalogShows.length === 0) return <EmptyState message="No shows found in the catalogue." />;
 
-  const featuredList = catalog.featured || [];
-  const heroShow = featuredList[0] || allCatalogShows[0];
+  const heroPool = featuredList.length > 0 ? featuredList : allCatalogShows;
+  const currentHeroIndex = Math.min(heroIndex, heroPool.length - 1);
+  const heroShow = heroPool[currentHeroIndex] || heroPool[0];
 
   const heroBanner = getShowBanner(heroShow) || getShowPoster(heroShow);
   const firstPlayableContentGroup =
@@ -41,17 +53,33 @@ const Home = () => {
   const heroSynopsis = heroShow.synopsis || "Explore fun, educational stories and adventures on PeBlo TV.";
   const heroCategories = heroShow.categories && heroShow.categories.length > 0 ? heroShow.categories : ['adventure', 'learning'];
 
+  const nextHero = () => {
+    setHeroIndex((prev) => (prev + 1) % heroPool.length);
+  };
+
+  const prevHero = () => {
+    setHeroIndex((prev) => (prev - 1 + heroPool.length) % heroPool.length);
+  };
+
+  const scrollRow = (section, direction) => {
+    const el = rowRefs.current[section];
+    if (el) {
+      const scrollAmt = direction === 'left' ? -420 : 420;
+      el.scrollBy({ left: scrollAmt, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
       {/* ─── Hero Billboard ──────────────────────────────────────────────────────── */}
       <div
         style={{
           position: 'relative',
-          borderRadius: 'var(--radius-xl)',
+          borderRadius: '26px',
           overflow: 'hidden',
           backgroundColor: '#F3EFFE',
-          minHeight: '340px',
-          boxShadow: '0 4px 20px rgba(109, 53, 232, 0.06)',
+          minHeight: '380px',
+          boxShadow: '0 6px 28px rgba(109, 53, 232, 0.07)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -64,7 +92,7 @@ const Home = () => {
             top: 0,
             right: 0,
             bottom: 0,
-            width: '64%',
+            width: '62%',
             overflow: 'hidden',
           }}
         >
@@ -84,7 +112,7 @@ const Home = () => {
               }}
             />
           ) : (
-            <div style={{ width: '100%', height: '100%', opacity: 0.15 }}>
+            <div style={{ width: '100%', height: '100%', opacity: 0.2 }}>
               <FallbackImage aspect="16/9" />
             </div>
           )}
@@ -94,7 +122,7 @@ const Home = () => {
             style={{
               position: 'absolute',
               inset: 0,
-              background: 'linear-gradient(90deg, #F3EFFE 0%, rgba(243, 239, 254, 0.95) 15%, rgba(243, 239, 254, 0) 55%)',
+              background: 'linear-gradient(90deg, #F3EFFE 0%, rgba(243, 239, 254, 0.95) 18%, rgba(243, 239, 254, 0) 60%)',
             }}
           />
         </div>
@@ -104,11 +132,11 @@ const Home = () => {
           style={{
             position: 'relative',
             zIndex: 2,
-            padding: '2.5rem 3rem',
-            maxWidth: '520px',
+            padding: '3rem 3.5rem',
+            maxWidth: '560px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '1rem',
+            gap: '1.15rem',
           }}
         >
           {/* Featured Badge */}
@@ -117,24 +145,24 @@ const Home = () => {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '5px',
+                gap: '6px',
                 backgroundColor: '#EDE6FF',
                 color: 'var(--purple-700)',
-                fontSize: '0.75rem',
+                fontSize: '0.78rem',
                 fontWeight: 800,
-                padding: '4px 12px',
+                padding: '5px 14px',
                 borderRadius: 'var(--radius-pill)',
-                letterSpacing: '0.2px',
+                letterSpacing: '0.3px',
               }}
             >
-              <Sparkles size={13} fill="var(--purple-700)" /> Premiere
+              <Sparkles size={14} fill="var(--purple-700)" /> Premiere
             </span>
           </div>
 
           {/* Real Title */}
           <h1
             style={{
-              fontSize: '2.4rem',
+              fontSize: '2.6rem',
               color: 'var(--navy-900)',
               fontWeight: 900,
               lineHeight: 1.15,
@@ -148,9 +176,9 @@ const Home = () => {
           {/* Real Synopsis */}
           <p
             style={{
-              fontSize: '0.98rem',
+              fontSize: '1.02rem',
               color: 'var(--text-muted)',
-              lineHeight: 1.5,
+              lineHeight: 1.55,
               margin: 0,
             }}
           >
@@ -165,9 +193,9 @@ const Home = () => {
                 style={{
                   backgroundColor: idx === 0 ? '#EDE8FA' : idx === 1 ? '#E6F7F0' : '#FFF0E8',
                   color: idx === 0 ? 'var(--purple-700)' : idx === 1 ? '#1B7F53' : '#B8531D',
-                  fontSize: '0.78rem',
+                  fontSize: '0.8rem',
                   fontWeight: 700,
-                  padding: '4px 12px',
+                  padding: '4px 13px',
                   borderRadius: 'var(--radius-pill)',
                   textTransform: 'capitalize',
                 }}
@@ -178,105 +206,109 @@ const Home = () => {
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '0.85rem', marginTop: '0.4rem' }}>
+          <div style={{ display: 'flex', gap: '0.9rem', marginTop: '0.5rem' }}>
             {firstPlayableContentGroup ? (
               <Link
                 to={`/episode/${firstPlayableContentGroup}`}
                 className="btn btn-primary"
-                style={{ padding: '0.75rem 1.6rem', fontSize: '0.95rem' }}
+                style={{ padding: '0.8rem 1.75rem', fontSize: '1rem' }}
               >
-                <Play size={16} fill="#ffffff" /> Watch Now
+                <Play size={17} fill="#ffffff" /> Watch Now
               </Link>
             ) : (
               <Link
                 to={`/show/${heroShow.slug || heroShow.show_id}`}
                 className="btn btn-primary"
-                style={{ padding: '0.75rem 1.6rem', fontSize: '0.95rem' }}
+                style={{ padding: '0.8rem 1.75rem', fontSize: '1rem' }}
               >
-                <Play size={16} fill="#ffffff" /> Watch Now
+                <Play size={17} fill="#ffffff" /> Watch Now
               </Link>
             )}
 
             <Link
               to={`/show/${heroShow.slug || heroShow.show_id}`}
               className="btn btn-secondary"
-              style={{ padding: '0.75rem 1.4rem', fontSize: '0.95rem' }}
+              style={{ padding: '0.8rem 1.5rem', fontSize: '1rem' }}
             >
-              <Info size={16} color="var(--navy-900)" /> More Info
+              <Info size={17} color="var(--navy-900)" /> More Info
             </Link>
           </div>
 
           {/* Bottom Left Pagination Dots */}
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '0.75rem' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--purple-700)' }} />
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#D8CEF6' }} />
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#D8CEF6' }} />
+            {heroPool.slice(0, 5).map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setHeroIndex(idx)}
+                style={{
+                  width: idx === currentHeroIndex ? '18px' : '7px',
+                  height: '7px',
+                  borderRadius: '999px',
+                  backgroundColor: idx === currentHeroIndex ? 'var(--purple-700)' : '#D8CEF6',
+                  transition: 'all 0.2s ease',
+                  padding: 0,
+                }}
+                aria-label={`Slide ${idx + 1}`}
+              />
+            ))}
           </div>
         </div>
 
         {/* Bottom Right Carousel Controls Overlay */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '24px',
-            right: '28px',
-            zIndex: 3,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-          }}
-        >
-          {/* Small Indicator Pill */}
+        {heroPool.length > 1 && (
           <div
             style={{
-              backgroundColor: 'rgba(21, 27, 79, 0.45)',
-              backdropFilter: 'blur(6px)',
-              padding: '6px 12px',
-              borderRadius: 'var(--radius-pill)',
+              position: 'absolute',
+              bottom: '24px',
+              right: '28px',
+              zIndex: 3,
               display: 'flex',
-              gap: '5px',
               alignItems: 'center',
+              gap: '10px',
             }}
           >
-            <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#ffffff' }} />
-            <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.6)' }} />
-            <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.6)' }} />
+            <button
+              onClick={prevHero}
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                backgroundColor: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 3px 10px rgba(21, 27, 79, 0.12)',
+                color: 'var(--navy-900)',
+                transition: 'transform 0.15s ease',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.06)')}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+              aria-label="Previous Hero Slide"
+            >
+              <ChevronLeft size={20} strokeWidth={2.5} />
+            </button>
+            <button
+              onClick={nextHero}
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                backgroundColor: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 3px 10px rgba(21, 27, 79, 0.12)',
+                color: 'var(--navy-900)',
+                transition: 'transform 0.15s ease',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.06)')}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+              aria-label="Next Hero Slide"
+            >
+              <ChevronRight size={20} strokeWidth={2.5} />
+            </button>
           </div>
-
-          {/* Arrow Buttons */}
-          <button
-            style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              backgroundColor: '#ffffff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-              color: 'var(--navy-900)',
-            }}
-            aria-label="Previous Hero Slide"
-          >
-            <ChevronLeft size={18} strokeWidth={2.5} />
-          </button>
-          <button
-            style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              backgroundColor: '#ffffff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-              color: 'var(--navy-900)',
-            }}
-            aria-label="Next Hero Slide"
-          >
-            <ChevronRight size={18} strokeWidth={2.5} />
-          </button>
-        </div>
+        )}
       </div>
 
       {/* ─── Real Catalogue Section Rows ────────────────────────────────────────── */}
@@ -286,35 +318,104 @@ const Home = () => {
 
         return (
           <section key={section} style={{ position: 'relative' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--navy-900)', margin: 0, textTransform: 'capitalize' }}>{section}</h2>
-              <Link
-                to={`/browse?section=${section}`}
-                style={{
-                  color: 'var(--purple-700)',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '3px',
-                }}
-              >
-                View all →
-              </Link>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--navy-900)', margin: 0, textTransform: 'capitalize' }}>
+                  {section}
+                </h2>
+                <span
+                  style={{
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    color: 'var(--purple-700)',
+                    backgroundColor: 'var(--purple-100)',
+                    padding: '2px 9px',
+                    borderRadius: 'var(--radius-pill)',
+                  }}
+                >
+                  {shows.length}
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <Link
+                  to={`/browse?section=${section}`}
+                  style={{
+                    color: 'var(--purple-700)',
+                    fontSize: '0.88rem',
+                    fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    transition: 'gap 0.15s ease',
+                  }}
+                >
+                  View all →
+                </Link>
+
+                {shows.length > 3 && (
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button
+                      onClick={() => scrollRow(section, 'left')}
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #ECE4F6',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'var(--navy-900)',
+                        boxShadow: '0 2px 6px rgba(21, 27, 79, 0.04)',
+                        transition: 'background-color 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--purple-100)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
+                      aria-label={`Scroll ${section} left`}
+                    >
+                      <ChevronLeft size={17} />
+                    </button>
+                    <button
+                      onClick={() => scrollRow(section, 'right')}
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #ECE4F6',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'var(--navy-900)',
+                        boxShadow: '0 2px 6px rgba(21, 27, 79, 0.04)',
+                        transition: 'background-color 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--purple-100)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
+                      aria-label={`Scroll ${section} right`}
+                    >
+                      <ChevronRight size={17} />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div style={{ position: 'relative' }}>
               <div
+                ref={(el) => (rowRefs.current[section] = el)}
                 className="hide-scrollbar"
                 style={{
                   display: 'flex',
-                  gap: '16px',
+                  gap: '18px',
                   overflowX: 'auto',
-                  paddingBottom: '8px',
+                  paddingBottom: '10px',
+                  scrollSnapType: 'x proximity',
                 }}
               >
                 {shows.map((show) => (
-                  <div key={section + '-' + (show.slug || show.show_id)} style={{ width: '240px', flexShrink: 0 }}>
+                  <div key={section + '-' + (show.slug || show.show_id)} style={{ width: '290px', flexShrink: 0, scrollSnapAlign: 'start' }}>
                     <ShowCard
                       show={show}
                       width="100%"
@@ -323,31 +424,6 @@ const Home = () => {
                   </div>
                 ))}
               </div>
-
-              {/* Floating Navigation Control for large rows */}
-              {shows.length > 4 && (
-                <button
-                  style={{
-                    position: 'absolute',
-                    right: '-18px',
-                    top: '38%',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    backgroundColor: '#ffffff',
-                    boxShadow: '0 4px 14px rgba(21, 27, 79, 0.12)',
-                    border: '1px solid #EAE6F4',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'var(--navy-900)',
-                    zIndex: 10,
-                  }}
-                  aria-label={`Scroll ${section} shows`}
-                >
-                  <ChevronRight size={18} strokeWidth={2.5} />
-                </button>
-              )}
             </div>
           </section>
         );

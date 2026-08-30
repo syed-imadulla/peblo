@@ -4,7 +4,7 @@ import { Play, Clock } from 'lucide-react';
 import { FallbackImage } from './ShowCard';
 import { formatDuration, resolveAssetUrl } from '../utils/catalogue';
 
-export const EpisodeCard = ({ episode, width = '260px' }) => {
+export const EpisodeCard = ({ episode, width = '290px' }) => {
   const rawThumbnail = episode.artwork?.thumbnail || episode.artwork?.banner || episode.artwork?.poster;
   const thumbnail = resolveAssetUrl(rawThumbnail);
 
@@ -16,9 +16,9 @@ export const EpisodeCard = ({ episode, width = '260px' }) => {
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
-        gap: '0.6rem',
+        gap: '0.65rem',
         outline: 'none',
-        borderRadius: 'var(--radius-md)',
+        textDecoration: 'none',
       }}
       className="episode-card"
       aria-label={`Play ${episode.title}`}
@@ -26,22 +26,22 @@ export const EpisodeCard = ({ episode, width = '260px' }) => {
       <div
         style={{
           position: 'relative',
-          borderRadius: 'var(--radius-md)',
+          borderRadius: '18px',
           overflow: 'hidden',
-          boxShadow: 'var(--shadow-sm)',
+          boxShadow: '0 4px 14px rgba(21, 27, 79, 0.05)',
           aspectRatio: '16/9',
-          backgroundColor: 'var(--surface)',
+          backgroundColor: '#EDE6FF',
           transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
-          e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+          e.currentTarget.style.transform = 'translateY(-5px) scale(1.025)';
+          e.currentTarget.style.boxShadow = '0 12px 28px rgba(109, 53, 232, 0.14)';
           const overlay = e.currentTarget.querySelector('.play-overlay');
           if (overlay) overlay.style.opacity = '1';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'none';
-          e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+          e.currentTarget.style.boxShadow = '0 4px 14px rgba(21, 27, 79, 0.05)';
           const overlay = e.currentTarget.querySelector('.play-overlay');
           if (overlay) overlay.style.opacity = '0';
         }}
@@ -74,7 +74,7 @@ export const EpisodeCard = ({ episode, width = '260px' }) => {
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundColor: 'rgba(25, 10, 45, 0.45)',
+            backgroundColor: 'rgba(21, 27, 79, 0.35)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -84,18 +84,18 @@ export const EpisodeCard = ({ episode, width = '260px' }) => {
         >
           <div
             style={{
-              width: '40px',
-              height: '40px',
+              width: '44px',
+              height: '44px',
               borderRadius: '50%',
-              backgroundColor: 'var(--purple-600)',
+              backgroundColor: 'var(--purple-700)',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
             }}
           >
-            <Play size={18} fill="#ffffff" style={{ marginLeft: '2px' }} />
+            <Play size={20} fill="#ffffff" style={{ marginLeft: '2px' }} />
           </div>
         </div>
 
@@ -104,15 +104,15 @@ export const EpisodeCard = ({ episode, width = '260px' }) => {
           <div
             style={{
               position: 'absolute',
-              bottom: '8px',
-              right: '8px',
-              backgroundColor: 'rgba(20, 9, 41, 0.85)',
+              bottom: '10px',
+              right: '10px',
+              backgroundColor: 'rgba(16, 20, 58, 0.85)',
               backdropFilter: 'blur(4px)',
               color: '#ffffff',
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              padding: '2px 6px',
-              borderRadius: '4px',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              padding: '3px 8px',
+              borderRadius: '6px',
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
@@ -127,10 +127,10 @@ export const EpisodeCard = ({ episode, width = '260px' }) => {
       <div>
         <h4
           style={{
-            fontSize: '0.92rem',
-            fontWeight: 700,
+            fontSize: '1rem',
+            fontWeight: 800,
             color: 'var(--navy-900)',
-            margin: '0 0 0.25rem 0',
+            margin: '0 0 0.3rem 0',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -146,15 +146,7 @@ export const EpisodeCard = ({ episode, width = '260px' }) => {
               {episode.languages.map((lang) => (
                 <span
                   key={lang}
-                  style={{
-                    fontSize: '0.65rem',
-                    textTransform: 'uppercase',
-                    backgroundColor: 'var(--purple-100)',
-                    color: 'var(--purple-700)',
-                    padding: '2px 6px',
-                    borderRadius: 'var(--radius-pill)',
-                    fontWeight: 700,
-                  }}
+                  className="lang-chip"
                 >
                   {lang}
                 </span>
