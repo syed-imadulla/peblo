@@ -72,18 +72,21 @@ const Publish = () => {
     queryKey: ['validationReport'],
     queryFn: fetchValidationReport,
     refetchOnWindowFocus: true,
+    refetchInterval: 5000,
   });
 
   const { data: history, isLoading: loadingHistory } = useQuery({
     queryKey: ['publishHistory'],
     queryFn: fetchPublishHistory,
     refetchOnWindowFocus: true,
+    refetchInterval: 5000,
   });
 
   const { data: previewData, isLoading: loadingPreview } = useQuery({
     queryKey: ['catalogPreview'],
     queryFn: fetchCatalogPreview,
     refetchOnWindowFocus: true,
+    refetchInterval: 5000,
   });
 
   const publishMutation = useMutation({
