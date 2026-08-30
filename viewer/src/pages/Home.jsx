@@ -7,7 +7,6 @@ import {
   Sparkles,
   ChevronRight,
   ChevronLeft,
-  Sun,
 } from 'lucide-react';
 import { getCatalog } from '../api';
 import { ShowCard, FallbackImage } from '../components/ShowCard';
@@ -285,8 +284,6 @@ const Home = () => {
         const shows = catalog[section];
         if (!shows || shows.length === 0) return null;
 
-        const isSeriesSection = section === 'series';
-
         return (
           <section key={section} style={{ position: 'relative' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
@@ -306,202 +303,52 @@ const Home = () => {
               </Link>
             </div>
 
-            {isSeriesSection ? (
+            <div style={{ position: 'relative' }}>
               <div
+                className="hide-scrollbar"
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: `repeat(${shows.length}, minmax(0, 1fr)) minmax(240px, 1.25fr)`,
-                  gap: '14px',
-                  alignItems: 'start',
+                  display: 'flex',
+                  gap: '16px',
+                  overflowX: 'auto',
+                  paddingBottom: '8px',
                 }}
               >
                 {shows.map((show) => (
-                  <ShowCard
-                    key={section + '-' + (show.slug || show.show_id)}
-                    show={show}
-                    width="100%"
-                    typeLabel="Series"
-                  />
-                ))}
-
-                {/* Real PeBlo Brand Promotional Panel */}
-                <div
-                  style={{
-                    background: 'linear-gradient(145deg, #F5F0FF 0%, #ECE4FD 100%)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '1.25rem 1.5rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    textAlign: 'center',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    boxShadow: 'var(--shadow-sm)',
-                    border: '1px solid #EAE2F8',
-                    minHeight: '130px',
-                    aspectRatio: '16/9',
-                  }}
-                >
-                  {/* Cheerful Sun Icon */}
-                  <div
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '50%',
-                      backgroundColor: '#FFEBB5',
-                      color: '#E08B00',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginBottom: '0.4rem',
-                    }}
-                  >
-                    <Sun size={18} fill="#FFB718" stroke="#E08B00" />
-                  </div>
-
-                  <h3
-                    style={{
-                      fontSize: '0.92rem',
-                      fontWeight: 900,
-                      color: 'var(--navy-900)',
-                      margin: '0 0 0.2rem 0',
-                      lineHeight: 1.25,
-                      maxWidth: '220px',
-                    }}
-                  >
-                    A kinder, brighter place for curious minds.
-                  </h3>
-
-                  <div
-                    style={{
-                      fontSize: '0.72rem',
-                      color: 'var(--text-muted)',
-                      fontWeight: 600,
-                      marginBottom: '0.6rem',
-                      letterSpacing: '0.2px',
-                    }}
-                  >
-                    Stories · Songs · Learning · Fun
-                  </div>
-
-                  {/* PeBlo TV Brand Stamp */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <img
-                      src="/peblo-logo.avif"
-                      alt="PeBlo"
-                      style={{
-                        height: '24px',
-                        width: 'auto',
-                        display: 'block',
-                        objectFit: 'contain',
-                      }}
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        const textFallback = e.target.nextElementSibling;
-                        if (textFallback) textFallback.style.display = 'inline-block';
-                      }}
-                    />
-                    <span
-                      style={{
-                        display: 'none',
-                        fontSize: '1.15rem',
-                        fontWeight: 900,
-                        color: 'var(--purple-700)',
-                        letterSpacing: '-0.5px',
-                      }}
-                    >
-                      PeBlo
-                    </span>
-                    <span
-                      style={{
-                        backgroundColor: '#ffffff',
-                        color: 'var(--purple-700)',
-                        fontSize: '0.62rem',
-                        fontWeight: 800,
-                        padding: '1px 5px',
-                        borderRadius: 'var(--radius-pill)',
-                        border: '1px solid #E4DCF8',
-                      }}
-                    >
-                      TV
-                    </span>
-                  </div>
-
-                  {/* Soft Decorative Cloud Shapes in Background */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: '-10px',
-                      left: '-10px',
-                      width: '50px',
-                      height: '50px',
-                      borderRadius: '50%',
-                      backgroundColor: 'rgba(255, 255, 255, 0.45)',
-                      pointerEvents: 'none',
-                    }}
-                  />
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: '-12px',
-                      right: '-12px',
-                      width: '60px',
-                      height: '60px',
-                      borderRadius: '50%',
-                      backgroundColor: 'rgba(255, 255, 255, 0.45)',
-                      pointerEvents: 'none',
-                    }}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div style={{ position: 'relative' }}>
-                <div
-                  className="hide-scrollbar"
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: `repeat(auto-fill, minmax(210px, 1fr))`,
-                    gap: '14px',
-                    paddingBottom: '6px',
-                  }}
-                >
-                  {shows.map((show) => (
+                  <div key={section + '-' + (show.slug || show.show_id)} style={{ width: '240px', flexShrink: 0 }}>
                     <ShowCard
-                      key={section + '-' + (show.slug || show.show_id)}
                       show={show}
                       width="100%"
                       typeLabel={show.type || (section === 'minisodes' ? 'Minisodes' : (section === 'songs' ? 'Songs' : 'Series'))}
                     />
-                  ))}
-                </div>
-
-                {/* Floating Navigation Control for large rows */}
-                {shows.length > 4 && (
-                  <button
-                    style={{
-                      position: 'absolute',
-                      right: '-18px',
-                      top: '38%',
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '50%',
-                      backgroundColor: '#ffffff',
-                      boxShadow: '0 4px 14px rgba(21, 27, 79, 0.12)',
-                      border: '1px solid #EAE6F4',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'var(--navy-900)',
-                      zIndex: 10,
-                    }}
-                    aria-label={`Scroll ${section} shows`}
-                  >
-                    <ChevronRight size={18} strokeWidth={2.5} />
-                  </button>
-                )}
+                  </div>
+                ))}
               </div>
-            )}
+
+              {/* Floating Navigation Control for large rows */}
+              {shows.length > 4 && (
+                <button
+                  style={{
+                    position: 'absolute',
+                    right: '-18px',
+                    top: '38%',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ffffff',
+                    boxShadow: '0 4px 14px rgba(21, 27, 79, 0.12)',
+                    border: '1px solid #EAE6F4',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--navy-900)',
+                    zIndex: 10,
+                  }}
+                  aria-label={`Scroll ${section} shows`}
+                >
+                  <ChevronRight size={18} strokeWidth={2.5} />
+                </button>
+              )}
+            </div>
           </section>
         );
       })}
