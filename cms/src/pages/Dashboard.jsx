@@ -117,8 +117,9 @@ const Dashboard = () => {
   const showsWithIssues = validation?.issues 
     ? new Set(validation.issues.map(i => i.show_title)).size 
     : 0;
-  const publishRuns = history?.length || 0;
-  const lastPublish = history?.[0] || null;
+  const historyArray = Array.isArray(history) ? history : history?.items || [];
+  const publishRuns = historyArray.length;
+  const lastPublish = historyArray[0] || null;
 
   // --- Recent Shows (Sorted by created_at) ---
   const recentShows = shows ? [...shows].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 5) : [];
@@ -127,7 +128,7 @@ const Dashboard = () => {
   const allEvents = [];
 
   // Add publish events (genuine audit records)
-  history?.forEach(run => {
+  historyArray.forEach(run => {
     if (run.created_at) {
       const isSuccess = run.status === 'success';
       allEvents.push({
