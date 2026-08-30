@@ -147,3 +147,66 @@ h1, h2, h3, h4, h5, h6 {
 .animate-fade-in {
   animation: fadeIn 0.25s ease-out forwards;
 }
+
+/* Streaming Card Hover Styles */
+.show-card, .episode-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.show-card-thumb, .episode-card-thumb {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(21, 27, 79, 0.05);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.show-card:hover .show-card-thumb,
+.episode-card:hover .episode-card-thumb {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(21, 27, 79, 0.12), 0 2px 8px rgba(109, 53, 232, 0.08);
+}
+
+.show-card:hover img,
+.episode-card:hover img {
+  filter: brightness(1.04);
+}
+
+.play-badge-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(109, 53, 232, 0.12) 0%, rgba(21, 27, 79, 0.22) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.show-card:hover .play-badge-overlay,
+.episode-card:hover .play-badge-overlay {
+  opacity: 1;
+}
+
+.play-badge-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  color: var(--purple-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  transform: scale(0.88);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.show-card:hover .play-badge-btn,
+.episode-card:hover .play-badge-btn {
+  transform: scale(1);
+}

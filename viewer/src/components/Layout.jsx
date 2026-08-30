@@ -11,7 +11,7 @@ const Layout = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 10);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -30,36 +30,38 @@ const Layout = () => {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--background)' }}>
-      {/* Floating Sticky Navigation Bar */}
+      {/* ─── Top-Attached Liquid Glass Island Navbar ───────────────────────────── */}
       <header
         style={{
           position: 'sticky',
-          top: '12px',
+          top: 0,
           zIndex: 100,
           width: '100%',
-          maxWidth: '1440px',
-          margin: '0 auto',
-          padding: '0 1.5rem',
+          display: 'flex',
+          justifyContent: 'center',
           pointerEvents: 'none',
         }}
       >
         <div
           style={{
             pointerEvents: 'auto',
-            backgroundColor: scrolled ? 'rgba(255, 255, 255, 0.94)' : 'rgba(255, 255, 255, 0.96)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            borderRadius: '24px',
-            border: '1px solid rgba(237, 230, 250, 0.9)',
+            width: 'calc(100% - 48px)',
+            maxWidth: '1440px',
+            backgroundColor: scrolled ? 'rgba(255, 255, 255, 0.88)' : 'rgba(255, 255, 255, 0.80)',
+            backdropFilter: 'blur(28px) saturate(190%)',
+            WebkitBackdropFilter: 'blur(28px) saturate(190%)',
+            borderRadius: '0 0 24px 24px',
+            border: '1px solid rgba(230, 222, 246, 0.85)',
+            borderTop: 'none',
             boxShadow: scrolled
-              ? '0 10px 30px rgba(21, 27, 79, 0.09), 0 2px 6px rgba(109, 53, 232, 0.04)'
-              : '0 4px 20px rgba(21, 27, 79, 0.05)',
-            padding: '0.6rem 1.4rem',
+              ? '0 10px 32px rgba(21, 27, 79, 0.08), 0 2px 8px rgba(109, 53, 232, 0.04), inset 0 -1px 0 rgba(255, 255, 255, 0.9)'
+              : '0 6px 24px rgba(21, 27, 79, 0.05), inset 0 -1px 0 rgba(255, 255, 255, 0.9)',
+            padding: '0.65rem 2rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '1.25rem',
-            transition: 'box-shadow 0.25s ease, background-color 0.25s ease, transform 0.2s ease',
+            gap: '1.5rem',
+            transition: 'all 0.25s ease',
           }}
         >
           {/* Left: PeBlo Logo + TV Pill Badge */}
@@ -78,7 +80,7 @@ const Layout = () => {
               src="/peblo-logo.avif"
               alt="PeBlo"
               style={{
-                height: '28px',
+                height: '30px',
                 width: 'auto',
                 display: 'block',
                 objectFit: 'contain',
@@ -92,7 +94,7 @@ const Layout = () => {
             <span
               style={{
                 display: 'none',
-                fontSize: '1.45rem',
+                fontSize: '1.5rem',
                 fontWeight: 900,
                 color: 'var(--purple-700)',
                 letterSpacing: '-0.75px',
@@ -102,7 +104,7 @@ const Layout = () => {
             </span>
             <span
               style={{
-                backgroundColor: 'var(--purple-100)',
+                backgroundColor: 'rgba(109, 53, 232, 0.12)',
                 color: 'var(--purple-700)',
                 fontSize: '0.72rem',
                 fontWeight: 800,
@@ -110,14 +112,27 @@ const Layout = () => {
                 borderRadius: 'var(--radius-pill)',
                 letterSpacing: '0.5px',
                 lineHeight: 1.2,
+                backdropFilter: 'blur(4px)',
               }}
             >
               TV
             </span>
           </Link>
 
-          {/* Center: Desktop Navigation Items */}
-          <nav style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }} className="desktop-nav">
+          {/* Center: Liquid Glass Nav Pills */}
+          <nav
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              backgroundColor: 'rgba(241, 236, 255, 0.5)',
+              padding: '4px',
+              borderRadius: '999px',
+              border: '1px solid rgba(230, 222, 246, 0.7)',
+              backdropFilter: 'blur(12px)',
+            }}
+            className="desktop-nav"
+          >
             {navItems.map(({ to, label, icon: Icon }) => (
               <NavLink
                 key={to}
@@ -127,13 +142,18 @@ const Layout = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '7px',
-                  padding: '0.45rem 1.15rem',
+                  padding: '0.45rem 1.2rem',
                   borderRadius: 'var(--radius-pill)',
                   fontSize: '0.92rem',
                   fontWeight: isActive ? 700 : 600,
-                  color: isActive ? 'var(--purple-700)' : 'var(--text-nav)',
-                  backgroundColor: isActive ? 'var(--purple-100)' : 'transparent',
-                  transition: 'all 0.18s ease',
+                  color: isActive ? '#ffffff' : 'var(--navy-900)',
+                  background: isActive
+                    ? 'linear-gradient(180deg, #7E45F2 0%, #632BD9 100%)'
+                    : 'transparent',
+                  boxShadow: isActive
+                    ? '0 3px 12px rgba(109, 53, 232, 0.32), inset 0 1px 1px rgba(255, 255, 255, 0.35)'
+                    : 'none',
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                   textDecoration: 'none',
                 })}
               >
@@ -152,20 +172,22 @@ const Layout = () => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '5px',
-                  padding: '0.35rem 0.8rem',
+                  gap: '6px',
+                  padding: '0.4rem 0.85rem',
                   borderRadius: 'var(--radius-pill)',
-                  border: '1px solid #ECE6F6',
-                  backgroundColor: '#FFFFFF',
+                  border: '1px solid rgba(230, 222, 246, 0.8)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                  backdropFilter: 'blur(8px)',
                   color: 'var(--navy-900)',
-                  fontSize: '0.82rem',
+                  fontSize: '0.84rem',
                   fontWeight: 700,
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
+                  boxShadow: '0 2px 6px rgba(21, 27, 79, 0.03)',
                 }}
                 aria-label="Select Language"
               >
-                <Globe size={14} color="var(--purple-600)" />
+                <Globe size={14} color="var(--purple-700)" />
                 <span>{selectedLang}</span>
                 <ChevronDown size={13} color="var(--text-muted)" />
               </button>
@@ -176,10 +198,12 @@ const Layout = () => {
                     position: 'absolute',
                     top: 'calc(100% + 8px)',
                     right: 0,
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #EAE6F4',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(230, 222, 246, 0.9)',
                     borderRadius: '14px',
-                    boxShadow: '0 8px 24px rgba(21, 27, 79, 0.12)',
+                    boxShadow: '0 8px 28px rgba(21, 27, 79, 0.12)',
                     padding: '6px',
                     minWidth: '130px',
                     zIndex: 110,
@@ -199,7 +223,7 @@ const Layout = () => {
                       fontSize: '0.85rem',
                       fontWeight: selectedLang === 'EN' ? 700 : 500,
                       color: selectedLang === 'EN' ? 'var(--purple-700)' : 'var(--navy-900)',
-                      backgroundColor: selectedLang === 'EN' ? 'var(--purple-100)' : 'transparent',
+                      backgroundColor: selectedLang === 'EN' ? 'rgba(109, 53, 232, 0.1)' : 'transparent',
                       textAlign: 'left',
                       cursor: 'pointer',
                     }}
@@ -217,7 +241,7 @@ const Layout = () => {
                       fontSize: '0.85rem',
                       fontWeight: selectedLang === 'HI' ? 700 : 500,
                       color: selectedLang === 'HI' ? 'var(--purple-700)' : 'var(--navy-900)',
-                      backgroundColor: selectedLang === 'HI' ? 'var(--purple-100)' : 'transparent',
+                      backgroundColor: selectedLang === 'HI' ? 'rgba(109, 53, 232, 0.1)' : 'transparent',
                       textAlign: 'left',
                       cursor: 'pointer',
                     }}
@@ -236,7 +260,7 @@ const Layout = () => {
                 height: '36px',
                 borderRadius: '50%',
                 overflow: 'hidden',
-                border: '2px solid #EAE6F4',
+                border: '2px solid rgba(230, 222, 246, 0.9)',
                 backgroundColor: '#FFE9D6',
                 display: 'flex',
                 alignItems: 'center',
@@ -269,8 +293,8 @@ const Layout = () => {
                 display: 'none',
                 padding: '6px',
                 borderRadius: '8px',
-                backgroundColor: 'transparent',
-                border: '1px solid #EAE6F4',
+                backgroundColor: 'rgba(241, 236, 255, 0.6)',
+                border: '1px solid rgba(230, 222, 246, 0.8)',
                 color: 'var(--navy-900)',
               }}
               aria-label="Toggle Navigation"
@@ -284,16 +308,21 @@ const Layout = () => {
         {mobileMenuOpen && (
           <div
             style={{
-              pointerEvents: 'auto',
-              marginTop: '8px',
-              padding: '0.85rem 1.2rem',
-              borderRadius: '20px',
-              border: '1px solid #ECE6F6',
-              backgroundColor: '#ffffff',
+              position: 'absolute',
+              top: '100%',
+              width: 'calc(100% - 48px)',
+              maxWidth: '1440px',
+              padding: '0.85rem 1.5rem',
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: '0 0 20px 20px',
+              border: '1px solid rgba(230, 222, 246, 0.9)',
+              borderTop: 'none',
               boxShadow: '0 8px 24px rgba(21, 27, 79, 0.12)',
               display: 'flex',
               flexDirection: 'column',
               gap: '0.4rem',
+              pointerEvents: 'auto',
             }}
           >
             {navItems.map(({ to, label, icon: Icon }) => (
@@ -324,8 +353,8 @@ const Layout = () => {
       </header>
 
       {/* Main Content Area */}
-      <main style={{ flex: 1, padding: '1rem 0 3.5rem 0' }}>
-        <div className="container" style={{ padding: '0 2rem' }}>
+      <main style={{ flex: 1, padding: '2rem 0 3.5rem 0' }}>
+        <div className="container" style={{ padding: '0 2.5rem' }}>
           <Outlet />
         </div>
       </main>
