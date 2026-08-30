@@ -151,10 +151,9 @@ def test_artwork_specs_match_reference_json(client):
     The artwork specs returned by the API must match reference.json exactly.
     """
     import json, os
-    ref_path = os.path.join(
-        os.path.dirname(__file__), "..", "..", "..", "docs", "challenge", "reference.json"
-    )
-    # Resolve path robustly
+    # tests/ is inside backend/, so we go: backend/../docs/challenge/reference.json
+    backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    ref_path = os.path.join(backend_dir, "..", "docs", "challenge", "reference.json")
     ref_path = os.path.abspath(ref_path)
     with open(ref_path) as f:
         reference = json.load(f)
