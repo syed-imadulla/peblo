@@ -217,10 +217,10 @@ const Publish = () => {
   const lastRun = history && history.length > 0 ? history[0] : null;
 
   // Validation Checks breakdown - using EXACT issue_type strings from admin.py
-  const hasArtworkIssue = report?.issues?.some(i => i.issue_type === 'missing_artwork');
-  const hasDurationIssue = report?.issues?.some(i => i.issue_type === 'missing_duration');
-  const hasSectionIssue = report?.issues?.some(i => i.issue_type === 'missing_section');
-  const hasDuplicateIssue = report?.issues?.some(i => i.issue_type === 'duplicate_variant');
+  const hasArtworkIssue = report?.issues?.some(i => i.issue_type === 'Missing Artwork');
+  const hasDurationIssue = report?.issues?.some(i => i.issue_type === 'Missing Duration');
+  const hasSectionIssue = report?.issues?.some(i => i.issue_type === 'Missing Show Section');
+  const hasDuplicateIssue = report?.issues?.some(i => i.issue_type === 'Duplicate Content Group');
 
   const ChecklistItem = ({ passed, title, description }) => (
     <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
