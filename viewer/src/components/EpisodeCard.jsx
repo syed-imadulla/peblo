@@ -13,28 +13,20 @@ export const EpisodeCard = ({ episode, width = '100%' }) => {
       style={{
         width: width,
         flexShrink: 0,
-        position: 'relative',
       }}
-      className="episode-card-container"
+      className="ott-card-slot"
     >
       <Link
         to={`/episode/${episode.content_group}`}
-        className="episode-card"
+        className="ott-floating-card episode-card"
         aria-label={`Play ${episode.title}`}
       >
-        <div className="episode-card-thumb">
+        <div className="ott-thumb-box">
           {thumbnail ? (
             <img
               src={thumbnail}
               alt={episode.title}
               loading="lazy"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                display: 'block',
-                transition: 'filter 0.18s ease',
-              }}
               onError={(e) => {
                 e.target.style.display = 'none';
                 const fb = e.target.nextElementSibling;
@@ -46,14 +38,12 @@ export const EpisodeCard = ({ episode, width = '100%' }) => {
             <FallbackImage aspect="16/9" />
           </div>
 
-          {/* Hover play icon overlay */}
           <div className="play-badge-overlay">
             <div className="play-badge-btn">
               <Play size={18} fill="var(--purple-700)" color="var(--purple-700)" style={{ marginLeft: '2px' }} />
             </div>
           </div>
 
-          {/* Duration badge on bottom-right of image */}
           {episode.duration_seconds > 0 && (
             <div className="card-duration-badge">
               <Clock size={10} />
@@ -62,56 +52,63 @@ export const EpisodeCard = ({ episode, width = '100%' }) => {
           )}
         </div>
 
-        {/* Base Visible Info */}
-        <div className="episode-card-base-info">
-          <h4 className="episode-card-title" title={episode.title}>
+        <div className="ott-info-box">
+          <h4 className="ott-card-title" title={episode.title}>
             {episode.title}
           </h4>
 
-          <div className="episode-card-subline">
+          <div className="ott-static-meta">
             {episode.languages && episode.languages.length > 0 && (
-              <div style={{ display: 'flex', gap: '4px' }}>
-                {episode.languages.map((lang) => (
-                  <span
-                    key={lang}
-                    className="lang-chip"
-                  >
+              <div style={{ display: 'flex', gap: '3px' }}>
+                {episode.languages.slice(0, 2).map((lang) => (
+                  <span key={lang} className="lang-chip">
                     {lang}
                   </span>
                 ))}
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Expanded Hover Drawer (Amazon Prime Video & JioHotstar Style) */}
-        <div className="card-hover-drawer">
-          <div className="card-hover-actions">
-            <span className="btn-play-mini">
-              <Play size={12} fill="#ffffff" /> Play
-            </span>
-            <span className="btn-info-circle" title="Play">
-              <Info size={13} />
-            </span>
-          </div>
-
-          <div className="card-hover-meta">
             {episode.duration_seconds > 0 && (
-              <span>{formatDuration(episode.duration_seconds)}</span>
-            )}
-            {episode.languages?.length > 0 && (
-              <>
-                <span className="meta-dot">•</span>
-                <span>{episode.languages.join(', ')}</span>
-              </>
+              <span style={{ marginLeft: 'auto', fontSize: '0.74rem' }}>
+                {formatDuration(episode.duration_seconds)}
+              </span>
             )}
           </div>
 
-          {episode.synopsis && (
-            <p className="card-hover-synopsis">
-              {episode.synopsis}
-            </p>
-          )}
+          {/* Expandable Hover Quick-Peek */}
+          <div className="ott-hover-drawer">
+            <div className="ott-hover-actions">
+              <span className="btn-popover-play">
+                <Play size={12} fill="#ffffff" /> Play Episode
+              </span>
+              <span className="btn-popover-circle" title="Play">
+                <Info size={13} />
+              </span>
+            </div>
+
+            <div className="ott-hover-meta">
+              {episode.duration_seconds > 0 && (
+                <span>{formatDuration(episode.duration_seconds)}</span>
+              )}
+              {episode.languages?.length > 0 && (
+                <>
+                  <span className="meta-dot">•</span>
+                  <div style={{ display: 'inline-flex', gap: '3px' }}>
+                    {episode.languages.map((lang) => (
+                      <span key={lang} className="lang-chip">
+                        {lang}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {episode.synopsis && (
+              <p className="ott-hover-synopsis">
+                {episode.synopsis}
+              </p>
+            )}
+          </div>
         </div>
       </Link>
     </div>

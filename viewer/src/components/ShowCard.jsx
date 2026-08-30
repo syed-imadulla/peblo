@@ -21,7 +21,6 @@ export const FallbackImage = ({ aspect = '16/9' }) => (
       textAlign: 'center',
     }}
   >
-    {/* Subtle soft backdrop glowing accents */}
     <div
       style={{
         position: 'absolute',
@@ -66,7 +65,6 @@ export const FallbackImage = ({ aspect = '16/9' }) => (
 );
 
 export const ShowCard = ({ show, width = '100%', typeLabel = 'Series' }) => {
-  // Use banner (16:9) first, fallback to poster
   const image = getShowBanner(show) || getShowPoster(show);
   const languages = getShowLanguages(show);
   const category = show.categories && show.categories.length > 0 ? show.categories[0] : 'Adventure';
@@ -77,28 +75,20 @@ export const ShowCard = ({ show, width = '100%', typeLabel = 'Series' }) => {
       style={{
         width: width,
         flexShrink: 0,
-        position: 'relative',
       }}
-      className="show-card-container"
+      className="ott-card-slot"
     >
       <Link
         to={`/show/${show.slug || show.show_id}`}
-        className="show-card"
+        className="ott-floating-card show-card"
         aria-label={`View ${show.title}`}
       >
-        <div className="show-card-thumb">
+        <div className="ott-thumb-box">
           {image ? (
             <img
               src={image}
               alt={show.title}
               loading="lazy"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                display: 'block',
-                transition: 'filter 0.18s ease',
-              }}
               onError={(e) => {
                 e.target.style.display = 'none';
                 const fb = e.target.nextElementSibling;
@@ -110,7 +100,6 @@ export const ShowCard = ({ show, width = '100%', typeLabel = 'Series' }) => {
             <FallbackImage aspect="16/9" />
           </div>
 
-          {/* Hover play icon overlay */}
           <div className="play-badge-overlay">
             <div className="play-badge-btn">
               <Play size={18} fill="var(--purple-700)" color="var(--purple-700)" style={{ marginLeft: '2px' }} />
@@ -118,63 +107,56 @@ export const ShowCard = ({ show, width = '100%', typeLabel = 'Series' }) => {
           </div>
         </div>
 
-        {/* Base Visible Title & Metadata */}
-        <div className="show-card-base-info">
-          <h3 className="show-card-title" title={show.title}>
+        <div className="ott-info-box">
+          <h3 className="ott-card-title" title={show.title}>
             {show.title}
           </h3>
 
-          <div className="show-card-subline">
-            <span style={{ textTransform: 'capitalize', fontWeight: 600 }}>{typeLabel}</span>
+          <div className="ott-static-meta">
+            <span style={{ textTransform: 'capitalize' }}>{typeLabel}</span>
             <span>·</span>
             <span style={{ textTransform: 'capitalize' }}>{category}</span>
             <span>·</span>
-            <div style={{ display: 'inline-flex', gap: '4px' }}>
+            <div style={{ display: 'inline-flex', gap: '3px' }}>
               {languages.length > 0 ? (
-                languages.map((l) => (
+                languages.slice(0, 2).map((l) => (
                   <span key={l} className="lang-chip">{l}</span>
                 ))
               ) : (
-                <>
-                  <span className="lang-chip">EN</span>
-                  <span className="lang-chip">HI</span>
-                </>
+                <span className="lang-chip">EN</span>
               )}
             </div>
           </div>
-        </div>
 
-        {/* Expanded Hover Drawer (Amazon Prime Video & JioHotstar Style) */}
-        <div className="card-hover-drawer">
-          {/* Action Row */}
-          <div className="card-hover-actions">
-            <span className="btn-play-mini">
-              <Play size={12} fill="#ffffff" /> Watch Now
-            </span>
-            <span className="btn-info-circle" title="View details">
-              <Info size={13} />
-            </span>
-          </div>
+          {/* Expandable Hover Quick-Peek (Pops over others without shifting layout) */}
+          <div className="ott-hover-drawer">
+            <div className="ott-hover-actions">
+              <span className="btn-popover-play">
+                <Play size={12} fill="#ffffff" /> Watch Now
+              </span>
+              <span className="btn-popover-circle" title="More Info">
+                <Info size={13} />
+              </span>
+            </div>
 
-          {/* Detailed Metadata */}
-          <div className="card-hover-meta">
-            <span className="meta-badge-purple">{typeLabel}</span>
-            <span className="meta-dot">•</span>
-            <span>{category}</span>
-            {totalEpisodes > 0 && (
-              <>
-                <span className="meta-dot">•</span>
-                <span>{totalEpisodes} Ep{totalEpisodes > 1 ? 's' : ''}</span>
-              </>
+            <div className="ott-hover-meta">
+              <span className="meta-badge-purple">{typeLabel}</span>
+              <span className="meta-dot">•</span>
+              <span>{category}</span>
+              {totalEpisodes > 0 && (
+                <>
+                  <span className="meta-dot">•</span>
+                  <span>{totalEpisodes} Ep{totalEpisodes > 1 ? 's' : ''}</span>
+                </>
+              )}
+            </div>
+
+            {show.synopsis && (
+              <p className="ott-hover-synopsis">
+                {show.synopsis}
+              </p>
             )}
           </div>
-
-          {/* 2-line Synopsis */}
-          {show.synopsis && (
-            <p className="card-hover-synopsis">
-              {show.synopsis}
-            </p>
-          )}
         </div>
       </Link>
     </div>
