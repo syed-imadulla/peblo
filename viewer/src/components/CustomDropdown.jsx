@@ -8,6 +8,7 @@ export const CustomDropdown = ({
   ariaLabel = 'Select option',
   minWidth = '140px',
   size = 'md', // 'sm' | 'md'
+  direction = 'down', // 'down' | 'up'
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -38,6 +39,7 @@ export const CustomDropdown = ({
   }, [isOpen]);
 
   const isSmall = size === 'sm';
+  const isUp = direction === 'up';
 
   return (
     <div
@@ -82,7 +84,7 @@ export const CustomDropdown = ({
           size={isSmall ? 14 : 16}
           color="var(--text-muted)"
           style={{
-            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            transform: isOpen ? (isUp ? 'rotate(0deg)' : 'rotate(180deg)') : (isUp ? 'rotate(180deg)' : 'rotate(0deg)'),
             transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
             flexShrink: 0,
           }}
@@ -95,7 +97,8 @@ export const CustomDropdown = ({
           role="listbox"
           style={{
             position: 'absolute',
-            top: 'calc(100% + 6px)',
+            top: isUp ? 'auto' : 'calc(100% + 6px)',
+            bottom: isUp ? 'calc(100% + 6px)' : 'auto',
             right: 0,
             minWidth: '100%',
             backgroundColor: '#121225',

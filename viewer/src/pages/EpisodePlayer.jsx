@@ -386,6 +386,7 @@ const EpisodePlayer = () => {
                 onChange={(val) => setPlaybackSpeed(parseFloat(val))}
                 minWidth="85px"
                 size="sm"
+                direction="up"
                 ariaLabel="Playback speed"
                 options={[
                   { value: '0.75', label: '0.75x' },
