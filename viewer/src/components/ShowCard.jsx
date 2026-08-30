@@ -78,10 +78,9 @@ export const ShowCard = ({ show, width = '100%', typeLabel = 'Series' }) => {
       }}
       className="ott-card-slot"
     >
-      {/* ─── 1. In-Flow Base Card (Maintains row height and position perfectly) ─── */}
       <Link
         to={`/show/${show.slug || show.show_id}`}
-        className="ott-base-card show-card"
+        className="ott-floating-card show-card"
         aria-label={`View ${show.title}`}
       >
         <div className="ott-thumb-box">
@@ -89,53 +88,6 @@ export const ShowCard = ({ show, width = '100%', typeLabel = 'Series' }) => {
             <img
               src={image}
               alt={show.title}
-              loading="lazy"
-              onError={(e) => {
-                e.target.style.display = 'none';
-                const fb = e.target.nextElementSibling;
-                if (fb) fb.style.display = 'flex';
-              }}
-            />
-          ) : null}
-          <div style={{ display: image ? 'none' : 'flex', width: '100%', height: '100%' }}>
-            <FallbackImage aspect="16/9" />
-          </div>
-        </div>
-
-        <div className="ott-info-box">
-          <h3 className="ott-card-title" title={show.title}>
-            {show.title}
-          </h3>
-          <div className="ott-static-meta">
-            <span style={{ textTransform: 'capitalize' }}>{typeLabel}</span>
-            <span>·</span>
-            <span style={{ textTransform: 'capitalize' }}>{category}</span>
-            <span>·</span>
-            <div style={{ display: 'inline-flex', gap: '3px' }}>
-              {languages.length > 0 ? (
-                languages.slice(0, 2).map((l) => (
-                  <span key={l} className="lang-chip">{l}</span>
-                ))
-              ) : (
-                <span className="lang-chip">EN</span>
-              )}
-            </div>
-          </div>
-        </div>
-      </Link>
-
-      {/* ─── 2. Absolute Floating Card (Pops OVER neighboring cards and the lane below) ─── */}
-      <Link
-        to={`/show/${show.slug || show.show_id}`}
-        className="ott-floating-card"
-        aria-hidden="true"
-        tabIndex="-1"
-      >
-        <div className="ott-thumb-box">
-          {image ? (
-            <img
-              src={image}
-              alt=""
               loading="lazy"
               onError={(e) => {
                 e.target.style.display = 'none';
@@ -156,41 +108,55 @@ export const ShowCard = ({ show, width = '100%', typeLabel = 'Series' }) => {
         </div>
 
         <div className="ott-info-box">
-          <div className="ott-card-title" style={{ fontSize: '1rem', fontWeight: 800 }}>
+          <h3 className="ott-card-title" title={show.title}>
             {show.title}
-          </div>
+          </h3>
 
-          <div className="ott-hover-actions">
-            <span className="btn-popover-play">
-              <Play size={12} fill="#ffffff" /> Watch Now
-            </span>
-            <span className="btn-popover-circle" title="More Info">
-              <Info size={13} />
-            </span>
-          </div>
-
-          <div className="ott-hover-meta">
-            <span className="meta-badge-purple">{typeLabel}</span>
-            <span className="meta-dot">•</span>
-            <span>{category}</span>
-            {totalEpisodes > 0 && (
-              <>
-                <span className="meta-dot">•</span>
-                <span>{totalEpisodes} Ep{totalEpisodes > 1 ? 's' : ''}</span>
-              </>
-            )}
-            <div style={{ display: 'inline-flex', gap: '3px', marginLeft: 'auto' }}>
-              {languages.map((l) => (
-                <span key={l} className="lang-chip">{l}</span>
-              ))}
+          <div className="ott-static-meta">
+            <span style={{ textTransform: 'capitalize' }}>{typeLabel}</span>
+            <span>·</span>
+            <span style={{ textTransform: 'capitalize' }}>{category}</span>
+            <span>·</span>
+            <div style={{ display: 'inline-flex', gap: '3px' }}>
+              {languages.length > 0 ? (
+                languages.slice(0, 2).map((l) => (
+                  <span key={l} className="lang-chip">{l}</span>
+                ))
+              ) : (
+                <span className="lang-chip">EN</span>
+              )}
             </div>
           </div>
 
-          {show.synopsis && (
-            <p className="ott-hover-synopsis">
-              {show.synopsis}
-            </p>
-          )}
+          {/* Expanded Hover Area (Pops OUT over lane below) */}
+          <div className="ott-hover-drawer">
+            <div className="ott-hover-actions">
+              <span className="btn-popover-play">
+                <Play size={12} fill="#ffffff" /> Watch Now
+              </span>
+              <span className="btn-popover-circle" title="More Info">
+                <Info size={13} />
+              </span>
+            </div>
+
+            <div className="ott-hover-meta">
+              <span className="meta-badge-purple">{typeLabel}</span>
+              <span className="meta-dot">•</span>
+              <span>{category}</span>
+              {totalEpisodes > 0 && (
+                <>
+                  <span className="meta-dot">•</span>
+                  <span>{totalEpisodes} Ep{totalEpisodes > 1 ? 's' : ''}</span>
+                </>
+              )}
+            </div>
+
+            {show.synopsis && (
+              <p className="ott-hover-synopsis">
+                {show.synopsis}
+              </p>
+            )}
+          </div>
         </div>
       </Link>
     </div>

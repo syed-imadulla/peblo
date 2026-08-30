@@ -104,8 +104,8 @@ export const CatalogueRow = ({ title, count, children }) => {
           display: 'flex',
           gap: '18px',
           overflowX: 'auto',
-          padding: '16px 8px 36px 8px',
-          margin: '-16px -8px 0 -8px',
+          padding: '16px 8px 140px 8px',
+          margin: '-16px -8px -120px -8px',
           scrollSnapType: 'x proximity',
         }}
       >

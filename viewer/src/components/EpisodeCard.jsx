@@ -74,7 +74,7 @@ export const EpisodeCard = ({ episode, width = '100%' }) => {
             )}
           </div>
 
-          {/* Expandable Hover Quick-Peek */}
+          {/* Expanded Hover Area */}
           <div className="ott-hover-drawer">
             <div className="ott-hover-actions">
               <span className="btn-popover-play">

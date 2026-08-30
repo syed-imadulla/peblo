@@ -214,14 +214,19 @@ h1, h2, h3, h4, h5, h6 {
   pointer-events: auto;
 }
 
-/* ─── Prime Video & JioHotstar Floating Popover Architecture ──────────────── */
+/* ─── Amazon Prime Video Absolute Floating OTT Card Architecture ─────────── */
 .ott-card-slot {
   position: relative;
   display: block;
+  height: 226px; /* Strict fixed footprint: prevents any lane/row below from shifting */
 }
 
 .ott-floating-card {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 226px;
   display: flex;
   flex-direction: column;
   background-color: var(--surface);
@@ -229,18 +234,19 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-  width: 100%;
   text-decoration: none;
   color: inherit;
-  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.24s ease, border-color 0.24s ease;
   z-index: 1;
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.24s ease, border-color 0.24s ease;
 }
 
-/* On hover, pop OVER others without pushing row or neighbors */
+/* On hover, pop OVER neighbor cards and the row below without moving anything */
 .ott-card-slot:hover .ott-floating-card {
-  transform: translateY(-8px) scale(1.08);
-  z-index: 999;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(124, 58, 237, 0.45);
+  height: auto;
+  min-height: 226px;
+  transform: scale(1.15) translateY(-8px);
+  z-index: 1000;
+  box-shadow: 0 28px 65px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(124, 58, 237, 0.45);
   border-color: rgba(124, 58, 237, 0.4);
 }
 
@@ -250,6 +256,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   background-color: #121225;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .ott-thumb-box img {
@@ -257,24 +264,20 @@ h1, h2, h3, h4, h5, h6 {
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: filter 0.2s ease;
-}
-
-.ott-card-slot:hover .ott-thumb-box img {
-  filter: brightness(1.08);
 }
 
 .ott-info-box {
-  padding: 0.65rem 0.85rem 0.65rem 0.85rem;
+  padding: 0.65rem 0.85rem 0.75rem 0.85rem;
   display: flex;
   flex-direction: column;
+  gap: 0.45rem;
 }
 
 .ott-card-title {
   font-size: 0.98rem;
   font-weight: 800;
   color: var(--navy-900);
-  margin: 0 0 0.2rem 0;
+  margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -290,21 +293,17 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
-/* Expandable quick peek drawer */
+/* Expanded Quick Peek Drawer: Renders seamlessly on hover inside the floating card */
 .ott-hover-drawer {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-height 0.26s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, margin-top 0.2s ease;
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 0.45rem;
+  margin-top: 0.25rem;
 }
 
 .ott-card-slot:hover .ott-hover-drawer {
-  max-height: 170px;
-  opacity: 1;
-  margin-top: 0.55rem;
+  display: flex;
+  animation: fadeIn 0.18s ease-out;
 }
 
 .ott-hover-actions {
