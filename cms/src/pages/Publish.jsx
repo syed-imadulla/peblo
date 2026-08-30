@@ -4,16 +4,8 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../components/AuthProvider';
 import { 
-  AlertTriangle, 
   CheckCircle, 
   Info, 
-  Send, 
-  Eye, 
-  History, 
-  LayoutGrid, 
-  Folder, 
-  Languages, 
-  ListVideo, 
   Check, 
   XCircle,
   FileJson,
@@ -22,9 +14,12 @@ import {
   Briefcase,
   PlaySquare,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Film,
+  Send,
+  Eye
 } from 'lucide-react';
-import { formatDistanceToNow, parseISO } from 'date-fns';
+import { parseISO, format } from 'date-fns';
 
 const fetchValidationReport = async () => {
   const { data } = await axios.get('/api/admin/validation-report');
@@ -46,7 +41,6 @@ const publishCatalog = async () => {
   return data;
 };
 
-// Utilities for date parsing
 const parseUtcDate = (dateString) => {
   if (!dateString) return null;
   if (!dateString.endsWith('Z')) {
@@ -74,29 +68,31 @@ const Publish = () => {
     };
   }, [showPreviewModal]);
 
-  const { data: report, isLoading: loadingReport, refetch: refetchReport } = useQuery({
+  const { data: report, isLoading: loadingReport } = useQuery({
     queryKey: ['validationReport'],
     queryFn: fetchValidationReport,
+    refetchOnWindowFocus: true,
   });
 
-  const { data: history, isLoading: loadingHistory, refetch: refetchHistory } = useQuery({
+  const { data: history, isLoading: loadingHistory } = useQuery({
     queryKey: ['publishHistory'],
     queryFn: fetchPublishHistory,
+    refetchOnWindowFocus: true,
   });
 
-  const { data: previewData, isLoading: loadingPreview, refetch: refetchPreview } = useQuery({
+  const { data: previewData, isLoading: loadingPreview } = useQuery({
     queryKey: ['catalogPreview'],
     queryFn: fetchCatalogPreview,
+    refetchOnWindowFocus: true,
   });
 
   const publishMutation = useMutation({
     mutationFn: publishCatalog,
     onSuccess: (data) => {
       setPublishResult({ type: 'success', data });
-      refetchReport();
-      refetchHistory();
-      refetchPreview();
-      // Invalidate relevant queries
+      queryClient.invalidateQueries({ queryKey: ['validationReport'] });
+      queryClient.invalidateQueries({ queryKey: ['publishHistory'] });
+      queryClient.invalidateQueries({ queryKey: ['catalogPreview'] });
       queryClient.invalidateQueries({ queryKey: ['shows'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     },
@@ -110,7 +106,7 @@ const Publish = () => {
 
   // Derived Preview Data
   const { allShows, allEpisodes, allLanguages, sectionsList = [] } = useMemo(() => {
-    if (!previewData) return { allShows: [], allEpisodes: [], allLanguages: [], sectionsCount: 0 };
+    if (!previewData || Object.keys(previewData).length === 0) return { allShows: [], allEpisodes: [], allLanguages: [], sectionsCount: 0 };
     
     const shows = [];
     const episodes = [];
@@ -121,21 +117,30 @@ const Publish = () => {
       if (sectionShows.length > 0) uniqueSections.add(section);
       
       sectionShows.forEach(show => {
-        let epCount = show.trailers.length;
+        let epCount = show.trailers?.length || 0;
         let showLangs = new Set();
+        let artworkUrl = null;
         
-        show.trailers.forEach(t => {
-          t.languages.forEach(l => { langs.add(l); showLangs.add(l); });
-          episodes.push({ ...t, showTitle: show.title, season: 0 });
-        });
+        if (show.trailers) {
+            show.trailers.forEach(t => {
+                if (t.languages) t.languages.forEach(l => { langs.add(l); showLangs.add(l); });
+                episodes.push({ ...t, showTitle: show.title, season: 0 });
+                if (!artworkUrl && t.artwork && t.artwork['16x9']) artworkUrl = t.artwork['16x9'];
+            });
+        }
         
-        show.seasons.forEach(season => {
-          epCount += season.episodes.length;
-          season.episodes.forEach(e => {
-            e.languages.forEach(l => { langs.add(l); showLangs.add(l); });
-            episodes.push({ ...e, showTitle: show.title, season: season.season_number });
-          });
-        });
+        if (show.seasons) {
+            show.seasons.forEach(season => {
+                epCount += (season.episodes?.length || 0);
+                if (season.episodes) {
+                    season.episodes.forEach(e => {
+                        if (e.languages) e.languages.forEach(l => { langs.add(l); showLangs.add(l); });
+                        episodes.push({ ...e, showTitle: show.title, season: season.season_number });
+                        if (!artworkUrl && e.artwork && e.artwork['16x9']) artworkUrl = e.artwork['16x9'];
+                    });
+                }
+            });
+        }
         
         shows.push({
           id: show.show_id,
@@ -144,7 +149,8 @@ const Publish = () => {
           episodeCount: epCount,
           languages: Array.from(showLangs),
           status: 'Published',
-          categories: show.categories || []
+          categories: show.categories || [],
+          artwork: artworkUrl
         });
       });
     });
@@ -152,7 +158,7 @@ const Publish = () => {
     return {
       allShows: shows,
       allEpisodes: episodes,
-      allLanguages: Array.from(langs).map(code => ({ code })), // just code for now
+      allLanguages: Array.from(langs).map(code => ({ code })), 
       sectionsList: Array.from(uniqueSections)
     };
   }, [previewData]);
@@ -173,11 +179,27 @@ const Publish = () => {
     return allLanguages.slice(start, start + pageSize);
   }, [allLanguages, currentPage]);
 
+  // Adjust pagination if data changes
+  useEffect(() => {
+      const activeData = activeTab === 'shows' ? allShows : (activeTab === 'episodes' ? allEpisodes : allLanguages);
+      const totalPages = Math.max(1, Math.ceil(activeData.length / pageSize));
+      if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [allShows, allEpisodes, allLanguages, activeTab, currentPage, pageSize]);
 
   if (loadingReport || loadingHistory || loadingPreview) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '400px', color: 'var(--text-muted)' }}>
-        Loading publish dashboard...
+      <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '60px' }}>
+        <div style={{ height: '40px', width: '300px', backgroundColor: '#f1f5f9', borderRadius: '8px', margin: '8px 0 32px' }} />
+        <div style={{ display: 'grid', gridTemplateColumns: '7fr 3fr', gap: '24px' }}>
+          <div>
+            <div style={{ height: '150px', backgroundColor: '#f1f5f9', borderRadius: '16px', marginBottom: '24px' }} />
+            <div style={{ height: '400px', backgroundColor: '#f1f5f9', borderRadius: '16px' }} />
+          </div>
+          <div>
+            <div style={{ height: '250px', backgroundColor: '#f1f5f9', borderRadius: '16px', marginBottom: '16px' }} />
+            <div style={{ height: '250px', backgroundColor: '#f1f5f9', borderRadius: '16px' }} />
+          </div>
+        </div>
       </div>
     );
   }
@@ -194,16 +216,23 @@ const Publish = () => {
 
   const lastRun = history && history.length > 0 ? history[0] : null;
 
-  // Validation Checks breakdown
-  const hasArtworkIssue = report?.issues.some(i => i.issue_type === 'missing_artwork');
-  const hasDurationIssue = report?.issues.some(i => i.issue_type === 'missing_duration');
-  const hasSectionIssue = report?.issues.some(i => i.issue_type === 'missing_section');
-  const hasDuplicateIssue = report?.issues.some(i => i.issue_type === 'duplicate_variant');
+  // Validation Checks breakdown - using EXACT issue_type strings from admin.py
+  const hasArtworkIssue = report?.issues?.some(i => i.issue_type === 'missing_artwork');
+  const hasDurationIssue = report?.issues?.some(i => i.issue_type === 'missing_duration');
+  const hasSectionIssue = report?.issues?.some(i => i.issue_type === 'missing_section');
+  const hasDuplicateIssue = report?.issues?.some(i => i.issue_type === 'duplicate_variant');
 
-  const ChecklistItem = ({ passed, text }) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: passed ? 'var(--green-700)' : 'var(--red-600)', fontSize: '14px' }}>
-      {passed ? <Check size={16} /> : <XCircle size={16} />}
-      <span>{text}</span>
+  const ChecklistItem = ({ passed, title, description }) => (
+    <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+      {passed ? (
+          <CheckCircle size={16} style={{ color: '#10b981', marginTop: '2px' }} />
+      ) : (
+          <XCircle size={16} style={{ color: '#ef4444', marginTop: '2px' }} />
+      )}
+      <div>
+        <div style={{ fontWeight: 700, fontSize: '13px', color: passed ? 'var(--navy-900)' : '#b91c1c' }}>{title}</div>
+        <div style={{ fontSize: '12px', color: passed ? 'var(--text-muted)' : '#b91c1c', marginTop: '2px', opacity: passed ? 1 : 0.8 }}>{description}</div>
+      </div>
     </div>
   );
 
@@ -248,152 +277,170 @@ const Publish = () => {
           >
             {publishMutation.isPending ? 'Publishing...' : (
               <>
-                <Send size={18} /> Publish Catalogue
+                <Send size={16} /> Publish Changes
               </>
             )}
           </button>
         </div>
       </div>
 
-      {publishResult?.type === 'success' && (
-        <div style={{ backgroundColor: 'var(--green-100)', color: 'var(--green-700)', padding: '16px 20px', borderRadius: 'var(--radius-md)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid #86EFAC' }}>
-          <CheckCircle size={24} style={{ color: 'var(--green-500)' }} />
-          <div>
-            <strong style={{ display: 'block', marginBottom: '4px' }}>Successfully Published!</strong>
-            <span style={{ fontSize: '14px' }}>Published {publishResult.data.published_records} records to the live catalogue.</span>
-          </div>
+      {publishResult && (
+        <div style={{ 
+          padding: '16px', 
+          backgroundColor: publishResult.type === 'success' ? '#dcfce7' : '#fee2e2', 
+          color: publishResult.type === 'success' ? '#166534' : '#991b1b',
+          borderRadius: '8px',
+          marginBottom: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          fontWeight: 600
+        }}>
+          {publishResult.type === 'success' ? <CheckCircle size={18} /> : <XCircle size={18} />}
+          {publishResult.type === 'success' ? 'Catalogue published successfully.' : `Publish failed: ${publishResult.message}`}
         </div>
       )}
 
-      {publishResult?.type === 'error' && (
-        <div style={{ backgroundColor: 'var(--red-100)', color: 'var(--red-700)', padding: '16px 20px', borderRadius: 'var(--radius-md)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid #FCA5A5' }}>
-          <AlertTriangle size={24} style={{ color: 'var(--red-500)' }} />
-          <div>
-            <strong style={{ display: 'block', marginBottom: '4px' }}>Publish Failed</strong>
-            <span style={{ fontSize: '14px' }}>{publishResult.message}</span>
-          </div>
-        </div>
-      )}
-
-      <div style={{ display: 'grid', gridTemplateColumns: '7fr 3fr', gap: '24px', alignItems: 'start' }}>
-        {/* Left Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '7fr 3fr', gap: '24px' }}>
+        {/* Left Content */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', minWidth: 0 }}>
           
-          {/* Catalogue Summary Card */}
+          {/* Summary Card */}
           <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '4px', color: 'var(--navy-900)' }}>Catalogue Summary</h2>
-            <p className="text-muted" style={{ fontSize: '14px', margin: 0, marginBottom: '24px' }}>Only published content will be included in the catalogue.</p>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
-              <div style={{ display: 'flex', flexDirection: 'row', gap: '16px', alignItems: 'flex-start' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', backgroundColor: 'rgba(67, 37, 194, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4325c2', flexShrink: 0 }}>
-                  <Tv size={24} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1.2' }}>{allShows.length}</div>
-                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--navy-900)', marginTop: '2px' }}>Shows</div>
-                  <div style={{ fontSize: '13px', color: '#10b981', fontWeight: 500, marginTop: '2px' }}>Published</div>
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'row', gap: '16px', alignItems: 'flex-start' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', backgroundColor: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', flexShrink: 0 }}>
-                  <PlaySquare size={24} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1.2' }}>{allEpisodes.length}</div>
-                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--navy-900)', marginTop: '2px' }}>Episodes</div>
-                  <div style={{ fontSize: '13px', color: '#10b981', fontWeight: 500, marginTop: '2px' }}>Published</div>
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'row', gap: '16px', alignItems: 'flex-start' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', backgroundColor: 'rgba(245, 158, 11, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b', flexShrink: 0 }}>
-                  <Globe size={24} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1.2' }}>{allLanguages.length}</div>
-                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--navy-900)', marginTop: '2px' }}>Languages</div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>{allLanguages.map(l => l.code.toUpperCase()).join(', ')}</div>
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'row', gap: '16px', alignItems: 'flex-start' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '14px', backgroundColor: 'rgba(59, 130, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6', flexShrink: 0 }}>
-                  <Briefcase size={24} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1.2' }}>{sectionsList.length}</div>
-                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--navy-900)', marginTop: '2px' }}>Sections</div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>{sectionsList.join(', ')}</div>
-                </div>
-              </div>
-            </div>
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+               <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--navy-900)' }}>Catalogue Summary</h3>
+               <button 
+                 className="btn btn-outline" 
+                 onClick={() => setShowPreviewModal(true)}
+                 style={{ padding: '6px 12px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+               >
+                 <Eye size={14} /> Preview JSON
+               </button>
+             </div>
+             
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#f3e8ff', color: '#7e22ce', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                   <Tv size={24} />
+                 </div>
+                 <div>
+                   <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1' }}>{allShows.length}</div>
+                   <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>Shows</div>
+                 </div>
+               </div>
+
+               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#e0e7ff', color: '#4338ca', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                   <PlaySquare size={24} />
+                 </div>
+                 <div>
+                   <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1' }}>{allEpisodes.length}</div>
+                   <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>Episodes</div>
+                 </div>
+               </div>
+
+               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#dcfce7', color: '#15803d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                   <Globe size={24} />
+                 </div>
+                 <div>
+                   <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1' }}>{allLanguages.length}</div>
+                   <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>Languages</div>
+                 </div>
+               </div>
+
+               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#ffedd5', color: '#c2410c', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                   <Briefcase size={24} />
+                 </div>
+                 <div>
+                   <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1' }}>{sectionsList.length}</div>
+                   <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>Sections</div>
+                 </div>
+               </div>
+             </div>
           </div>
 
-          {/* Content to be Published Card */}
-          <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', marginBottom: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-              <div>
-                <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '4px', color: 'var(--navy-900)' }}>Content to be Published</h2>
-                <p className="text-muted" style={{ fontSize: '14px', margin: 0 }}>This is the exact content that will be included in the published catalogue.</p>
-              </div>
-              <button 
-                className="btn btn-outline"
-                onClick={() => setShowPreviewModal(true)}
-                style={{ height: '36px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--navy-900)', fontWeight: 600 }}
-              >
-                <Eye size={16} style={{ color: 'var(--text-muted)' }} /> Preview Catalogue
-              </button>
-            </div>
+          {/* Data Tables */}
+          <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
+             <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '24px', color: 'var(--navy-900)' }}>Content to be Published</h3>
+             
+             {/* Tabs */}
+             <div style={{ display: 'flex', gap: '24px', borderBottom: '1px solid var(--border)', marginBottom: '24px' }}>
+               <button 
+                 onClick={() => { setActiveTab('shows'); setCurrentPage(1); }}
+                 style={{ 
+                   padding: '0 0 12px 0', 
+                   background: 'none', 
+                   border: 'none', 
+                   borderBottom: activeTab === 'shows' ? '2px solid var(--purple-600)' : '2px solid transparent',
+                   color: activeTab === 'shows' ? 'var(--navy-900)' : 'var(--text-muted)',
+                   fontWeight: activeTab === 'shows' ? 700 : 600,
+                   fontSize: '14px',
+                   cursor: 'pointer',
+                   display: 'flex', alignItems: 'center', gap: '8px'
+                 }}
+               >
+                 <Tv size={16} /> Shows <span style={{ backgroundColor: activeTab === 'shows' ? 'var(--purple-100)' : '#f1f5f9', color: activeTab === 'shows' ? 'var(--purple-700)' : 'var(--text-muted)', padding: '2px 8px', borderRadius: '12px', fontSize: '12px' }}>{allShows.length}</span>
+               </button>
+               <button 
+                 onClick={() => { setActiveTab('episodes'); setCurrentPage(1); }}
+                 style={{ 
+                   padding: '0 0 12px 0', 
+                   background: 'none', 
+                   border: 'none', 
+                   borderBottom: activeTab === 'episodes' ? '2px solid var(--purple-600)' : '2px solid transparent',
+                   color: activeTab === 'episodes' ? 'var(--navy-900)' : 'var(--text-muted)',
+                   fontWeight: activeTab === 'episodes' ? 700 : 600,
+                   fontSize: '14px',
+                   cursor: 'pointer',
+                   display: 'flex', alignItems: 'center', gap: '8px'
+                 }}
+               >
+                 <PlaySquare size={16} /> Episodes <span style={{ backgroundColor: activeTab === 'episodes' ? 'var(--purple-100)' : '#f1f5f9', color: activeTab === 'episodes' ? 'var(--purple-700)' : 'var(--text-muted)', padding: '2px 8px', borderRadius: '12px', fontSize: '12px' }}>{allEpisodes.length}</span>
+               </button>
+               <button 
+                 onClick={() => { setActiveTab('languages'); setCurrentPage(1); }}
+                 style={{ 
+                   padding: '0 0 12px 0', 
+                   background: 'none', 
+                   border: 'none', 
+                   borderBottom: activeTab === 'languages' ? '2px solid var(--purple-600)' : '2px solid transparent',
+                   color: activeTab === 'languages' ? 'var(--navy-900)' : 'var(--text-muted)',
+                   fontWeight: activeTab === 'languages' ? 700 : 600,
+                   fontSize: '14px',
+                   cursor: 'pointer',
+                   display: 'flex', alignItems: 'center', gap: '8px'
+                 }}
+               >
+                 <Globe size={16} /> Languages <span style={{ backgroundColor: activeTab === 'languages' ? 'var(--purple-100)' : '#f1f5f9', color: activeTab === 'languages' ? 'var(--purple-700)' : 'var(--text-muted)', padding: '2px 8px', borderRadius: '12px', fontSize: '12px' }}>{allLanguages.length}</span>
+               </button>
+             </div>
 
-            <div style={{ display: 'flex', gap: '24px', borderBottom: '1px solid var(--border)', marginBottom: '16px', paddingBottom: '0' }}>
-              {['shows', 'episodes', 'languages'].map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => {
-                    setActiveTab(tab);
-                    setCurrentPage(1);
-                  }}
-                  style={{
-                    backgroundColor: 'transparent',
-                    border: 'none',
-                    padding: '0 0 12px 0',
-                    borderBottom: activeTab === tab ? '2px solid #4325c2' : '2px solid transparent',
-                    color: activeTab === tab ? '#4325c2' : 'var(--text-muted)',
-                    fontWeight: activeTab === tab ? 800 : 600,
-                    textTransform: 'capitalize',
-                    fontSize: '14px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  {tab} ({tab === 'shows' ? allShows.length : tab === 'episodes' ? allEpisodes.length : allLanguages.length})
-                </button>
-              ))}
-            </div>
-
-            {/* Tables */}
-            <div>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <div style={{ overflowX: 'auto', margin: '0 -24px', padding: '0 24px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
                 <thead>
                   {activeTab === 'shows' && (
                     <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '12px' }}>
-                      <th style={{ padding: '12px 8px', fontWeight: 600 }}>SHOW</th>
-                      <th style={{ padding: '12px 8px', fontWeight: 600 }}>SECTION</th>
-                      <th style={{ padding: '12px 8px', fontWeight: 600 }}>EPISODES</th>
-                      <th style={{ padding: '12px 8px', fontWeight: 600 }}>LANGUAGES</th>
-                      <th style={{ padding: '12px 8px', fontWeight: 600, textAlign: 'right' }}>STATUS</th>
+                      <th style={{ padding: '12px 20px', fontWeight: 600 }}>SHOW</th>
+                      <th style={{ padding: '12px 20px', fontWeight: 600 }}>SECTION</th>
+                      <th style={{ padding: '12px 20px', fontWeight: 600 }}>EPISODES</th>
+                      <th style={{ padding: '12px 20px', fontWeight: 600 }}>LANGUAGES</th>
+                      <th style={{ padding: '12px 20px', fontWeight: 600, textAlign: 'left' }}>STATUS</th>
                     </tr>
                   )}
                   {activeTab === 'episodes' && (
                     <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '12px' }}>
-                      <th style={{ padding: '12px 8px', fontWeight: 600 }}>EPISODE</th>
-                      <th style={{ padding: '12px 8px', fontWeight: 600 }}>SHOW</th>
-                      <th style={{ padding: '12px 8px', fontWeight: 600 }}>SEASON</th>
-                      <th style={{ padding: '12px 8px', fontWeight: 600 }}>DURATION</th>
-                      <th style={{ padding: '12px 8px', fontWeight: 600, textAlign: 'right' }}>LANGUAGES</th>
+                      <th style={{ padding: '12px 20px', fontWeight: 600 }}>EPISODE</th>
+                      <th style={{ padding: '12px 20px', fontWeight: 600 }}>SHOW</th>
+                      <th style={{ padding: '12px 20px', fontWeight: 600 }}>SEASON</th>
+                      <th style={{ padding: '12px 20px', fontWeight: 600 }}>DURATION</th>
+                      <th style={{ padding: '12px 20px', fontWeight: 600, textAlign: 'right' }}>LANGUAGES</th>
                     </tr>
                   )}
                   {activeTab === 'languages' && (
                     <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '12px' }}>
-                      <th style={{ padding: '12px 8px', fontWeight: 600 }}>LANGUAGE CODE</th>
+                      <th style={{ padding: '12px 20px', fontWeight: 600 }}>LANGUAGE CODE</th>
                     </tr>
                   )}
                 </thead>
@@ -414,7 +461,22 @@ const Publish = () => {
                       <tr key={show.id}>
                         <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                            <div style={{ width: '48px', height: '36px', borderRadius: '6px', backgroundColor: '#5b21b6', flexShrink: 0 }}></div>
+                            <div style={{ width: '64px', height: '36px', borderRadius: '8px', backgroundColor: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A78BFA', flexShrink: 0, overflow: 'hidden' }}>
+                              {show.artwork ? (
+                                <img 
+                                  src={show.artwork} 
+                                  alt={show.title} 
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.style.display = 'none';
+                                    e.target.parentNode.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-film"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>';
+                                  }}
+                                />
+                              ) : (
+                                <Film size={20} />
+                              )}
+                            </div>
                             <div>
                               <div style={{ fontWeight: 600, color: 'var(--navy-900)', fontSize: '14px' }}>{show.title}</div>
                               {show.categories && show.categories.length > 0 && (
@@ -565,14 +627,14 @@ const Publish = () => {
         </div>
 
         {/* Right Sidebar */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {/* Publish Readiness */}
           <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
             <h3 style={{ fontSize: '15px', fontWeight: 800, marginBottom: '16px', color: 'var(--navy-900)' }}>Publish Readiness</h3>
             
             {isBlocked ? (
-              <div style={{ backgroundColor: 'var(--red-50)', padding: '16px', borderRadius: '8px', border: '1px solid var(--red-100)' }}>
+              <div style={{ backgroundColor: 'var(--red-50)', padding: '16px', borderRadius: '8px', border: '1px solid var(--red-100)', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--red-700)', marginBottom: '8px' }}>
                   <XCircle size={18} />
                   <span style={{ fontWeight: 600, fontSize: '14px' }}>Blocking Issues Found</span>
@@ -583,8 +645,7 @@ const Publish = () => {
                 </Link>
               </div>
             ) : (
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
                   <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', flexShrink: 0 }}>
                     <CheckCircle size={20} />
                   </div>
@@ -593,46 +654,15 @@ const Publish = () => {
                     <div style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: '2px' }}>Your catalogue is ready to publish.</div>
                   </div>
                 </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <CheckCircle size={16} style={{ color: '#10b981', marginTop: '2px' }} />
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--navy-900)' }}>No critical issues</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>All blocking issues resolved</div>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <CheckCircle size={16} style={{ color: '#10b981', marginTop: '2px' }} />
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--navy-900)' }}>Artwork uploaded</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>All required artwork is available</div>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <CheckCircle size={16} style={{ color: '#10b981', marginTop: '2px' }} />
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--navy-900)' }}>Duration available</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>All episodes have duration</div>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <CheckCircle size={16} style={{ color: '#10b981', marginTop: '2px' }} />
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--navy-900)' }}>Content grouped</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Language variants are grouped correctly</div>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <CheckCircle size={16} style={{ color: '#10b981', marginTop: '2px' }} />
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--navy-900)' }}>Required fields complete</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>All mandatory fields are filled</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <ChecklistItem passed={report?.blocked_records_count === 0} title={report?.blocked_records_count === 0 ? "No critical issues" : "Critical issues found"} description="All blocking issues resolved" />
+              <ChecklistItem passed={!hasArtworkIssue} title="Artwork uploaded" description="All required artwork is available" />
+              <ChecklistItem passed={!hasDurationIssue} title="Duration available" description="All episodes have duration" />
+              <ChecklistItem passed={!hasSectionIssue} title="Content grouped" description="Language variants are grouped correctly" />
+              <ChecklistItem passed={!hasDuplicateIssue} title="Variants unique" description="No duplicate languages for a content group" />
+            </div>
           </div>
 
           {/* Last Publish Run */}
@@ -643,36 +673,43 @@ const Publish = () => {
               <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: 0 }}>No publish run yet.</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #dcfce7', borderRadius: '8px', padding: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
-                  <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#fff', border: '2px solid #10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', flexShrink: 0 }}>
-                    <Check size={14} strokeWidth={3} />
+                <div style={{ backgroundColor: lastRun.status === 'success' ? '#f0fdf4' : '#fee2e2', border: lastRun.status === 'success' ? '1px solid #dcfce7' : '1px solid #fecaca', borderRadius: '8px', padding: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#fff', border: lastRun.status === 'success' ? '2px solid #10b981' : '2px solid #ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', color: lastRun.status === 'success' ? '#10b981' : '#ef4444', flexShrink: 0 }}>
+                    {lastRun.status === 'success' ? <Check size={14} strokeWidth={3} /> : <XCircle size={14} strokeWidth={3} />}
                   </div>
                   <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#166534' }}>Published Successfully</div>
-                    <div style={{ fontSize: '11px', color: '#15803d', marginTop: '2px' }}>
-                      Today, 10:30 AM by Admin User
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: lastRun.status === 'success' ? '#166534' : '#991b1b' }}>{lastRun.status === 'success' ? 'Published Successfully' : 'Failed'}</div>
+                    <div style={{ fontSize: '11px', color: lastRun.status === 'success' ? '#15803d' : '#7f1d1d', marginTop: '2px' }}>
+                      {format(parseUtcDate(lastRun.created_at), 'MMM d, h:mm a')} {lastRun.triggered_by ? 'by Admin' : ''}
                     </div>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--navy-900)' }}>8</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Shows</div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--navy-900)' }}>85</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Episodes</div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--navy-900)' }}>2</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Languages</div>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--navy-900)' }}>4</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Sections</div>
-                  </div>
-                </div>
+                {lastRun.stats && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--navy-900)' }}>{lastRun.stats.shows}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Shows</div>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--navy-900)' }}>{lastRun.stats.episodes}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Episodes</div>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--navy-900)' }}>{lastRun.stats.languages}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Languages</div>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--navy-900)' }}>{lastRun.stats.sections}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Sections</div>
+                      </div>
+                    </div>
+                )}
+                {!lastRun.stats && lastRun.status === 'success' && (
+                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', textAlign: 'center' }}>
+                        Published {lastRun.published_records} records. Detailed stats unavailable.
+                    </div>
+                )}
 
                 <Link to="/history" style={{ 
                   display: 'flex', 
@@ -701,7 +738,7 @@ const Publish = () => {
              <p style={{ fontSize: '13px', color: 'var(--purple-800)', lineHeight: '1.6', margin: 0 }}>
                Publishing will generate the <code style={{backgroundColor:'rgba(255,255,255,0.5)', color:'var(--purple-800)', padding:'2px 4px', borderRadius:'4px', fontWeight: 600}}>catalogue.json</code> file that powers the viewer experience. 
                <br /><br />
-               The process is atomic and safe.
+               The process is atomic and safe. Viewers will not see partial updates.
              </p>
           </div>
 
@@ -712,19 +749,20 @@ const Publish = () => {
       {showPreviewModal && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000,
-          display: 'flex', alignItems: 'center', justifyContent: 'center'
+          backgroundColor: 'rgba(15, 23, 42, 0.7)', zIndex: 1000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          backdropFilter: 'blur(4px)'
         }}>
-          <div className="card" style={{ width: '80%', maxWidth: '800px', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '24px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-               <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                 <FileJson size={20} style={{ color: 'var(--purple-600)' }}/>
+          <div className="card" style={{ width: '80%', maxWidth: '900px', height: '80vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <div style={{ padding: '24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+               <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px', fontWeight: 800 }}>
+                 <FileJson size={22} style={{ color: 'var(--purple-600)' }}/>
                  Catalogue JSON Preview
                </h3>
-               <button className="btn btn-outline" onClick={() => setShowPreviewModal(false)} style={{ padding: '6px 12px' }}>Close</button>
+               <button className="btn btn-outline" onClick={() => setShowPreviewModal(false)} style={{ padding: '8px 16px', fontWeight: 600 }}>Close Preview</button>
             </div>
-            <div style={{ padding: '24px', overflowY: 'auto', backgroundColor: '#1e1e1e', color: '#d4d4d4', fontFamily: 'monospace', fontSize: '13px', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px' }}>
-               <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
+            <div style={{ flex: 1, overflowY: 'auto', backgroundColor: '#0f172a', padding: '24px', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px' }}>
+               <pre style={{ margin: 0, whiteSpace: 'pre-wrap', color: '#e2e8f0', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', fontSize: '13px', lineHeight: '1.5' }}>
                  {JSON.stringify(previewData, null, 2)}
                </pre>
             </div>
