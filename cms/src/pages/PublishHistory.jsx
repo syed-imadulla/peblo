@@ -24,8 +24,16 @@ import {
 import { Dropdown } from '../components/ui/Dropdown';
 import { parseISO, format, formatDistanceToNow, isAfter, subDays, subHours } from 'date-fns';
 
-const fetchPublishHistory = async () => {
-  const { data } = await axios.get('/api/admin/publish-history');
+const fetchPublishHistory = async ({ queryKey }) => {
+  const [_key, { page, pageSize, search, status, dateRange }] = queryKey;
+  const params = new URLSearchParams({
+    page,
+    page_size: pageSize,
+    search: search || '',
+    status: status || 'all',
+    date_range: dateRange || 'all'
+  });
+  const { data } = await axios.get(`/api/admin/publish-history?${params.toString()}`);
   return data;
 };
 
@@ -51,91 +59,70 @@ const PublishHistory = () => {
   const [dateFilter, setDateFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [selectedRun, setSelectedRun] = useState(null);
+  const [selectedRunId, setSelectedRunId] = useState(null);
+  const [selectedRunCache, setSelectedRunCache] = useState(null);
 
-  const { data: history, isLoading, error, refetch } = useQuery({
-    queryKey: ['publishHistory'],
+  const { data: response, isLoading, error, refetch } = useQuery({
+    queryKey: ['publishHistory', { page: currentPage, pageSize, search: searchTerm, status: statusFilter, dateRange: dateFilter }],
     queryFn: fetchPublishHistory,
     refetchOnWindowFocus: true,
     refetchInterval: 5000,
+    keepPreviousData: true,
   });
 
-  const filteredHistory = useMemo(() => {
-    if (!history) return [];
-    
-    let filtered = [...history];
+  const paginatedHistory = response?.data || [];
+  const totalPages = response?.total_pages || 1;
+  const totalCount = response?.total_count || 0;
+  
+  const stats = response?.global_stats || { total: 0, success: 0, failed: 0, avgDuration: null };
+  const formattedStats = {
+    total: stats.total,
+    success: stats.success,
+    failed: stats.failed,
+    avgDuration: formatDuration(stats.avgDuration)
+  };
 
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(run => 
-        run.id.toLowerCase().includes(term) ||
-        (run.user?.email && run.user.email.toLowerCase().includes(term)) ||
-        (run.user?.role && run.user.role.toLowerCase().includes(term))
-      );
+  const latestRun = response?.latest_run || null;
+
+  // Realtime Modal Update Logic
+  useEffect(() => {
+    if (selectedRunId && response?.data) {
+      const freshRun = response.data.find(r => r.id === selectedRunId);
+      if (freshRun) {
+        setSelectedRunCache(freshRun);
+      }
     }
+  }, [selectedRunId, response?.data]);
 
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(run => run.status === statusFilter);
-    }
-
-    if (dateFilter !== 'all') {
-      const now = new Date();
-      filtered = filtered.filter(run => {
-        const d = parseUtcDate(run.created_at);
-        if (dateFilter === '24h') return isAfter(d, subHours(now, 24));
-        if (dateFilter === '7d') return isAfter(d, subDays(now, 7));
-        if (dateFilter === '30d') return isAfter(d, subDays(now, 30));
-        return true;
-      });
-    }
-
-    return filtered;
-  }, [history, searchTerm, statusFilter, dateFilter]);
-
-  const paginatedHistory = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredHistory.slice(start, start + pageSize);
-  }, [filteredHistory, currentPage]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredHistory.length / pageSize));
+  const handleOpenModal = (run) => {
+    setSelectedRunId(run.id);
+    setSelectedRunCache(run);
+  };
+  
+  const handleCloseModal = () => {
+    setSelectedRunId(null);
+    setSelectedRunCache(null);
+  };
 
   // Reset page when filters change
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter, dateFilter]);
+  }, [searchTerm, statusFilter, dateFilter, pageSize]);
 
-  // Clamp page when dataset shrinks (e.g. after filter change or polling update)
-  React.useEffect(() => {
-    if (currentPage > totalPages) {
+  // Clamp page when dataset shrinks
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(totalPages);
     }
   }, [totalPages, currentPage]);
 
   // Escape key closes the modal
   useEffect(() => {
-    if (!selectedRun) return;
-    const handler = (e) => { if (e.key === 'Escape') setSelectedRun(null); };
+    if (!selectedRunId) return;
+    const handler = (e) => { if (e.key === 'Escape') handleCloseModal(); };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [selectedRun]);
-
-  // Statistics
-  const stats = useMemo(() => {
-    if (!history) return { total: 0, success: 0, failed: 0, avgDuration: '—' };
-    const success = history.filter(r => r.status === 'success').length;
-    const failed = history.filter(r => r.status === 'failed').length;
-    
-    const runsWithDuration = history.filter(r => r.duration_seconds != null);
-    let avgDuration = '—';
-    if (runsWithDuration.length > 0) {
-      const totalSeconds = runsWithDuration.reduce((acc, r) => acc + r.duration_seconds, 0);
-      avgDuration = formatDuration(Math.round(totalSeconds / runsWithDuration.length));
-    }
-
-    return { total: history.length, success, failed, avgDuration };
-  }, [history]);
-
-  const latestRun = history && history.length > 0 ? history[0] : null;
+  }, [selectedRunId]);
 
   if (isLoading) {
     return (
@@ -393,7 +380,7 @@ const PublishHistory = () => {
                         </td>
                         <td style={{ padding: '20px 0', textAlign: 'right', whiteSpace: 'nowrap' }}>
                           <button 
-                            onClick={() => setSelectedRun(run)}
+                            onClick={() => handleOpenModal(run)}
                             aria-label={`View details for run ${run.id.substring(0, 8)}`}
                             style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '6px', width: '32px', height: '32px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', cursor: 'pointer', outline: 'none' }}
                           >
@@ -409,11 +396,11 @@ const PublishHistory = () => {
           </div>
 
           {/* Pagination */}
-          {filteredHistory.length > 0 && (
+          {totalCount > 0 && (
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
-              totalItems={filteredHistory.length}
+              totalItems={totalCount}
               itemsPerPage={pageSize}
               setCurrentPage={setCurrentPage}
               setItemsPerPage={setPageSize}
@@ -437,7 +424,7 @@ const PublishHistory = () => {
                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#dcfce7', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
                   <CheckCircle size={16} />
                 </div>
-                <div style={{ fontSize: '20px', fontWeight: 800, color: '#166534', lineHeight: 1 }}>{stats.success}</div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: '#166534', lineHeight: 1 }}>{formattedStats.success}</div>
                 <div style={{ fontSize: '12px', color: '#15803d', fontWeight: 600, marginTop: '4px' }}>Successful</div>
               </div>
               
@@ -445,7 +432,7 @@ const PublishHistory = () => {
                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#fee2e2', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
                   <XCircle size={16} />
                 </div>
-                <div style={{ fontSize: '20px', fontWeight: 800, color: '#991b1b', lineHeight: 1 }}>{stats.failed}</div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: '#991b1b', lineHeight: 1 }}>{formattedStats.failed}</div>
                 <div style={{ fontSize: '12px', color: '#b91c1c', fontWeight: 600, marginTop: '4px' }}>Failed</div>
               </div>
 
@@ -453,7 +440,7 @@ const PublishHistory = () => {
                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#e2e8f0', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
                   <History size={16} />
                 </div>
-                <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: 1 }}>{stats.total}</div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: 1 }}>{formattedStats.total}</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>Total Runs</div>
               </div>
 
@@ -461,7 +448,7 @@ const PublishHistory = () => {
                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#e0f2fe', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
                   <Clock size={16} />
                 </div>
-                <div style={{ fontSize: '20px', fontWeight: 800, color: '#075985', lineHeight: 1 }}>{stats.avgDuration}</div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: '#075985', lineHeight: 1 }}>{formattedStats.avgDuration}</div>
                 <div style={{ fontSize: '12px', color: '#0369a1', fontWeight: 600, marginTop: '4px' }}>Avg. Duration</div>
               </div>
             </div>
@@ -523,7 +510,7 @@ const PublishHistory = () => {
                 )}
                 
                 <button 
-                  onClick={() => setSelectedRun(latestRun)}
+                  onClick={() => handleOpenModal(latestRun)}
                   style={{ 
                     display: 'flex', 
                     alignItems: 'center', 
@@ -574,17 +561,17 @@ const PublishHistory = () => {
       </div>
 
       {/* Details Modal */}
-      {selectedRun && (
+      {selectedRunCache && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
           backgroundColor: 'rgba(15, 23, 42, 0.7)', zIndex: 1000,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           backdropFilter: 'blur(4px)'
-        }} onClick={() => setSelectedRun(null)}>
+        }} onClick={handleCloseModal}>
           <div className="card" onClick={e => e.stopPropagation()} style={{ width: '90%', maxWidth: '600px', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', overflow: 'hidden', padding: 0 }} role="dialog" aria-modal="true" aria-label="Publish Run Details">
             <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>Publish Run Details</h3>
-              <button onClick={() => setSelectedRun(null)} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', outline: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <button onClick={handleCloseModal} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', outline: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <X size={20} />
               </button>
             </div>
@@ -593,77 +580,77 @@ const PublishHistory = () => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
                 <div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>RUN ID</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>pub_{selectedRun.id}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>pub_{selectedRunCache.id}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>STATUS</div>
                   <span style={{ 
-                     backgroundColor: selectedRun.status === 'success' ? '#dcfce7' : '#fee2e2', 
-                     color: selectedRun.status === 'success' ? '#166534' : '#991b1b', 
+                     backgroundColor: selectedRunCache.status === 'success' ? '#dcfce7' : '#fee2e2', 
+                     color: selectedRunCache.status === 'success' ? '#166534' : '#991b1b', 
                      padding: '2px 8px', 
                      borderRadius: '12px', 
                      fontSize: '12px', 
                      fontWeight: 600,
                      display: 'inline-block'
                    }}>
-                     {selectedRun.status === 'success' ? 'Success' : 'Failed'}
+                     {selectedRunCache.status === 'success' ? 'Success' : 'Failed'}
                    </span>
                 </div>
                 <div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>TIMESTAMP</div>
-                  <div style={{ fontSize: '14px', color: 'var(--navy-900)' }}>{format(parseUtcDate(selectedRun.created_at), 'MMMM d, yyyy h:mm:ss a')}</div>
+                  <div style={{ fontSize: '14px', color: 'var(--navy-900)' }}>{format(parseUtcDate(selectedRunCache.created_at), 'MMMM d, yyyy h:mm:ss a')}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>TRIGGERED BY</div>
                   <div style={{ fontSize: '14px', color: 'var(--navy-900)' }}>
-                    {selectedRun.user
-                      ? selectedRun.user.email
-                      : selectedRun.triggered_by
-                        ? `ID: ${selectedRun.triggered_by}`
+                    {selectedRunCache.user
+                      ? selectedRunCache.user.email
+                      : selectedRunCache.triggered_by
+                        ? `ID: ${selectedRunCache.triggered_by}`
                         : 'System'}
                   </div>
                 </div>
                 <div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>DURATION</div>
-                  <div style={{ fontSize: '14px', color: 'var(--navy-900)' }}>{formatDuration(selectedRun.duration_seconds)}</div>
+                  <div style={{ fontSize: '14px', color: 'var(--navy-900)' }}>{formatDuration(selectedRunCache.duration_seconds)}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>RECORDS PROCESSED</div>
-                  <div style={{ fontSize: '14px', color: 'var(--navy-900)' }}>{selectedRun.total_records_processed} total ({selectedRun.published_records} published, {selectedRun.blocked_records} blocked)</div>
+                  <div style={{ fontSize: '14px', color: 'var(--navy-900)' }}>{selectedRunCache.total_records_processed} total ({selectedRunCache.published_records} published, {selectedRunCache.blocked_records} blocked)</div>
                 </div>
               </div>
 
-              {selectedRun.stats && (
+              {selectedRunCache.stats && (
                 <div style={{ marginBottom: '24px' }}>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '8px' }}>CONTENT STATISTICS</div>
                   <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', textAlign: 'center' }}>
                     <div>
-                      <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>{selectedRun.stats.shows}</div>
+                      <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>{selectedRunCache.stats.shows}</div>
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Shows</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>{selectedRun.stats.episodes}</div>
+                      <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>{selectedRunCache.stats.episodes}</div>
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Episodes</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>{selectedRun.stats.languages}</div>
+                      <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>{selectedRunCache.stats.languages}</div>
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Languages</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>{selectedRun.stats.sections}</div>
+                      <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>{selectedRunCache.stats.sections}</div>
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Sections</div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {selectedRun.error_log && Array.isArray(selectedRun.error_log) && selectedRun.error_log.length > 0 && (
+              {selectedRunCache.error_log && Array.isArray(selectedRunCache.error_log) && selectedRunCache.error_log.length > 0 && (
                 <div>
-                  <div style={{ fontSize: '12px', color: '#b91c1c', fontWeight: 600, marginBottom: '8px' }}>ERROR LOG ({selectedRun.error_log.length} Issues)</div>
+                  <div style={{ fontSize: '12px', color: '#b91c1c', fontWeight: 600, marginBottom: '8px' }}>ERROR LOG ({selectedRunCache.error_log.length} Issues)</div>
                   <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', overflow: 'hidden' }}>
                     <div style={{ padding: '12px 16px', fontSize: '13px', color: '#7f1d1d', fontFamily: 'monospace', maxHeight: '200px', overflowY: 'auto' }}>
                       <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
-                        {JSON.stringify(selectedRun.error_log, null, 2)}
+                        {JSON.stringify(selectedRunCache.error_log, null, 2)}
                       </pre>
                     </div>
                   </div>
@@ -673,7 +660,7 @@ const PublishHistory = () => {
             
             <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end', backgroundColor: '#f8fafc' }}>
               <button 
-                onClick={() => setSelectedRun(null)}
+                onClick={handleCloseModal}
                 className="btn btn-outline"
                 style={{ padding: '8px 16px', fontSize: '14px' }}
               >

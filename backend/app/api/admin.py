@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import or_, cast, String, func, case
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from app.core.database import get_db
 from app.services.publish import PublishService
 from app.models.models import Episode, Season, Show, Artwork, PublishRun, User
@@ -289,17 +290,83 @@ def publish_catalog(
 
 @router.get("/publish-history")
 def get_publish_history(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+    search: str = None,
+    status: str = None,
+    date_range: str = None,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),  # read-only — all authenticated users
 ):
+    query = db.query(PublishRun, User).outerjoin(User, PublishRun.triggered_by == User.id)
+
+    # Search logic matching existing JS client-side behavior
+    if search:
+        search_term = f"%{search.lower()}%"
+        query = query.filter(
+            or_(
+                cast(PublishRun.id, String).ilike(search_term),
+                User.email.ilike(search_term),
+                cast(PublishRun.triggered_by, String).ilike(search_term)
+            )
+        )
+
+    if status and status != 'all':
+        query = query.filter(PublishRun.status == status)
+
+    if date_range and date_range != 'all':
+        now = datetime.utcnow()
+        cutoff = None
+        if date_range == '24h':
+            cutoff = now - timedelta(hours=24)
+        elif date_range == '7d':
+            cutoff = now - timedelta(days=7)
+        elif date_range == '30d':
+            cutoff = now - timedelta(days=30)
+        
+        if cutoff:
+            query = query.filter(PublishRun.created_at >= cutoff)
+
+    total_count = query.count()
+    total_pages = max(1, (total_count + page_size - 1) // page_size)
+
     runs = (
-        db.query(PublishRun, User)
-        .outerjoin(User, PublishRun.triggered_by == User.id)
-        .order_by(PublishRun.created_at.desc())
-        .limit(50)
+        query.order_by(PublishRun.created_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
         .all()
     )
-    return [
+
+    # Compute global stats (unfiltered database truth)
+    stats_query = db.query(
+        func.count(PublishRun.id).label("total"),
+        func.sum(case((PublishRun.status == 'success', 1), else_=0)).label("success"),
+        func.sum(case((PublishRun.status == 'failed', 1), else_=0)).label("failed"),
+        func.avg(PublishRun.duration_seconds).label("avg_duration")
+    ).one()
+    
+    avg_dur = stats_query.avg_duration
+    global_stats = {
+        "total": stats_query.total or 0,
+        "success": stats_query.success or 0,
+        "failed": stats_query.failed or 0,
+        "avgDuration": int(avg_dur) if avg_dur is not None else None
+    }
+    
+    # Compute the true global latest run
+    latest_run_obj = db.query(PublishRun, User).outerjoin(User, PublishRun.triggered_by == User.id).order_by(PublishRun.created_at.desc()).first()
+    latest_run_data = None
+    if latest_run_obj:
+        run_latest, user_latest = latest_run_obj
+        latest_run_data = {
+            "id": str(run_latest.id),
+            "status": run_latest.status,
+            "created_at": run_latest.created_at.isoformat(),
+            "triggered_by": str(run_latest.triggered_by) if run_latest.triggered_by else None,
+            "user": {"id": str(user_latest.id), "email": user_latest.email, "role": user_latest.role} if user_latest else None
+        }
+
+    data = [
         {
             "id": str(run.id),
             "status": run.status,
@@ -315,3 +382,11 @@ def get_publish_history(
         }
         for run, user in runs
     ]
+
+    return {
+        "data": data,
+        "total_count": total_count,
+        "total_pages": total_pages,
+        "global_stats": global_stats,
+        "latest_run": latest_run_data
+    }
