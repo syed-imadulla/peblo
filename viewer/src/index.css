@@ -237,27 +237,32 @@ h1, h2, h3, h4, h5, h6 {
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
   text-decoration: none;
   color: inherit;
   z-index: 1;
   transform-origin: top center; /* Anchor top so hover never shoots wildly up or into headers */
   transition:
-    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.22s ease,
-    background-color 0.22s ease;
+    transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.24s ease,
+    background-color 0.24s ease;
 }
 
-/* On hover, smoothly pop down over the lane below while keeping top & sides perfectly contained */
+/* On hover, smoothly pop down over the lane below with soft multi-layer ambient shadows */
 .ott-card-slot:hover .ott-floating-card {
   height: auto;
   min-height: 242px;
   transform: scale(1.05) translateY(-4px); /* Subtle, premium OTT scale that stays within bounds */
   z-index: 100;
   background-color: #16162E;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(124, 58, 237, 0.45);
-  border-color: rgba(124, 58, 237, 0.45);
+  /* Clean, smooth multi-layer ambient shadows - zero harsh black smudges */
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.25),
+    0 12px 28px rgba(0, 0, 0, 0.35),
+    0 24px 44px -6px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(124, 58, 237, 0.35);
+  border-color: rgba(124, 58, 237, 0.35);
   border-radius: 16px;
 }
 
@@ -279,10 +284,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .ott-info-box {
-  padding: 0.6rem 0.85rem 0.75rem 0.85rem;
+  padding: 0.75rem 0.9rem 0.85rem 0.9rem;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
   flex: 1;
 }
 
@@ -309,14 +314,14 @@ h1, h2, h3, h4, h5, h6 {
   text-overflow: ellipsis;
 }
 
-/* Expanded Quick Peek Drawer: Renders seamlessly on hover inside the floating card */
+/* Expanded Quick Peek Drawer: Cleanly structured and aligned on hover */
 .ott-hover-drawer {
   display: none;
   flex-direction: column;
-  gap: 0.45rem;
-  margin-top: 0.35rem;
-  padding-top: 0.35rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 0.55rem;
+  margin-top: 0.25rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .ott-card-slot:hover .ott-hover-drawer {
@@ -331,17 +336,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-popover-play {
+  height: 30px;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 0.35rem 0.8rem;
+  gap: 6px;
+  padding: 0 0.85rem;
   border-radius: var(--radius-pill);
   background-color: var(--purple-700);
   color: #ffffff;
   font-size: 0.78rem;
-  font-weight: 800;
-  box-shadow: 0 3px 10px rgba(124, 58, 237, 0.4);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35);
   transition: background-color 0.15s ease;
+  line-height: 1;
 }
 
 .btn-popover-play:hover {
@@ -349,16 +356,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-popover-circle {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   color: #F8F7FF;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transition: background-color 0.15s ease;
+  flex-shrink: 0;
 }
 
 .btn-popover-circle:hover {
@@ -369,35 +377,41 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.76rem;
+  font-weight: 600;
   color: var(--text-nav);
   flex-wrap: wrap;
+  line-height: 1.3;
 }
 
 .meta-badge-purple {
   background-color: rgba(124, 58, 237, 0.2);
   color: var(--purple-500);
-  padding: 1px 6px;
+  padding: 2px 6px;
   border-radius: 4px;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
+  font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
 }
 
 .meta-dot {
   color: var(--text-muted);
+  opacity: 0.5;
 }
 
 .ott-hover-synopsis {
-  font-size: 0.76rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
-  line-height: 1.4;
+  line-height: 1.45;
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
 
 .card-duration-badge {
   position: absolute;

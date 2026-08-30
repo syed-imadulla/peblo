@@ -142,7 +142,7 @@ export const ShowCard = ({ show, width = '100%', typeLabel = 'Series' }) => {
             <div className="ott-hover-meta">
               <span className="meta-badge-purple">{typeLabel}</span>
               <span className="meta-dot">•</span>
-              <span>{category}</span>
+              <span style={{ textTransform: 'capitalize' }}>{category}</span>
               {totalEpisodes > 0 && (
                 <>
                   <span className="meta-dot">•</span>
