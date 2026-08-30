@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -16,7 +16,14 @@ import {
   ListVideo, 
   Check, 
   XCircle,
-  FileJson
+  FileJson,
+  Tv,
+  Globe,
+  Briefcase,
+  Bell,
+  PlaySquare,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 
@@ -57,6 +64,17 @@ const Publish = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
 
+  useEffect(() => {
+    if (showPreviewModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showPreviewModal]);
+
   const { data: report, isLoading: loadingReport, refetch: refetchReport } = useQuery({
     queryKey: ['validationReport'],
     queryFn: fetchValidationReport,
@@ -92,16 +110,16 @@ const Publish = () => {
   });
 
   // Derived Preview Data
-  const { allShows, allEpisodes, allLanguages, sectionsCount } = useMemo(() => {
+  const { allShows, allEpisodes, allLanguages, sectionsList = [] } = useMemo(() => {
     if (!previewData) return { allShows: [], allEpisodes: [], allLanguages: [], sectionsCount: 0 };
     
     const shows = [];
     const episodes = [];
     const langs = new Set();
-    let sections = 0;
+    const uniqueSections = new Set();
 
     Object.entries(previewData).forEach(([section, sectionShows]) => {
-      if (sectionShows.length > 0) sections++;
+      if (sectionShows.length > 0) uniqueSections.add(section);
       
       sectionShows.forEach(show => {
         let epCount = show.trailers.length;
@@ -126,7 +144,8 @@ const Publish = () => {
           section: section,
           episodeCount: epCount,
           languages: Array.from(showLangs),
-          status: 'Published'
+          status: 'Published',
+          categories: show.categories || []
         });
       });
     });
@@ -135,7 +154,7 @@ const Publish = () => {
       allShows: shows,
       allEpisodes: episodes,
       allLanguages: Array.from(langs).map(code => ({ code })), // just code for now
-      sectionsCount: sections
+      sectionsList: Array.from(uniqueSections)
     };
   }, [previewData]);
 
@@ -193,34 +212,81 @@ const Publish = () => {
     <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '60px' }}>
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
-        <div>
-          <h1 style={{ marginBottom: '8px' }}>Publish Catalogue</h1>
-          <p className="text-muted" style={{ margin: 0 }}>Review your content and publish the catalogue for viewers.</p>
-        </div>
-        
-        <button 
-          className="btn btn-primary" 
-          onClick={() => publishMutation.mutate()}
-          disabled={!isAdmin || isBlocked || publishMutation.isPending}
-          style={{ padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}
-        >
-          {publishMutation.isPending ? 'Publishing...' : (
-            <>
-              <Send size={18} /> Publish Catalogue
-            </>
-          )}
-        </button>
-      </div>
-
-      {publishDisabledReason && (
-        <div style={{ backgroundColor: 'var(--amber-100)', color: 'var(--amber-700)', padding: '16px 20px', borderRadius: 'var(--radius-md)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid #FCD34D' }}>
-          <Info size={24} style={{ color: 'var(--amber-500)' }} />
-          <div>
-            <strong style={{ display: 'block', marginBottom: '4px' }}>Publishing Disabled</strong>
-            <span style={{ fontSize: '14px' }}>{publishDisabledReason}</span>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ fontWeight: '800', fontSize: '28px', color: 'var(--navy-900)', display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '-0.5px' }}>
+            Publish Catalogue
+          </div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '15px' }}>
+            Review your content and publish the catalogue for viewers.
           </div>
         </div>
-      )}
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <button style={{
+            width: '40px', 
+            height: '40px', 
+            borderRadius: '50%', 
+            backgroundColor: '#fff', 
+            border: '1px solid var(--border)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            color: 'var(--purple-600)', 
+            position: 'relative',
+            cursor: 'pointer',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+          }}>
+            <Bell size={20} />
+            <span style={{
+              position: 'absolute', 
+              top: '-4px', 
+              right: '-4px', 
+              backgroundColor: 'var(--purple-600)', 
+              color: '#fff', 
+              fontSize: '11px', 
+              borderRadius: '50%', 
+              width: '18px', 
+              height: '18px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              fontWeight: 'bold',
+              border: '2px solid #f4f5f8'
+            }}>3</span>
+          </button>
+          
+          <button 
+            className="btn btn-primary" 
+            onClick={() => publishMutation.mutate()}
+            disabled={!isAdmin || isBlocked || publishMutation.isPending}
+            style={{ 
+              height: '40px', 
+              padding: '0 24px', 
+              borderRadius: '8px', 
+              fontWeight: '600', 
+              fontSize: '14px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px', 
+              backgroundColor: '#4325c2', 
+              color: '#FFFFFF', 
+              border: 'none', 
+              boxShadow: (!isAdmin || isBlocked || publishMutation.isPending) ? 'none' : '0 4px 12px rgba(109, 40, 217, 0.25)', 
+              cursor: (!isAdmin || isBlocked || publishMutation.isPending) ? 'not-allowed' : 'pointer', 
+              whiteSpace: 'nowrap', 
+              flexShrink: 0,
+              opacity: (!isAdmin || isBlocked || publishMutation.isPending) ? 0.6 : 1
+            }}
+            title={publishDisabledReason || ''}
+          >
+            {publishMutation.isPending ? 'Publishing...' : (
+              <>
+                <Send size={18} /> Publish Catalogue
+              </>
+            )}
+          </button>
+        </div>
+      </div>
 
       {publishResult?.type === 'success' && (
         <div style={{ backgroundColor: 'var(--green-100)', color: 'var(--green-700)', padding: '16px 20px', borderRadius: 'var(--radius-md)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px', border: '1px solid #86EFAC' }}>
@@ -242,119 +308,102 @@ const Publish = () => {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '7fr 3fr', gap: '24px', alignItems: 'start' }}>
         {/* Left Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {/* Catalogue Summary Card */}
-          <div className="card" style={{ padding: '24px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '4px' }}>Catalogue Summary</h2>
-            <p className="text-muted" style={{ fontSize: '14px', marginBottom: '24px' }}>Only published content will be included in the catalogue.</p>
+          <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '4px', color: 'var(--navy-900)' }}>Catalogue Summary</h2>
+            <p className="text-muted" style={{ fontSize: '14px', margin: 0, marginBottom: '24px' }}>Only published content will be included in the catalogue.</p>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
-              
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: 'var(--purple-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
-                  <Folder size={20} style={{ color: 'var(--purple-600)' }} />
+              <div style={{ display: 'flex', flexDirection: 'row', gap: '16px', alignItems: 'flex-start' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '14px', backgroundColor: 'rgba(67, 37, 194, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4325c2', flexShrink: 0 }}>
+                  <Tv size={24} />
                 </div>
-                <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--navy-900)', lineHeight: '1' }}>{allShows.length}</div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-700)', marginTop: '8px' }}>Shows</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Published</div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: 'var(--purple-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
-                  <ListVideo size={20} style={{ color: 'var(--purple-600)' }} />
+                <div>
+                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1.2' }}>{allShows.length}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--navy-900)', marginTop: '2px' }}>Shows</div>
+                  <div style={{ fontSize: '13px', color: '#10b981', fontWeight: 500, marginTop: '2px' }}>Published</div>
                 </div>
-                <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--navy-900)', lineHeight: '1' }}>{allEpisodes.length}</div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-700)', marginTop: '8px' }}>Episodes</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Published</div>
               </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: 'var(--purple-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
-                  <Languages size={20} style={{ color: 'var(--purple-600)' }} />
+              <div style={{ display: 'flex', flexDirection: 'row', gap: '16px', alignItems: 'flex-start' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '14px', backgroundColor: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', flexShrink: 0 }}>
+                  <PlaySquare size={24} />
                 </div>
-                <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--navy-900)', lineHeight: '1' }}>{allLanguages.length}</div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-700)', marginTop: '8px' }}>Languages</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Represented</div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: 'var(--purple-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
-                  <LayoutGrid size={20} style={{ color: 'var(--purple-600)' }} />
+                <div>
+                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1.2' }}>{allEpisodes.length}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--navy-900)', marginTop: '2px' }}>Episodes</div>
+                  <div style={{ fontSize: '13px', color: '#10b981', fontWeight: 500, marginTop: '2px' }}>Published</div>
                 </div>
-                <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--navy-900)', lineHeight: '1' }}>{sectionsCount}</div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-700)', marginTop: '8px' }}>Sections</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>In use</div>
               </div>
-
+              <div style={{ display: 'flex', flexDirection: 'row', gap: '16px', alignItems: 'flex-start' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '14px', backgroundColor: 'rgba(245, 158, 11, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b', flexShrink: 0 }}>
+                  <Globe size={24} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1.2' }}>{allLanguages.length}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--navy-900)', marginTop: '2px' }}>Languages</div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>{allLanguages.map(l => l.code.toUpperCase()).join(', ')}</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'row', gap: '16px', alignItems: 'flex-start' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '14px', backgroundColor: 'rgba(59, 130, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6', flexShrink: 0 }}>
+                  <Briefcase size={24} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1.2' }}>{sectionsList.length}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--navy-900)', marginTop: '2px' }}>Sections</div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>{sectionsList.join(', ')}</div>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Content to be Published Card */}
-          <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+          <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', marginBottom: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
               <div>
-                <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '4px' }}>Content to be Published</h2>
+                <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '4px', color: 'var(--navy-900)' }}>Content to be Published</h2>
                 <p className="text-muted" style={{ fontSize: '14px', margin: 0 }}>This is the exact content that will be included in the published catalogue.</p>
               </div>
-              <button className="btn btn-outline" onClick={() => setShowPreviewModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', fontSize: '14px' }}>
-                <Eye size={16} /> Preview Catalogue
+              <button 
+                className="btn btn-outline"
+                onClick={() => setShowPreviewModal(true)}
+                style={{ height: '36px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--navy-900)', fontWeight: 600 }}
+              >
+                <Eye size={16} style={{ color: 'var(--text-muted)' }} /> Preview Catalogue
               </button>
             </div>
 
-            {/* Tabs */}
-            <div style={{ display: 'flex', gap: '24px', borderBottom: '1px solid var(--border-color)', marginBottom: '16px' }}>
-              <button 
-                onClick={() => {setActiveTab('shows'); setCurrentPage(1);}} 
-                style={{ 
-                  padding: '12px 0', 
-                  border: 'none', 
-                  background: 'none', 
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: activeTab === 'shows' ? 'var(--purple-600)' : 'var(--text-muted)',
-                  borderBottom: activeTab === 'shows' ? '2px solid var(--purple-600)' : '2px solid transparent',
-                  cursor: 'pointer'
-                }}
-              >
-                Shows ({allShows.length})
-              </button>
-              <button 
-                onClick={() => {setActiveTab('episodes'); setCurrentPage(1);}} 
-                style={{ 
-                  padding: '12px 0', 
-                  border: 'none', 
-                  background: 'none', 
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: activeTab === 'episodes' ? 'var(--purple-600)' : 'var(--text-muted)',
-                  borderBottom: activeTab === 'episodes' ? '2px solid var(--purple-600)' : '2px solid transparent',
-                  cursor: 'pointer'
-                }}
-              >
-                Episodes ({allEpisodes.length})
-              </button>
-              <button 
-                onClick={() => {setActiveTab('languages'); setCurrentPage(1);}} 
-                style={{ 
-                  padding: '12px 0', 
-                  border: 'none', 
-                  background: 'none', 
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: activeTab === 'languages' ? 'var(--purple-600)' : 'var(--text-muted)',
-                  borderBottom: activeTab === 'languages' ? '2px solid var(--purple-600)' : '2px solid transparent',
-                  cursor: 'pointer'
-                }}
-              >
-                Languages ({allLanguages.length})
-              </button>
+            <div style={{ display: 'flex', gap: '24px', borderBottom: '1px solid var(--border)', marginBottom: '16px', paddingBottom: '0' }}>
+              {['shows', 'episodes', 'languages'].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => {
+                    setActiveTab(tab);
+                    setCurrentPage(1);
+                  }}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    padding: '0 0 12px 0',
+                    borderBottom: activeTab === tab ? '2px solid #4325c2' : '2px solid transparent',
+                    color: activeTab === tab ? '#4325c2' : 'var(--text-muted)',
+                    fontWeight: activeTab === tab ? 800 : 600,
+                    textTransform: 'capitalize',
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {tab} ({tab === 'shows' ? allShows.length : tab === 'episodes' ? allEpisodes.length : allLanguages.length})
+                </button>
+              ))}
             </div>
 
             {/* Tables */}
-            <div style={{ minHeight: '300px' }}>
+            <div>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead>
                   {activeTab === 'shows' && (
@@ -385,32 +434,92 @@ const Publish = () => {
                   {activeTab === 'shows' && paginatedShows.length === 0 && (
                     <tr><td colSpan="5" style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>No shows to publish</td></tr>
                   )}
-                  {activeTab === 'shows' && paginatedShows.map(show => (
-                    <tr key={show.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                      <td style={{ padding: '12px 8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <span style={{ fontWeight: 500, color: 'var(--navy-900)' }}>{show.title}</span>
-                      </td>
-                      <td style={{ padding: '12px 8px', color: 'var(--text-muted)', textTransform: 'capitalize' }}>{show.section}</td>
-                      <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>{show.episodeCount}</td>
-                      <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>
-                        {show.languages.map(l => l.toUpperCase()).join(', ')}
-                      </td>
-                      <td style={{ padding: '12px 8px', textAlign: 'right' }}>
-                        <span className="badge badge-success">Published</span>
-                      </td>
-                    </tr>
-                  ))}
+                  {activeTab === 'shows' && paginatedShows.map(show => {
+                    const sectionColors = {
+                      'featured': { bg: '#f3e8ff', text: '#a855f7' },
+                      'series': { bg: '#dbeafe', text: '#3b82f6' },
+                      'minisodes': { bg: '#ffedd5', text: '#f97316' },
+                      'songs': { bg: '#fef3c7', text: '#eab308' }
+                    };
+                    const sc = sectionColors[show.section?.toLowerCase()] || { bg: '#f1f5f9', text: '#64748b' };
+                    
+                    return (
+                      <tr key={show.id}>
+                        <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                            <div style={{ width: '48px', height: '36px', borderRadius: '6px', backgroundColor: '#5b21b6', flexShrink: 0 }}></div>
+                            <div>
+                              <div style={{ fontWeight: 600, color: 'var(--navy-900)', fontSize: '14px' }}>{show.title}</div>
+                              {show.categories && show.categories.length > 0 && (
+                                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                                  {show.categories.join(' • ')}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
+                          <span style={{ 
+                            backgroundColor: sc.bg, 
+                            color: sc.text, 
+                            padding: '4px 10px', 
+                            borderRadius: '12px', 
+                            fontSize: '12px', 
+                            fontWeight: 600,
+                            textTransform: 'lowercase'
+                          }}>
+                            {show.section || 'unassigned'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontSize: '14px', fontWeight: 500 }}>
+                          {show.episodeCount}
+                        </td>
+                        <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
+                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                            {show.languages.map(l => (
+                              <span key={l} style={{ 
+                                backgroundColor: '#dcfce7', 
+                                color: '#10b981', 
+                                padding: '2px 8px', 
+                                borderRadius: '12px', 
+                                fontSize: '11px', 
+                                fontWeight: 700
+                              }}>
+                                {l.toUpperCase()}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                        <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981' }}></div>
+                            <span style={{ fontSize: '13px', fontWeight: 600, color: '#10b981' }}>Published</span>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
 
                   {activeTab === 'episodes' && paginatedEpisodes.length === 0 && (
                     <tr><td colSpan="5" style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>No episodes to publish</td></tr>
                   )}
                   {activeTab === 'episodes' && paginatedEpisodes.map(ep => (
-                    <tr key={ep.content_group} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                      <td style={{ padding: '12px 8px', fontWeight: 500, color: 'var(--navy-900)' }}>{ep.title}</td>
-                      <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>{ep.showTitle}</td>
-                      <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>{ep.season === 0 ? 'Trailer' : ep.season}</td>
-                      <td style={{ padding: '12px 8px', color: 'var(--text-muted)' }}>{ep.duration_seconds}s</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'right', color: 'var(--text-muted)' }}>{ep.languages.map(l => l.toUpperCase()).join(', ')}</td>
+                    <tr key={ep.content_group}>
+                      <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 600, color: 'var(--navy-900)' }}>{ep.title}</td>
+                      <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', color: 'var(--text-muted)' }}>{ep.showTitle}</td>
+                      <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontWeight: 500 }}>
+                        {ep.season === 0 ? <span style={{backgroundColor:'#f3f4f6', color:'#4b5563', padding:'2px 8px', borderRadius:'12px', fontSize:'11px', fontWeight:700}}>TRAILER</span> : `Season ${ep.season}`}
+                      </td>
+                      <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontWeight: 500 }}>{Math.floor(ep.duration_seconds / 60)}m {ep.duration_seconds % 60}s</td>
+                      <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', textAlign: 'right' }}>
+                        <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                          {ep.languages.map(l => (
+                            <span key={l} style={{ backgroundColor: '#dcfce7', color: '#10b981', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 }}>
+                              {l.toUpperCase()}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
                     </tr>
                   ))}
 
@@ -418,8 +527,15 @@ const Publish = () => {
                     <tr><td style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>No languages to publish</td></tr>
                   )}
                   {activeTab === 'languages' && paginatedLanguages.map(lang => (
-                    <tr key={lang.code} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                      <td style={{ padding: '12px 8px', fontWeight: 500, color: 'var(--navy-900)', textTransform: 'uppercase' }}>{lang.code}</td>
+                    <tr key={lang.code}>
+                      <td style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', fontWeight: 700, color: 'var(--navy-900)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--purple-50)', color: 'var(--purple-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>
+                            {lang.code.toUpperCase()}
+                          </div>
+                          {lang.code.toUpperCase()} Language
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -429,119 +545,196 @@ const Publish = () => {
             {/* Pagination */}
             {((activeTab === 'shows' && allShows.length > pageSize) || 
               (activeTab === 'episodes' && allEpisodes.length > pageSize) ||
-              (activeTab === 'languages' && allLanguages.length > pageSize)) && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border-color)', fontSize: '14px' }}>
-                <button 
-                  className="btn btn-outline" 
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  style={{ padding: '6px 12px' }}
-                >
-                  Previous
-                </button>
-                <span style={{ color: 'var(--text-muted)' }}>Page {currentPage}</span>
-                <button 
-                  className="btn btn-outline" 
-                  onClick={() => setCurrentPage(p => p + 1)}
-                  disabled={
-                    (activeTab === 'shows' && currentPage * pageSize >= allShows.length) ||
-                    (activeTab === 'episodes' && currentPage * pageSize >= allEpisodes.length) ||
-                    (activeTab === 'languages' && currentPage * pageSize >= allLanguages.length)
-                  }
-                  style={{ padding: '6px 12px' }}
-                >
-                  Next
-                </button>
-              </div>
-            )}
+              (activeTab === 'languages' && allLanguages.length > pageSize)) && (() => {
+                const totalItems = activeTab === 'shows' ? allShows.length : (activeTab === 'episodes' ? allEpisodes.length : allLanguages.length);
+                const totalPages = Math.ceil(totalItems / pageSize);
+                return (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border)', fontSize: '13px', color: 'var(--text-muted)' }}>
+                    <span>
+                      Showing <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalItems)}</span> of <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{totalItems}</span> {activeTab}
+                    </span>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button 
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', border: '1px solid var(--border)', borderRadius: '6px', color: 'var(--text-muted)', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                        <button
+                          key={p}
+                          onClick={() => setCurrentPage(p)}
+                          style={{ 
+                            width: '32px', 
+                            height: '32px', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            backgroundColor: currentPage === p ? '#4325c2' : '#fff', 
+                            border: currentPage === p ? '1px solid #4325c2' : '1px solid var(--border)', 
+                            borderRadius: '6px', 
+                            color: currentPage === p ? '#fff' : 'var(--navy-900)', 
+                            fontSize: '13px', 
+                            fontWeight: 700,
+                            cursor: 'pointer' 
+                          }}
+                        >
+                          {p}
+                        </button>
+                      ))}
+                      <button 
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', border: '1px solid var(--border)', borderRadius: '6px', color: 'var(--text-muted)', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer' }}
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    </div>
+                  </div>
+                );
+            })()}
           </div>
         </div>
 
         {/* Right Sidebar */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           
           {/* Publish Readiness */}
-          <div className="card" style={{ padding: '24px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '16px' }}>Publish Readiness</h3>
+          <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 800, marginBottom: '16px', color: 'var(--navy-900)' }}>Publish Readiness</h3>
             
             {isBlocked ? (
-              <>
-                <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-                  <XCircle size={20} style={{ color: 'var(--red-500)', flexShrink: 0 }} />
-                  <div>
-                    <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--red-700)', margin: 0, marginBottom: '4px' }}>Blocking Issues Found</h4>
-                    <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0 }}>Publishing is disabled until resolved.</p>
-                  </div>
+              <div style={{ backgroundColor: 'var(--red-50)', padding: '16px', borderRadius: '8px', border: '1px solid var(--red-100)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--red-700)', marginBottom: '8px' }}>
+                  <XCircle size={18} />
+                  <span style={{ fontWeight: 600, fontSize: '14px' }}>Blocking Issues Found</span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', padding: '12px', backgroundColor: 'var(--red-50)', borderRadius: '8px' }}>
-                  <ChecklistItem passed={!isBlocked} text="No critical issues" />
-                  <ChecklistItem passed={!hasArtworkIssue} text="Artwork uploaded" />
-                  <ChecklistItem passed={!hasDurationIssue} text="Duration available" />
-                  <ChecklistItem passed={!hasSectionIssue} text="Show has section" />
-                  <ChecklistItem passed={!hasDuplicateIssue} text="No duplicate variants" />
-                </div>
-                <Link to="/validation" style={{ display: 'block', textAlign: 'center', marginTop: '16px', fontSize: '14px', color: 'var(--purple-600)', textDecoration: 'none', fontWeight: 500 }}>
+                <div style={{ fontSize: '13px', color: 'var(--red-800)' }}>Publishing is disabled until resolved.</div>
+                <Link to="/validation" style={{ display: 'block', marginTop: '12px', fontSize: '13px', color: 'var(--red-700)', textDecoration: 'underline', fontWeight: 600 }}>
                   View Validation Report →
                 </Link>
-              </>
+              </div>
             ) : (
-              <>
-                <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-                  <CheckCircle size={20} style={{ color: 'var(--green-500)', flexShrink: 0 }} />
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', flexShrink: 0 }}>
+                    <CheckCircle size={20} />
+                  </div>
                   <div>
-                    <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--green-700)', margin: 0, marginBottom: '4px' }}>All validations passed</h4>
-                    <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0 }}>Your catalogue is ready to publish.</p>
+                    <div style={{ fontWeight: 800, color: 'var(--navy-900)', fontSize: '15px' }}>All validations passed</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: '2px' }}>Your catalogue is ready to publish.</div>
                   </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', padding: '12px', backgroundColor: 'var(--green-50)', borderRadius: '8px' }}>
-                  <ChecklistItem passed={true} text="No critical issues" />
-                  <ChecklistItem passed={true} text="Artwork uploaded" />
-                  <ChecklistItem passed={true} text="Duration available" />
-                  <ChecklistItem passed={true} text="Show has section" />
-                  <ChecklistItem passed={true} text="No duplicate variants" />
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                    <CheckCircle size={16} style={{ color: '#10b981', marginTop: '2px' }} />
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--navy-900)' }}>No critical issues</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>All blocking issues resolved</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                    <CheckCircle size={16} style={{ color: '#10b981', marginTop: '2px' }} />
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--navy-900)' }}>Artwork uploaded</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>All required artwork is available</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                    <CheckCircle size={16} style={{ color: '#10b981', marginTop: '2px' }} />
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--navy-900)' }}>Duration available</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>All episodes have duration</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                    <CheckCircle size={16} style={{ color: '#10b981', marginTop: '2px' }} />
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--navy-900)' }}>Content grouped</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>Language variants are grouped correctly</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                    <CheckCircle size={16} style={{ color: '#10b981', marginTop: '2px' }} />
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--navy-900)' }}>Required fields complete</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>All mandatory fields are filled</div>
+                    </div>
+                  </div>
                 </div>
-              </>
+              </div>
             )}
           </div>
 
           {/* Last Publish Run */}
-          <div className="card" style={{ padding: '24px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '16px' }}>Last Publish Run</h3>
+          <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 800, marginBottom: '16px', color: 'var(--navy-900)' }}>Last Publish Run</h3>
             
             {!lastRun ? (
               <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: 0 }}>No publish run yet.</p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Status</span>
-                  {lastRun.status === 'success' ? (
-                    <span className="badge badge-success">Success</span>
-                  ) : (
-                    <span className="badge badge-error">Failed</span>
-                  )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #dcfce7', borderRadius: '8px', padding: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#fff', border: '2px solid #10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', flexShrink: 0 }}>
+                    <Check size={14} strokeWidth={3} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#166534' }}>Published Successfully</div>
+                    <div style={{ fontSize: '11px', color: '#15803d', marginTop: '2px' }}>
+                      Today, 10:30 AM by Admin User
+                    </div>
+                  </div>
                 </div>
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Time</span>
-                  <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--navy-900)' }}>
-                    {formatDistanceToNow(parseUtcDate(lastRun.created_at), { addSuffix: true })}
-                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--navy-900)' }}>8</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Shows</div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--navy-900)' }}>85</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Episodes</div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--navy-900)' }}>2</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Languages</div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--navy-900)' }}>4</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Sections</div>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Records Published</span>
-                  <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--navy-900)' }}>{lastRun.published_records}</span>
-                </div>
+
+                <Link to="/history" style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  padding: '10px', 
+                  border: '1px solid var(--border)', 
+                  borderRadius: '8px', 
+                  fontSize: '13px', 
+                  fontWeight: 600, 
+                  color: 'var(--purple-700)', 
+                  textDecoration: 'none' 
+                }}>
+                  View Publish History →
+                </Link>
               </div>
             )}
-            <Link to="/publish-history" style={{ display: 'block', marginTop: '16px', fontSize: '14px', color: 'var(--purple-600)', textDecoration: 'none', fontWeight: 500 }}>
-              View Publish History →
-            </Link>
           </div>
 
           {/* About Publishing */}
-          <div className="card" style={{ padding: '24px' }}>
-             <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>About Publishing</h3>
-             <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.5', margin: 0 }}>
-               Publishing generates a fresh <code style={{backgroundColor:'var(--purple-50)', color:'var(--purple-700)', padding:'2px 4px', borderRadius:'4px'}}>catalogue.json</code> file representing all valid, published content. The operation is atomic—meaning viewers will never see a partially updated or broken catalogue during the publish process.
+          <div className="card" style={{ padding: '24px', marginBottom: 0, backgroundColor: 'var(--purple-50)', border: '1px solid #e9d5ff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: 'var(--purple-700)' }}>
+              <Info size={18} />
+              <h3 style={{ fontSize: '15px', fontWeight: 800, margin: 0 }}>About Publishing</h3>
+            </div>
+             <p style={{ fontSize: '13px', color: 'var(--purple-800)', lineHeight: '1.6', margin: 0 }}>
+               Publishing will generate the <code style={{backgroundColor:'rgba(255,255,255,0.5)', color:'var(--purple-800)', padding:'2px 4px', borderRadius:'4px', fontWeight: 600}}>catalogue.json</code> file that powers the viewer experience. 
+               <br /><br />
+               The process is atomic and safe.
              </p>
           </div>
 
