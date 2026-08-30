@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Pagination } from '../components/ui/Pagination';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { 
@@ -20,6 +21,7 @@ import {
   X,
   RefreshCw
 } from 'lucide-react';
+import { Dropdown } from '../components/ui/Dropdown';
 import { parseISO, format, formatDistanceToNow, isAfter, subDays, subHours } from 'date-fns';
 
 const fetchPublishHistory = async () => {
@@ -41,142 +43,15 @@ const formatDuration = (seconds) => {
   return s > 0 ? `${m}m ${s}s` : `${m}m`;
 };
 
-const getPaginationWindow = (current, total) => {
-  if (total <= 7) {
-    return Array.from({length: total}, (_, i) => i + 1);
-  }
-  
-  if (current <= 4) {
-    return [1, 2, 3, 4, 5, 'ellipsis-1', total];
-  }
-  
-  if (current >= total - 3) {
-    return [1, 'ellipsis-1', total - 4, total - 3, total - 2, total - 1, total];
-  }
-  
-  return [1, 'ellipsis-1', current - 1, current, current + 1, 'ellipsis-2', total];
-};
 
-const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix, placement = 'bottom', height = '42px', padding = '0 12px 0 16px' }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [dynamicPlacement, setDynamicPlacement] = useState(placement);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (isOpen && ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const spaceAbove = rect.top;
-      // Dropdown max-height is 280px + search box ~45px = ~325px.
-      // If we don't have 325px below, but have more space above, open upwards.
-      if (spaceBelow < 325 && spaceAbove > spaceBelow) {
-        setDynamicPlacement('top');
-      } else {
-        setDynamicPlacement('bottom');
-      }
-    } else {
-      setSearchQuery(''); // reset search when closed
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setIsOpen(false);
-    };
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') setIsOpen(false);
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, []);
-
-  const filteredOptions = options.filter(opt => 
-    opt.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  return (
-    <div ref={ref} style={{ position: 'relative', minWidth, flexShrink: 0 }}>
-      {label && <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--navy-900)', paddingLeft: '4px', marginBottom: '6px', display: 'block' }}>{label}</label>}
-      <div 
-        onClick={() => setIsOpen(!isOpen)}
-        style={{ 
-          height, padding, display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-          backgroundColor: isOpen ? '#F5F3FF' : '#FFFFFF', 
-          border: isOpen ? '1px solid #A78BFA' : '1px solid #E2E8F0', 
-          borderRadius: '20px', cursor: 'pointer', color: isOpen ? '#6D28D9' : '#334155', 
-          fontSize: '13px', transition: 'all 0.2s ease', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
-        }}
-      >
-        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: '8px', fontWeight: value.startsWith('All') ? '400' : '500' }}>
-          {prefix && <span style={{ color: 'var(--text-muted)', fontWeight: '400', marginRight: '4px' }}>{prefix}</span>}
-          {value}
-        </span>
-        <ChevronDown size={14} style={{ flexShrink: 0, color: isOpen ? 'var(--purple-700)' : 'var(--text-muted)', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
-      </div>
-      {isOpen && (
-        <div style={{ 
-          position: 'absolute', 
-          ...(dynamicPlacement === 'top' ? { bottom: 'calc(100% + 6px)' } : { top: 'calc(100% + 6px)' }), 
-          left: 0, 
-          minWidth: '100%', 
-          backgroundColor: '#FFFFFF', 
-          border: '1px solid #E2E8F0', 
-          borderRadius: '16px', 
-          boxShadow: '0 10px 40px -10px rgba(109, 40, 217, 0.15)', 
-          zIndex: 50,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden'
-        }}>
-          {options.length > 10 && (
-            <div style={{ padding: '8px', borderBottom: '1px solid #F1F5F9', backgroundColor: '#F8FAFC' }}>
-              <input
-                type="text"
-                autoFocus
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E2E8F0', fontSize: '13px', outline: 'none', boxSizing: 'border-box' }}
-              />
-            </div>
-          )}
-          <div style={{ maxHeight: '280px', overflowY: 'auto', padding: '6px' }} className="custom-scrollbar">
-            {filteredOptions.length > 0 ? filteredOptions.map(opt => (
-              <div 
-                key={opt}
-                title={opt}
-                onClick={() => { onChange(opt); setIsOpen(false); }}
-                style={{ padding: '8px 12px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', backgroundColor: value === opt ? 'var(--purple-50)' : 'transparent', color: value === opt ? 'var(--purple-700)' : 'var(--navy-900)', fontWeight: value === opt ? '600' : '400', display: 'flex', alignItems: 'center', justifyContent: 'space-between', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                onMouseOver={e => { if (value !== opt) e.currentTarget.style.backgroundColor = 'var(--gray-50)' }}
-                onMouseOut={e => { if (value !== opt) e.currentTarget.style.backgroundColor = 'transparent' }}
-              >
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: '8px' }}>{opt}</span>
-                {value === opt && <Check size={14} style={{ flexShrink: 0 }} />}
-              </div>
-            )) : (
-              <div style={{ padding: '12px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
-                No results found
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
 
 const PublishHistory = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [selectedRun, setSelectedRun] = useState(null);
-  const pageSize = 10;
 
   const { data: history, isLoading, error, refetch } = useQuery({
     queryKey: ['publishHistory'],
@@ -535,64 +410,15 @@ const PublishHistory = () => {
 
           {/* Pagination */}
           {filteredHistory.length > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', borderTop: '1px solid var(--border)', fontSize: '13px', color: 'var(--text-muted)', backgroundColor: '#fff', flexWrap: 'wrap', gap: '16px' }}>
-              <div style={{ flex: 1, minWidth: '150px' }}>
-                Showing <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{(currentPage - 1) * pageSize + 1}</span> to <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{Math.min(currentPage * pageSize, filteredHistory.length)}</span> of <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{filteredHistory.length}</span> runs
-              </div>
-              
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center', flex: 2, minWidth: '200px' }}>
-                <button 
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', border: '1px solid var(--border)', borderRadius: '6px', color: 'var(--text-muted)', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                
-                {getPaginationWindow(currentPage, totalPages).map((p) => {
-                  if (typeof p === 'string') {
-                    return <span key={p} style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)', padding: '0 4px' }}>…</span>;
-                  }
-                  return (
-                    <button
-                      key={p}
-                      onClick={() => setCurrentPage(p)}
-                      style={{ 
-                        width: '32px', 
-                        height: '32px', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        backgroundColor: currentPage === p ? '#4325c2' : '#fff', 
-                        border: currentPage === p ? '1px solid #4325c2' : '1px solid var(--border)', 
-                        borderRadius: '6px', 
-                        color: currentPage === p ? '#fff' : 'var(--navy-900)', 
-                        fontSize: '13px', 
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      {p}
-                    </button>
-                  );
-                })}
-
-                <button 
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', border: '1px solid var(--border)', borderRadius: '6px', color: 'var(--text-muted)', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer' }}
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-
-              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', minWidth: '120px' }}>
-                <select style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '6px 12px', fontSize: '13px', color: 'var(--navy-900)', outline: 'none', cursor: 'pointer', backgroundColor: '#fff' }} defaultValue={10}>
-                  <option value={10}>10 per page</option>
-                </select>
-              </div>
-            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filteredHistory.length}
+              itemsPerPage={pageSize}
+              setCurrentPage={setCurrentPage}
+              setItemsPerPage={setPageSize}
+              itemName="runs"
+            />
           )}
         </div>
 

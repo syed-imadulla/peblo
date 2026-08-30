@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Pagination } from '../components/ui/Pagination';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../components/AuthProvider';
@@ -55,6 +56,7 @@ const Publish = () => {
   const [publishResult, setPublishResult] = useState(null);
   const [activeTab, setActiveTab] = useState('shows');
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
 
   useEffect(() => {
@@ -171,7 +173,6 @@ const Publish = () => {
     };
   }, [previewData]);
 
-  const pageSize = 10;
   const paginatedShows = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     return allShows.slice(start, start + pageSize);
@@ -602,49 +603,15 @@ const Publish = () => {
                 const totalItems = activeTab === 'shows' ? allShows.length : (activeTab === 'episodes' ? allEpisodes.length : allLanguages.length);
                 const totalPages = Math.ceil(totalItems / pageSize);
                 return (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border)', fontSize: '13px', color: 'var(--text-muted)' }}>
-                    <span>
-                      Showing <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalItems)}</span> of <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{totalItems}</span> {activeTab}
-                    </span>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button 
-                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                        disabled={currentPage === 1}
-                        style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', border: '1px solid var(--border)', borderRadius: '6px', color: 'var(--text-muted)', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
-                      >
-                        <ChevronLeft size={16} />
-                      </button>
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-                        <button
-                          key={p}
-                          onClick={() => setCurrentPage(p)}
-                          style={{ 
-                            width: '32px', 
-                            height: '32px', 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center', 
-                            backgroundColor: currentPage === p ? '#4325c2' : '#fff', 
-                            border: currentPage === p ? '1px solid #4325c2' : '1px solid var(--border)', 
-                            borderRadius: '6px', 
-                            color: currentPage === p ? '#fff' : 'var(--navy-900)', 
-                            fontSize: '13px', 
-                            fontWeight: 700,
-                            cursor: 'pointer' 
-                          }}
-                        >
-                          {p}
-                        </button>
-                      ))}
-                      <button 
-                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                        disabled={currentPage === totalPages}
-                        style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', border: '1px solid var(--border)', borderRadius: '6px', color: 'var(--text-muted)', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer' }}
-                      >
-                        <ChevronRight size={16} />
-                      </button>
-                    </div>
-                  </div>
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={totalItems}
+                    itemsPerPage={pageSize}
+                    setCurrentPage={setCurrentPage}
+                    setItemsPerPage={setPageSize}
+                    itemName={activeTab}
+                  />
                 );
             })()}
           </div>
