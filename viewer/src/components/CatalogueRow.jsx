@@ -12,7 +12,7 @@ export const CatalogueRow = ({ title, count, children }) => {
   };
 
   return (
-    <section className="catalogue-row" style={{ marginBottom: '2.5rem', position: 'relative' }}>
+    <section className="catalogue-row" style={{ marginBottom: '1.75rem', position: 'relative' }}>
       <div
         style={{
           display: 'flex',

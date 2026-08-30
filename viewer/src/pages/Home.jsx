@@ -70,7 +70,7 @@ const Home = () => {
   };
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
       {/* ─── Hero Billboard ──────────────────────────────────────────────────────── */}
       <div
         style={{
