@@ -264,14 +264,14 @@ const Publish = () => {
               display: 'flex', 
               alignItems: 'center', 
               gap: '8px', 
-              backgroundColor: '#4325c2', 
-              color: '#FFFFFF', 
+              backgroundColor: (!isAdmin || isBlocked || publishMutation.isPending) ? '#e2e8f0' : '#4325c2', 
+              color: (!isAdmin || isBlocked || publishMutation.isPending) ? '#94a3b8' : '#FFFFFF', 
               border: 'none', 
               boxShadow: (!isAdmin || isBlocked || publishMutation.isPending) ? 'none' : '0 4px 12px rgba(109, 40, 217, 0.25)', 
               cursor: (!isAdmin || isBlocked || publishMutation.isPending) ? 'not-allowed' : 'pointer', 
               whiteSpace: 'nowrap', 
               flexShrink: 0,
-              opacity: (!isAdmin || isBlocked || publishMutation.isPending) ? 0.6 : 1
+              opacity: 1
             }}
             title={publishDisabledReason || ''}
           >
