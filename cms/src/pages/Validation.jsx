@@ -325,7 +325,8 @@ const Validation = () => {
   const hasFilt  = search || fShow !== 'All Shows' || fStatus !== 'All Status' || fSev !== 'All Severity';
   const clearAll = () => { setSearch(''); setFShow('All Shows'); setFStatus('All Status'); setFSev('All Severity'); };
 
-  const latestRunTimestamp = report?.validated_at || history?.[0]?.created_at;
+  const historyData = Array.isArray(history) ? history : (history?.data || []);
+  const latestRunTimestamp = report?.validated_at || historyData[0]?.created_at;
 
   // Error state
   if (rError) return (
@@ -645,7 +646,7 @@ const Validation = () => {
                 </span>
               )}
             </div>
-            <LatestRunCard report={report} historyRun={history?.[0]} loading={rLoading || hLoading} />
+            <LatestRunCard report={report} historyRun={historyData[0]} loading={rLoading || hLoading} />
           </div>
 
         </div>

@@ -223,7 +223,8 @@ const Publish = () => {
     publishDisabledReason = "Publishing is disabled because there are blocking validation issues.";
   }
 
-  const lastRun = history && history.length > 0 ? history[0] : null;
+  const historyData = Array.isArray(history) ? history : (history?.data || []);
+  const lastRun = historyData.length > 0 ? historyData[0] : null;
 
   // Validation Checks breakdown - using EXACT issue_type strings from admin.py
   const hasArtworkIssue = report?.issues?.some(i => i.issue_type === 'Missing Artwork');
