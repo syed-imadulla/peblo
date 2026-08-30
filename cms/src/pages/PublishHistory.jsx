@@ -99,6 +99,13 @@ const PublishHistory = () => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, dateFilter]);
 
+  // Clamp page when dataset shrinks (e.g. after filter change or polling update)
+  React.useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
   // Statistics
   const stats = useMemo(() => {
     if (!history) return { total: 0, success: 0, failed: 0, avgDuration: '—' };
@@ -279,15 +286,28 @@ const PublishHistory = () => {
                     const formattedDate = format(date, 'MMM d, yyyy');
                     const formattedTime = format(date, 'hh:mm a');
                     
-                    let displayRole = 'System';
-                    let displayEmail = 'system@peblo.tv';
-                    
+                    // Published By resolution:
+                    // - If triggered_by has a matching user: show real role + real email
+                    // - If triggered_by is a UUID but user no longer exists: show deleted-user state
+                    // - If triggered_by is NULL: this is a system-initiated run; "System" is accurate,
+                    //   but we do NOT invent an email address for it.
+                    let displayRole;
+                    let displayEmail;
+
                     if (run.user) {
-                      displayRole = run.user.role ? run.user.role.charAt(0).toUpperCase() + run.user.role.slice(1) : 'Unknown Role';
+                      // Real user found via JOIN
+                      displayRole = run.user.role
+                        ? run.user.role.charAt(0).toUpperCase() + run.user.role.slice(1)
+                        : 'Unknown Role';
                       displayEmail = run.user.email;
                     } else if (run.triggered_by) {
+                      // UUID exists but user was deleted from DB
                       displayRole = 'Deleted User';
-                      displayEmail = `ID: ${run.triggered_by.substring(0, 8)}...`;
+                      displayEmail = `ID: ${run.triggered_by.substring(0, 8)}…`;
+                    } else {
+                      // NULL triggered_by — system/script triggered
+                      displayRole = 'System';
+                      displayEmail = null; // no email to show
                     }
 
                     const isSuccess = run.status === 'success';
@@ -307,7 +327,9 @@ const PublishHistory = () => {
                         </td>
                         <td style={{ padding: '16px 0' }}>
                           <div style={{ fontWeight: 600, color: 'var(--navy-900)' }}>{displayRole}</div>
-                          <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{displayEmail}</div>
+                          {displayEmail && (
+                            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{displayEmail}</div>
+                          )}
                         </td>
                         <td style={{ padding: '16px 0' }}>
                            <span style={{ 
@@ -324,8 +346,8 @@ const PublishHistory = () => {
                              <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: isSuccess ? '#10b981' : '#ef4444' }}></div>
                              {isSuccess ? 'Success' : 'Failed'}
                            </span>
-                           {!isSuccess && run.error_log && run.error_log.length > 0 && (
-                             <div style={{ fontSize: '11px', color: 'var(--red-700)', marginTop: '4px', maxWidth: '120px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                           {!isSuccess && run.error_log && Array.isArray(run.error_log) && run.error_log.length > 0 && (
+                             <div style={{ fontSize: '11px', color: '#b91c1c', marginTop: '4px', maxWidth: '120px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                {run.error_log[0].issue_type || run.error_log[0].type || 'Validation failed'}
                              </div>
                            )}
@@ -494,7 +516,12 @@ const PublishHistory = () => {
                       {latestRun.status === 'success' ? 'Published Successfully' : 'Publish Failed'}
                     </div>
                     <div style={{ fontSize: '11px', color: latestRun.status === 'success' ? '#15803d' : '#7f1d1d', marginTop: '2px' }}>
-                      {format(parseUtcDate(latestRun.created_at), 'MMM d, yyyy h:mm a')} by {latestRun.user ? (latestRun.user.role ? latestRun.user.role.charAt(0).toUpperCase() + latestRun.user.role.slice(1) : 'Unknown User') : (latestRun.triggered_by ? 'Deleted User' : 'System')}
+                      {format(parseUtcDate(latestRun.created_at), 'MMM d, yyyy h:mm a')}
+                      {latestRun.user
+                        ? ` by ${latestRun.user.role ? latestRun.user.role.charAt(0).toUpperCase() + latestRun.user.role.slice(1) : 'User'}`
+                        : latestRun.triggered_by
+                          ? ' by Deleted User'
+                          : ' by System'}
                     </div>
                   </div>
                 </div>
@@ -542,13 +569,13 @@ const PublishHistory = () => {
           </div>
 
           {/* Quick Actions */}
-          <div>
+          <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', color: 'var(--purple-700)' }}>
               <Send size={18} />
               <h3 style={{ fontSize: '15px', fontWeight: 800, margin: 0, color: 'var(--navy-900)' }}>Quick Actions</h3>
             </div>
             
-            <Link to="/publish" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', backgroundColor: 'var(--purple-50)', borderRadius: '12px', textDecoration: 'none', marginBottom: '12px', border: '1px solid transparent', transition: 'border-color 0.2s' }}>
+            <Link to="/publish" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', backgroundColor: 'var(--purple-50)', borderRadius: '12px', textDecoration: 'none', marginBottom: '12px', border: '1px solid #e9d5ff', transition: 'border-color 0.2s' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#fff', color: 'var(--purple-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
                 <Send size={18} />
               </div>
@@ -558,7 +585,7 @@ const PublishHistory = () => {
               </div>
             </Link>
 
-            <Link to="/validation" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', backgroundColor: '#f1f5f9', borderRadius: '12px', textDecoration: 'none', border: '1px solid transparent' }}>
+            <Link to="/validation" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', backgroundColor: '#f1f5f9', borderRadius: '12px', textDecoration: 'none', border: '1px solid var(--border)' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#fff', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
                 <FileJson size={18} />
               </div>
@@ -625,7 +652,13 @@ const PublishHistory = () => {
                 </div>
                 <div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>TRIGGERED BY</div>
-                  <div style={{ fontSize: '14px', color: 'var(--navy-900)' }}>{selectedRun.user ? selectedRun.user.email : (selectedRun.triggered_by ? `ID: ${selectedRun.triggered_by}` : 'System')}</div>
+                  <div style={{ fontSize: '14px', color: 'var(--navy-900)' }}>
+                    {selectedRun.user
+                      ? selectedRun.user.email
+                      : selectedRun.triggered_by
+                        ? `ID: ${selectedRun.triggered_by}`
+                        : 'System (no user associated)'}
+                  </div>
                 </div>
                 <div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>DURATION</div>
@@ -661,7 +694,7 @@ const PublishHistory = () => {
                 </div>
               )}
 
-              {selectedRun.error_log && selectedRun.error_log.length > 0 && (
+              {selectedRun.error_log && Array.isArray(selectedRun.error_log) && selectedRun.error_log.length > 0 && (
                 <div>
                   <div style={{ fontSize: '12px', color: 'var(--red-700)', fontWeight: 600, marginBottom: '8px' }}>ERROR LOG ({selectedRun.error_log.length} Issues)</div>
                   <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', overflow: 'hidden' }}>
