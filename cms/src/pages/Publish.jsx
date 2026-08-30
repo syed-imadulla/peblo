@@ -657,11 +657,31 @@ const Publish = () => {
             )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <ChecklistItem passed={report?.blocked_records_count === 0} title={report?.blocked_records_count === 0 ? "No critical issues" : "Critical issues found"} description="All blocking issues resolved" />
-              <ChecklistItem passed={!hasArtworkIssue} title="Artwork uploaded" description="All required artwork is available" />
-              <ChecklistItem passed={!hasDurationIssue} title="Duration available" description="All episodes have duration" />
-              <ChecklistItem passed={!hasSectionIssue} title="Content grouped" description="Language variants are grouped correctly" />
-              <ChecklistItem passed={!hasDuplicateIssue} title="Variants unique" description="No duplicate languages for a content group" />
+              <ChecklistItem 
+                passed={report?.blocked_records_count === 0} 
+                title={report?.blocked_records_count === 0 ? "No critical issues" : "Critical issues found"} 
+                description={report?.blocked_records_count === 0 ? "All blocking issues resolved" : "Publishing is disabled until resolved"} 
+              />
+              <ChecklistItem 
+                passed={!hasArtworkIssue} 
+                title="Artwork uploaded" 
+                description={!hasArtworkIssue ? "All required artwork is available" : `${report?.issues?.filter(i => i.issue_type === 'Missing Artwork').length} episode${report?.issues?.filter(i => i.issue_type === 'Missing Artwork').length > 1 ? 's are' : ' is'} missing artwork`} 
+              />
+              <ChecklistItem 
+                passed={!hasDurationIssue} 
+                title="Duration available" 
+                description={!hasDurationIssue ? "All episodes have duration" : `${report?.issues?.filter(i => i.issue_type === 'Missing Duration').length} episode${report?.issues?.filter(i => i.issue_type === 'Missing Duration').length > 1 ? 's are' : ' is'} missing duration`} 
+              />
+              <ChecklistItem 
+                passed={!hasSectionIssue} 
+                title="Show section assigned" 
+                description={!hasSectionIssue ? "All published shows have a section" : `${report?.issues?.filter(i => i.issue_type === 'Missing Show Section').length} episode${report?.issues?.filter(i => i.issue_type === 'Missing Show Section').length > 1 ? 's belong' : ' belongs'} to a show missing a section`} 
+              />
+              <ChecklistItem 
+                passed={!hasDuplicateIssue} 
+                title="Variants unique" 
+                description={!hasDuplicateIssue ? "No duplicate languages for a content group" : `${report?.issues?.filter(i => i.issue_type === 'Duplicate Content Group').length} duplicate language variant${report?.issues?.filter(i => i.issue_type === 'Duplicate Content Group').length > 1 ? 's' : ''} found`} 
+              />
             </div>
           </div>
 
