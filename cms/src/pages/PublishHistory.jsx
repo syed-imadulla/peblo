@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -8,7 +8,6 @@ import {
   XCircle,
   Search,
   Filter,
-  Calendar,
   MoreHorizontal,
   Bell,
   Clock,
@@ -17,7 +16,8 @@ import {
   ChevronRight,
   Send,
   FileJson,
-  X
+  X,
+  RefreshCw
 } from 'lucide-react';
 import { parseISO, format, formatDistanceToNow, isAfter, subDays, subHours } from 'date-fns';
 
@@ -48,7 +48,7 @@ const PublishHistory = () => {
   const [selectedRun, setSelectedRun] = useState(null);
   const pageSize = 10;
 
-  const { data: history, isLoading, error } = useQuery({
+  const { data: history, isLoading, error, refetch } = useQuery({
     queryKey: ['publishHistory'],
     queryFn: fetchPublishHistory,
     refetchOnWindowFocus: true,
@@ -106,6 +106,14 @@ const PublishHistory = () => {
     }
   }, [totalPages, currentPage]);
 
+  // Escape key closes the modal
+  useEffect(() => {
+    if (!selectedRun) return;
+    const handler = (e) => { if (e.key === 'Escape') setSelectedRun(null); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [selectedRun]);
+
   // Statistics
   const stats = useMemo(() => {
     if (!history) return { total: 0, success: 0, failed: 0, avgDuration: '—' };
@@ -141,7 +149,21 @@ const PublishHistory = () => {
   }
 
   if (error) {
-    return <div className="badge badge-error">Error loading history: {error.message}</div>;
+    return (
+      <div style={{ maxWidth: '1200px', margin: '0 auto', paddingTop: '80px', textAlign: 'center' }}>
+        <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: '#fee2e2', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+          <XCircle size={28} />
+        </div>
+        <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--navy-900)', margin: '0 0 8px' }}>Failed to load publish history</h3>
+        <p style={{ color: 'var(--text-muted)', fontSize: '14px', margin: '0 0 24px' }}>{error.message}</p>
+        <button
+          onClick={() => refetch()}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#4325c2', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
+        >
+          <RefreshCw size={16} /> Retry
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -165,7 +187,10 @@ const PublishHistory = () => {
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <div style={{ position: 'relative' }}>
-            <button style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid var(--border)', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', cursor: 'pointer' }}>
+            <button
+              aria-label="Notifications"
+              style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid var(--border)', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', cursor: 'pointer', outline: 'none' }}
+            >
               <Bell size={18} />
             </button>
           </div>
@@ -373,7 +398,8 @@ const PublishHistory = () => {
                         <td style={{ padding: '16px 0', textAlign: 'right' }}>
                           <button 
                             onClick={() => setSelectedRun(run)}
-                            style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '6px', width: '32px', height: '32px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', cursor: 'pointer' }}
+                            aria-label={`View details for run ${run.id.substring(0, 8)}`}
+                            style={{ background: 'none', border: '1px solid var(--border)', borderRadius: '6px', width: '32px', height: '32px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', cursor: 'pointer', outline: 'none' }}
                           >
                             <MoreHorizontal size={16} />
                           </button>
@@ -403,7 +429,7 @@ const PublishHistory = () => {
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => {
                   if (totalPages > 7) {
                     if (p !== 1 && p !== totalPages && Math.abs(currentPage - p) > 1) {
-                      if (p === 2 || p === totalPages - 1) return <span key={p}>...</span>;
+                      if (p === 2 || p === totalPages - 1) return <span key={`ellipsis-${p}`} style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}>…</span>;
                       return null;
                     }
                   }
@@ -597,13 +623,13 @@ const PublishHistory = () => {
           </div>
 
           {/* About Publish History */}
-          <div className="card" style={{ padding: '24px', marginBottom: 0, backgroundColor: 'var(--purple-50)', border: '1px solid #e9d5ff' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: 'var(--purple-700)' }}>
+          <div className="card" style={{ padding: '24px', marginBottom: 0, backgroundColor: '#f5f3ff', border: '1px solid #e9d5ff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: '#6D28D9' }}>
               <Info size={18} />
-              <h3 style={{ fontSize: '15px', fontWeight: 800, margin: 0 }}>About Publish History</h3>
+              <h3 style={{ fontSize: '15px', fontWeight: 800, margin: 0, color: '#4B27B5' }}>About Publish History</h3>
             </div>
-             <p style={{ fontSize: '13px', color: 'var(--purple-800)', lineHeight: '1.6', margin: 0 }}>
-               Each publish run generates a new <code style={{backgroundColor:'rgba(255,255,255,0.5)', color:'var(--purple-800)', padding:'2px 4px', borderRadius:'4px', fontWeight: 600}}>catalogue.json</code> file with the latest content and metadata.
+             <p style={{ fontSize: '13px', color: '#5b21b6', lineHeight: '1.6', margin: 0 }}>
+               Each publish run generates a new <code style={{backgroundColor:'rgba(255,255,255,0.5)', color:'#5b21b6', padding:'2px 4px', borderRadius:'4px', fontWeight: 600}}>catalogue.json</code> file with the latest content and metadata.
              </p>
           </div>
 
@@ -618,10 +644,10 @@ const PublishHistory = () => {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           backdropFilter: 'blur(4px)'
         }} onClick={() => setSelectedRun(null)}>
-          <div className="card" onClick={e => e.stopPropagation()} style={{ width: '90%', maxWidth: '600px', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', overflow: 'hidden', padding: 0 }}>
+          <div className="card" onClick={e => e.stopPropagation()} style={{ width: '90%', maxWidth: '600px', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', overflow: 'hidden', padding: 0 }} role="dialog" aria-modal="true" aria-label="Publish Run Details">
             <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>Publish Run Details</h3>
-              <button onClick={() => setSelectedRun(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
+              <button onClick={() => setSelectedRun(null)} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', outline: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <X size={20} />
               </button>
             </div>
@@ -657,7 +683,7 @@ const PublishHistory = () => {
                       ? selectedRun.user.email
                       : selectedRun.triggered_by
                         ? `ID: ${selectedRun.triggered_by}`
-                        : 'System (no user associated)'}
+                        : 'System'}
                   </div>
                 </div>
                 <div>
@@ -696,9 +722,9 @@ const PublishHistory = () => {
 
               {selectedRun.error_log && Array.isArray(selectedRun.error_log) && selectedRun.error_log.length > 0 && (
                 <div>
-                  <div style={{ fontSize: '12px', color: 'var(--red-700)', fontWeight: 600, marginBottom: '8px' }}>ERROR LOG ({selectedRun.error_log.length} Issues)</div>
+                  <div style={{ fontSize: '12px', color: '#b91c1c', fontWeight: 600, marginBottom: '8px' }}>ERROR LOG ({selectedRun.error_log.length} Issues)</div>
                   <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', overflow: 'hidden' }}>
-                    <div style={{ padding: '12px 16px', fontSize: '13px', color: 'var(--red-800)', fontFamily: 'monospace', maxHeight: '200px', overflowY: 'auto' }}>
+                    <div style={{ padding: '12px 16px', fontSize: '13px', color: '#7f1d1d', fontFamily: 'monospace', maxHeight: '200px', overflowY: 'auto' }}>
                       <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
                         {JSON.stringify(selectedRun.error_log, null, 2)}
                       </pre>

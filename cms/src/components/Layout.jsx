@@ -36,7 +36,7 @@ const Layout = () => {
     transition: 'all 0.2s',
     fontWeight: '600',
     textDecoration: 'none',
-    borderLeft: '4px solid transparent'
+    outline: 'none',
   };
   
   const getPageTitle = () => {
@@ -129,7 +129,7 @@ const Layout = () => {
         </div>
       </div>
 
-      {/* Responsive Adjustments */}
+      {/* Responsive Adjustments + Nav Focus Fix */}
       <style>{`
         .sidebar { 
           position: sticky; 
@@ -141,6 +141,19 @@ const Layout = () => {
           flex: 1; 
           min-width: 0; 
           box-sizing: border-box; 
+        }
+        /* Remove browser default black outline on nav links.
+           We keep :focus-visible for keyboard accessibility with a purple ring. */
+        nav a {
+          outline: none;
+        }
+        nav a:focus-visible {
+          outline: 2px solid var(--purple-500);
+          outline-offset: 2px;
+        }
+        nav a:hover:not([aria-current="page"]) {
+          background-color: #f5f3ff !important;
+          color: var(--purple-700) !important;
         }
         @media (max-width: 1024px) {
           .sidebar { 
