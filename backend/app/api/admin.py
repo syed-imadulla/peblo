@@ -4,7 +4,7 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from app.core.database import get_db
 from app.services.publish import PublishService
-from app.models.models import Episode, Season, Show, Artwork, PublishRun
+from app.models.models import Episode, Season, Show, Artwork, PublishRun, User
 from app.api.auth import get_current_user, get_current_admin
 
 router = APIRouter(prefix="/admin")
@@ -293,7 +293,8 @@ def get_publish_history(
     current_user: dict = Depends(get_current_user),  # read-only — all authenticated users
 ):
     runs = (
-        db.query(PublishRun)
+        db.query(PublishRun, User)
+        .outerjoin(User, PublishRun.triggered_by == User.id)
         .order_by(PublishRun.created_at.desc())
         .limit(50)
         .all()
@@ -307,8 +308,10 @@ def get_publish_history(
             "blocked_records": run.blocked_records,
             "error_log": run.error_log,
             "stats": run.stats,
+            "duration_seconds": run.duration_seconds,
             "created_at": run.created_at.isoformat(),
             "triggered_by": str(run.triggered_by) if run.triggered_by else None,
+            "user": {"id": str(user.id), "email": user.email, "role": user.role} if user else None
         }
-        for run in runs
+        for run, user in runs
     ]

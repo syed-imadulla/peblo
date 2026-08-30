@@ -1,6 +1,7 @@
 import json
 import uuid
 import os
+import time
 from typing import Dict, Any, List
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
@@ -11,6 +12,7 @@ from app.services.storage import storage
 class PublishService:
     @staticmethod
     def publish_catalogue(db: Session, triggered_by: str = None) -> PublishRun:
+        start_time = time.time()
         # 1. Fetch all published records with relationships eagerly loaded
         episodes = db.query(Episode).options(
             joinedload(Episode.season).joinedload(Season.show)
@@ -70,6 +72,8 @@ class PublishService:
         else:
             error_log.append({"type": "empty_catalogue", "description": "No valid records to publish"})
 
+        duration_seconds = int(time.time() - start_time)
+
         # Record run
         run = PublishRun(
             id=str(uuid.uuid4()),
@@ -78,7 +82,8 @@ class PublishService:
             published_records=published_records,
             blocked_records=blocked,
             error_log=error_log,
-            stats=stats
+            stats=stats,
+            duration_seconds=duration_seconds
         )
         if triggered_by:
             run.triggered_by = triggered_by
