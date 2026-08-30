@@ -157,10 +157,10 @@ const PillDrop = ({ value, onChange, options, minW = '110px' }) => {
         <ChevronDown size={13} color={open ? '#6D28D9' : '#94A3B8'} style={{ flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
       </button>
       {open && (
-        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, minWidth: '100%', background: '#FFF', border: '1px solid #E2E8F0', borderRadius: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.07)', zIndex: 300, padding: '4px', maxHeight: '240px', overflowY: 'auto' }}>
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, minWidth: '100%', width: 'max-content', maxWidth: '280px', background: '#FFF', border: '1px solid #E2E8F0', borderRadius: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.07)', zIndex: 300, padding: '4px', maxHeight: '240px', overflowY: 'auto' }}>
           {options.map(opt => (
             <div key={opt} onClick={() => { onChange(opt); setOpen(false); }}
-              style={{ padding: '8px 12px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', background: value === opt ? '#F5F3FF' : 'transparent', color: value === opt ? '#6D28D9' : '#334155', fontWeight: value === opt ? '600' : '400' }}
+              style={{ padding: '8px 12px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', background: value === opt ? '#F5F3FF' : 'transparent', color: value === opt ? '#6D28D9' : '#334155', fontWeight: value === opt ? '600' : '400', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
               onMouseOver={e => { if (value !== opt) e.currentTarget.style.background = '#F8FAFC'; }}
               onMouseOut={e => { if (value !== opt) e.currentTarget.style.background = 'transparent'; }}
             >
