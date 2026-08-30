@@ -1,12 +1,13 @@
+import json
+import os
+import uuid
+from typing import List, Any, Dict
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from typing import List, Any, Dict
-import json
-import os
 
 from app.core.database import get_db
-from app.api.auth import get_current_admin
+from app.api.auth import get_current_admin, get_current_user
 from app.models.models import SystemSettings
 from app.services.storage import asset_storage, storage
 from app.core.config import settings as app_settings
@@ -85,8 +86,6 @@ def get_system_info() -> dict:
         "artwork_specs": artwork_specs
     }
 
-from app.api.auth import get_current_admin, get_current_user
-
 @router.get("")
 def read_settings(
     db: Session = Depends(get_db),
@@ -145,8 +144,6 @@ def update_publishing_settings(
     db.refresh(settings_obj)
     return settings_obj
 
-import uuid as _uuid
-
 @router.post("/storage/test")
 def test_storage_connection(
     admin_user: dict = Depends(get_current_admin)
@@ -157,12 +154,10 @@ def test_storage_connection(
     Never leaves a permanent file behind.
     """
     # Use a unique name per request to avoid race conditions or stale files.
-    test_id = _uuid.uuid4().hex
+    test_id = uuid.uuid4().hex
     test_filename = f".conn_test_{test_id}"
     test_content = f"peblo_conn_test_{test_id}"
 
-    data_ok = False
-    asset_ok = False
     error_detail = None
 
     try:
@@ -171,29 +166,25 @@ def test_storage_connection(
         read_back = storage.read(test_filename)
         if read_back != test_content:
             raise Exception("Data storage: read value did not match written value.")
-        data_ok = True
 
         # Test asset storage
         asset_storage.write(test_filename, test_content)
         asset_read = asset_storage.read(test_filename)
         if asset_read != test_content:
             raise Exception("Asset storage: read value did not match written value.")
-        asset_ok = True
 
     except Exception as e:
         error_detail = str(e)
     finally:
-        # Unconditional cleanup - never leave the test file behind
-        if data_ok:
-            try:
-                storage.delete(test_filename)
-            except Exception:
-                pass
-        if asset_ok:
-            try:
-                asset_storage.delete(test_filename)
-            except Exception:
-                pass
+        # Unconditional cleanup - delete test file from both storage locations regardless of when error occurred
+        try:
+            storage.delete(test_filename)
+        except Exception:
+            pass
+        try:
+            asset_storage.delete(test_filename)
+        except Exception:
+            pass
 
     if error_detail:
         return StorageTestResponse(success=False, message=error_detail)
@@ -202,4 +193,5 @@ def test_storage_connection(
         success=True,
         message="Storage connection successful. Data path and assets path are readable and writable."
     )
+
 

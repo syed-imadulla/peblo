@@ -170,7 +170,7 @@ const Layout = () => {
 
       {/* Main Content */}
       <div className="main-content" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        {!(location.pathname.includes('/new') || location.pathname.includes('/edit') || location.pathname === '/validation' || location.pathname === '/publish' || location.pathname === '/publish-history' || location.pathname === '/settings') ? (
+        {!(location.pathname.includes('/new') || location.pathname.includes('/edit') || location.pathname === '/validation' || location.pathname === '/publish' || location.pathname === '/publish-history' || location.pathname.startsWith('/settings')) ? (
           <header style={{ display: 'flex', alignItems: 'center', padding: '32px 32px 0 32px', gap: '16px', background: 'transparent', maxWidth: '1400px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
             <button className="mobile-only" onClick={() => setSidebarOpen(true)} style={{ color: 'var(--text-main)', display: 'none' }}>
               <Menu size={24} />

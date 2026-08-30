@@ -114,14 +114,46 @@ def test_update_publishing_settings(client):
 def test_non_admin_cannot_update_settings(client):
     token = editor_token(client)
     headers = {"Authorization": f"Bearer {token}"}
-    payload = {
+    
+    # PUT site
+    res_site = client.put("/admin/settings/site", json={
         "site_name": "Hacked",
         "admin_email": "hack@evil.com",
         "site_url": "http://evil.com",
         "timezone": "UTC",
-    }
-    res = client.put("/admin/settings/site", json=payload, headers=headers)
-    assert res.status_code == 403
+    }, headers=headers)
+    assert res_site.status_code == 403
+
+    # PUT content
+    res_content = client.put("/admin/settings/content", json={
+        "default_section": "series",
+        "default_languages": ["en"],
+        "default_status": "Draft",
+        "season_0_handling": "Trailers",
+        "content_grouping": "Variants",
+    }, headers=headers)
+    assert res_content.status_code == 403
+
+    # PUT publishing
+    res_pub = client.put("/admin/settings/publishing", json={
+        "auto_publish": False,
+        "generate_backup": False,
+        "catalogue_format": "JSON",
+        "atomic_publish": True,
+    }, headers=headers)
+    assert res_pub.status_code == 403
+
+    # POST storage test
+    res_storage = client.post("/admin/settings/storage/test", headers=headers)
+    assert res_storage.status_code == 403
+
+
+def test_invalid_settings_payload_rejected(client):
+    token = admin_token(client)
+    headers = {"Authorization": f"Bearer {token}"}
+    # Missing required field
+    res = client.put("/admin/settings/site", json={"site_name": "Incomplete"}, headers=headers)
+    assert res.status_code == 422
 
 
 def test_storage_test_succeeds_and_cleans_up(client, tmp_path, monkeypatch):
@@ -148,6 +180,41 @@ def test_storage_test_succeeds_and_cleans_up(client, tmp_path, monkeypatch):
         # Verify no test files remain
         leftover = [f for f in os.listdir(tmp_path) if f.startswith(".conn_test_")]
         assert leftover == [], f"Leftover test files found: {leftover}"
+    finally:
+        storage_module.storage.base_path = original_data
+        storage_module.asset_storage.base_path = original_asset
+
+
+def test_storage_test_failure_cleans_up(client, tmp_path, monkeypatch):
+    """
+    When an error occurs during storage test (e.g. read failure),
+    the endpoint must return success=False AND clean up all temporary files.
+    """
+    import os
+    from app.services import storage as storage_module
+
+    original_data = storage_module.storage.base_path
+    original_asset = storage_module.asset_storage.base_path
+    storage_module.storage.base_path = str(tmp_path)
+    storage_module.asset_storage.base_path = str(tmp_path)
+
+    # Monkeypatch asset_storage.read to simulate a failure
+    def failing_read(filename):
+        raise IOError("Simulated disk read error")
+
+    monkeypatch.setattr(storage_module.asset_storage, "read", failing_read)
+
+    try:
+        token = admin_token(client)
+        res = client.post("/admin/settings/storage/test", headers={"Authorization": f"Bearer {token}"})
+        assert res.status_code == 200
+        body = res.json()
+        assert body["success"] is False
+        assert "Simulated disk read error" in body["message"]
+
+        # Crucial check: verify zero test files remain even after failure!
+        leftover = [f for f in os.listdir(tmp_path) if f.startswith(".conn_test_")]
+        assert leftover == [], f"Leftover test files found after failure: {leftover}"
     finally:
         storage_module.storage.base_path = original_data
         storage_module.asset_storage.base_path = original_asset
