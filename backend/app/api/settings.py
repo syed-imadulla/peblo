@@ -17,13 +17,40 @@ router = APIRouter(
     tags=["Settings"],
 )
 
-# Pydantic Schemas
+from pydantic import BaseModel, field_validator
 
 class SiteSettingsUpdate(BaseModel):
     site_name: str
     admin_email: str
     site_url: str
     timezone: str
+
+    @field_validator("site_name")
+    @classmethod
+    def validate_site_name(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Site name cannot be empty.")
+        return v
+
+    @field_validator("admin_email")
+    @classmethod
+    def validate_admin_email(cls, v: str) -> str:
+        v = v.strip()
+        if not v or "@" not in v or "." not in v:
+            raise ValueError("A valid admin email is required.")
+        return v
+
+    @field_validator("site_url")
+    @classmethod
+    def validate_site_url(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Site URL cannot be empty.")
+        return v
+
+ALLOWED_SECTIONS = {"featured", "series", "minisodes", "songs"}
+ALLOWED_STATUSES = {"Draft", "Published"}
 
 class ContentSettingsUpdate(BaseModel):
     default_section: str
@@ -32,11 +59,43 @@ class ContentSettingsUpdate(BaseModel):
     season_0_handling: str
     content_grouping: str
 
+    @field_validator("default_section")
+    @classmethod
+    def validate_default_section(cls, v: str) -> str:
+        v = v.strip().lower()
+        if v not in ALLOWED_SECTIONS:
+            raise ValueError(f"Invalid section '{v}'. Allowed sections: {', '.join(sorted(ALLOWED_SECTIONS))}")
+        return v
+
+    @field_validator("default_status")
+    @classmethod
+    def validate_default_status(cls, v: str) -> str:
+        v = v.strip().capitalize()
+        if v not in ALLOWED_STATUSES:
+            raise ValueError(f"Invalid status '{v}'. Allowed statuses: {', '.join(sorted(ALLOWED_STATUSES))}")
+        return v
+
+    @field_validator("default_languages")
+    @classmethod
+    def validate_default_languages(cls, v: List[str]) -> List[str]:
+        cleaned = [lang.strip().lower() for lang in v if lang.strip()]
+        if not cleaned:
+            raise ValueError("At least one default language must be provided.")
+        return cleaned
+
 class PublishingSettingsUpdate(BaseModel):
     auto_publish: bool
     generate_backup: bool
     catalogue_format: str
     atomic_publish: bool
+
+    @field_validator("catalogue_format")
+    @classmethod
+    def validate_catalogue_format(cls, v: str) -> str:
+        v = v.strip().upper()
+        if v != "JSON":
+            raise ValueError("Only 'JSON' catalogue format is currently supported.")
+        return v
 
 class StorageTestResponse(BaseModel):
     success: bool

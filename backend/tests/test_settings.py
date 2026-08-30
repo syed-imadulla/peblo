@@ -151,9 +151,67 @@ def test_non_admin_cannot_update_settings(client):
 def test_invalid_settings_payload_rejected(client):
     token = admin_token(client)
     headers = {"Authorization": f"Bearer {token}"}
+    
     # Missing required field
     res = client.put("/admin/settings/site", json={"site_name": "Incomplete"}, headers=headers)
     assert res.status_code == 422
+
+    # Empty site name
+    res_empty_name = client.put("/admin/settings/site", json={
+        "site_name": "   ",
+        "admin_email": "admin@peblo.tv",
+        "site_url": "http://localhost:5173",
+        "timezone": "Asia/Kolkata"
+    }, headers=headers)
+    assert res_empty_name.status_code == 422
+
+    # Invalid email format
+    res_bad_email = client.put("/admin/settings/site", json={
+        "site_name": "PeBLo",
+        "admin_email": "not-an-email",
+        "site_url": "http://localhost:5173",
+        "timezone": "Asia/Kolkata"
+    }, headers=headers)
+    assert res_bad_email.status_code == 422
+
+    # Invalid default section
+    res_bad_section = client.put("/admin/settings/content", json={
+        "default_section": "nonexistent_section",
+        "default_languages": ["en"],
+        "default_status": "Draft",
+        "season_0_handling": "Trailers",
+        "content_grouping": "Grouping"
+    }, headers=headers)
+    assert res_bad_section.status_code == 422
+
+    # Invalid default status
+    res_bad_status = client.put("/admin/settings/content", json={
+        "default_section": "series",
+        "default_languages": ["en"],
+        "default_status": "InvalidStatus",
+        "season_0_handling": "Trailers",
+        "content_grouping": "Grouping"
+    }, headers=headers)
+    assert res_bad_status.status_code == 422
+
+    # Empty languages list
+    res_empty_lang = client.put("/admin/settings/content", json={
+        "default_section": "series",
+        "default_languages": ["  "],
+        "default_status": "Draft",
+        "season_0_handling": "Trailers",
+        "content_grouping": "Grouping"
+    }, headers=headers)
+    assert res_empty_lang.status_code == 422
+
+    # Unsupported catalogue format
+    res_bad_format = client.put("/admin/settings/publishing", json={
+        "auto_publish": False,
+        "generate_backup": True,
+        "catalogue_format": "XML",
+        "atomic_publish": True
+    }, headers=headers)
+    assert res_bad_format.status_code == 422
 
 
 def test_storage_test_succeeds_and_cleans_up(client, tmp_path, monkeypatch):
