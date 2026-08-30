@@ -2,14 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { 
-  Bell, 
   Cloud, 
   Settings as SettingsIcon, 
   Edit3, 
   Image as ImageIcon,
   CheckCircle,
   XCircle,
-  X
 } from 'lucide-react';
 import { useAuth } from '../components/AuthProvider';
 
@@ -21,20 +19,24 @@ const fetchSettings = async () => {
 const Settings = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { data: settings, isLoading, error } = useQuery({
+  const { data: response, isLoading, error } = useQuery({
     queryKey: ['settings'],
     queryFn: fetchSettings,
   });
 
-  const [editModal, setEditModal] = useState(null); // 'site', 'content', 'publishing', null
+  const [editSection, setEditSection] = useState(null); // 'site', 'content', 'publishing', null
   const [formData, setFormData] = useState({});
   const [testStorageStatus, setTestStorageStatus] = useState(null); // { loading, success, message }
+
+  // Extract variables
+  const dbSettings = response?.db_settings || {};
+  const systemInfo = response?.system_info || {};
 
   const updateSiteMutation = useMutation({
     mutationFn: (data) => axios.put('/api/admin/settings/site', data),
     onSuccess: () => {
       queryClient.invalidateQueries(['settings']);
-      setEditModal(null);
+      setEditSection(null);
     }
   });
 
@@ -42,7 +44,7 @@ const Settings = () => {
     mutationFn: (data) => axios.put('/api/admin/settings/content', data),
     onSuccess: () => {
       queryClient.invalidateQueries(['settings']);
-      setEditModal(null);
+      setEditSection(null);
     }
   });
 
@@ -50,7 +52,7 @@ const Settings = () => {
     mutationFn: (data) => axios.put('/api/admin/settings/publishing', data),
     onSuccess: () => {
       queryClient.invalidateQueries(['settings']);
-      setEditModal(null);
+      setEditSection(null);
     }
   });
 
@@ -58,11 +60,11 @@ const Settings = () => {
     mutationFn: () => axios.post('/api/admin/settings/storage/test'),
     onSuccess: (res) => {
       setTestStorageStatus({ loading: false, success: res.data.success, message: res.data.message });
-      setTimeout(() => setTestStorageStatus(null), 3000);
+      setTimeout(() => setTestStorageStatus(null), 4000);
     },
     onError: (err) => {
-      setTestStorageStatus({ loading: false, success: false, message: 'Request failed' });
-      setTimeout(() => setTestStorageStatus(null), 3000);
+      setTestStorageStatus({ loading: false, success: false, message: 'Storage connection test failed.' });
+      setTimeout(() => setTestStorageStatus(null), 4000);
     }
   });
 
@@ -71,19 +73,23 @@ const Settings = () => {
       alert("Only administrators can modify settings.");
       return;
     }
-    setEditModal(section);
-    setFormData({ ...settings });
+    setEditSection(section);
+    setFormData({ ...dbSettings });
   };
 
-  const handleSave = () => {
-    if (editModal === 'site') {
+  const handleCancel = () => {
+    setEditSection(null);
+  };
+
+  const handleSave = (section) => {
+    if (section === 'site') {
       updateSiteMutation.mutate({
         site_name: formData.site_name,
         admin_email: formData.admin_email,
         site_url: formData.site_url,
         timezone: formData.timezone
       });
-    } else if (editModal === 'content') {
+    } else if (section === 'content') {
       updateContentMutation.mutate({
         default_section: formData.default_section,
         default_languages: typeof formData.default_languages === 'string' ? formData.default_languages.split(',').map(s=>s.trim()) : formData.default_languages,
@@ -91,7 +97,7 @@ const Settings = () => {
         season_0_handling: formData.season_0_handling,
         content_grouping: formData.content_grouping
       });
-    } else if (editModal === 'publishing') {
+    } else if (section === 'publishing') {
       updatePublishingMutation.mutate({
         auto_publish: formData.auto_publish,
         generate_backup: formData.generate_backup,
@@ -111,10 +117,31 @@ const Settings = () => {
     return <div style={{ padding: '40px', color: '#ef4444' }}>Error loading settings: {error.message}</div>;
   }
 
+  // Build artwork specs dynamically
+  const artworkSpecs = systemInfo.artwork_specs || {};
+  const renderSpec = (title, specData) => {
+    if (!specData) return null;
+    const px = specData.target_px ? `${specData.target_px[0]} × ${specData.target_px[1]} px` : '';
+    return (
+      <React.Fragment key={title}>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#f8fafc', color: 'var(--purple-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)' }}>
+            <ImageIcon size={14} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--navy-900)' }}>{title}</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{specData.aspect} • {px} • Max {specData.max_kb} KB</div>
+          </div>
+        </div>
+        <div style={{ height: '1px', backgroundColor: 'var(--border)' }}></div>
+      </React.Fragment>
+    );
+  };
+
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '40px' }}>
       
-      {/* Header */}
+      {/* Header (No Bell Icon) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingTop: '8px', marginBottom: '32px' }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ fontWeight: '800', fontSize: '28px', color: 'var(--navy-900)', display: 'flex', alignItems: 'center', gap: '8px', letterSpacing: '-0.5px' }}>
@@ -124,153 +151,258 @@ const Settings = () => {
             Manage your CMS preferences.
           </div>
         </div>
-        
-        <div style={{ position: 'relative', width: '48px', height: '48px', borderRadius: '50%', border: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF', cursor: 'pointer', color: 'var(--purple-700)' }}>
-          <Bell size={20} />
-          <div style={{ position: 'absolute', top: '-4px', right: '-4px', backgroundColor: '#6D28D9', color: '#FFF', fontSize: '11px', fontWeight: 'bold', width: '20px', height: '20px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #F8F9FF' }}>
-            3
-          </div>
-        </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '7fr 4fr', gap: '24px', alignItems: 'start' }}>
+      <div className="show-form-layout">
         
         {/* LEFT COLUMN */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {/* Card 1: Site Information */}
-          <div className="card" style={{ padding: '24px', position: 'relative' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: '#f3e8ff', color: '#7e22ce', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Cloud size={20} />
+          <div className="card" style={{ padding: 0, position: 'relative', marginBottom: 0, overflow: 'hidden' }}>
+            <div style={{ padding: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: '#f3e8ff', color: '#7e22ce', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Cloud size={20} />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--navy-900)' }}>Site Information</h3>
+                    <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Basic details about your PeBLo CMS.</div>
+                  </div>
                 </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--navy-900)' }}>Site Information</h3>
-                  <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Basic details about your PeBLo CMS.</div>
-                </div>
+                {editSection !== 'site' && (
+                  <button 
+                    onClick={() => handleEdit('site')}
+                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '8px', border: '1px solid #e9d5ff', backgroundColor: '#fff', color: '#7e22ce', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    <Edit3 size={14} /> Edit
+                  </button>
+                )}
               </div>
-              <button 
-                onClick={() => handleEdit('site')}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '8px', border: '1px solid #e9d5ff', backgroundColor: '#fff', color: '#7e22ce', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
-              >
-                <Edit3 size={14} /> Edit
-              </button>
-            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-              <div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Site Name</div>
-                <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>{settings.site_name}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Admin Email</div>
-                <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>{settings.admin_email}</div>
-              </div>
-              <div style={{ gridColumn: '1 / -1', height: '1px', backgroundColor: 'var(--border)' }}></div>
-              <div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Site URL</div>
-                <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>{settings.site_url}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Timezone</div>
-                <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>{settings.timezone}</div>
-              </div>
+              {editSection === 'site' ? (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  <div className="input-group" style={{ marginBottom: 0 }}>
+                    <label>Site Name</label>
+                    <input type="text" className="form-control" value={formData.site_name || ''} onChange={e => setFormData({...formData, site_name: e.target.value})} />
+                  </div>
+                  <div className="input-group" style={{ marginBottom: 0 }}>
+                    <label>Admin Email</label>
+                    <input type="email" className="form-control" value={formData.admin_email || ''} onChange={e => setFormData({...formData, admin_email: e.target.value})} />
+                  </div>
+                  <div className="input-group" style={{ marginBottom: 0 }}>
+                    <label>Site URL</label>
+                    <input type="url" className="form-control" value={formData.site_url || ''} onChange={e => setFormData({...formData, site_url: e.target.value})} />
+                  </div>
+                  <div className="input-group" style={{ marginBottom: 0 }}>
+                    <label>Timezone</label>
+                    <input type="text" className="form-control" value={formData.timezone || ''} onChange={e => setFormData({...formData, timezone: e.target.value})} />
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Site Name</div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>{dbSettings.site_name}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Admin Email</div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>{dbSettings.admin_email}</div>
+                  </div>
+                  <div style={{ gridColumn: '1 / -1', height: '1px', backgroundColor: 'var(--border)' }}></div>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Site URL</div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>{dbSettings.site_url}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Timezone</div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>{dbSettings.timezone}</div>
+                  </div>
+                </div>
+              )}
             </div>
+            {editSection === 'site' && (
+              <div style={{ padding: '16px 24px', backgroundColor: '#f8fafc', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                <button onClick={handleCancel} className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '13px' }}>Cancel</button>
+                <button onClick={() => handleSave('site')} className="btn btn-primary" style={{ padding: '8px 24px', fontSize: '13px', borderRadius: '8px' }} disabled={isSaving}>
+                  {updateSiteMutation.isPending ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Card 2: Default Content Settings */}
-          <div className="card" style={{ padding: '24px', position: 'relative' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: '#f3e8ff', color: '#7e22ce', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <SettingsIcon size={20} />
+          <div className="card" style={{ padding: 0, position: 'relative', marginBottom: 0, overflow: 'hidden' }}>
+            <div style={{ padding: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: '#f3e8ff', color: '#7e22ce', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <SettingsIcon size={20} />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--navy-900)' }}>Default Content Settings</h3>
+                    <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Defaults applied when creating new content.</div>
+                  </div>
                 </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--navy-900)' }}>Default Content Settings</h3>
-                  <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Defaults applied when creating new content.</div>
-                </div>
+                {editSection !== 'content' && (
+                  <button 
+                    onClick={() => handleEdit('content')}
+                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '8px', border: '1px solid #e9d5ff', backgroundColor: '#fff', color: '#7e22ce', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    <Edit3 size={14} /> Edit
+                  </button>
+                )}
               </div>
-              <button 
-                onClick={() => handleEdit('content')}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '8px', border: '1px solid #e9d5ff', backgroundColor: '#fff', color: '#7e22ce', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
-              >
-                <Edit3 size={14} /> Edit
-              </button>
-            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
-              <div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '8px' }}>Default Section</div>
-                <span style={{ backgroundColor: '#f3e8ff', color: '#7e22ce', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600 }}>{settings.default_section}</span>
-              </div>
-              <div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '8px' }}>Default Languages</div>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  {settings.default_languages.map(lang => (
-                    <span key={lang} style={{ backgroundColor: '#dcfce7', color: '#166534', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600 }}>{lang}</span>
-                  ))}
+              {editSection === 'content' ? (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  <div className="input-group" style={{ marginBottom: 0 }}>
+                    <label>Default Section</label>
+                    <input type="text" className="form-control" value={formData.default_section || ''} onChange={e => setFormData({...formData, default_section: e.target.value})} />
+                  </div>
+                  <div className="input-group" style={{ marginBottom: 0 }}>
+                    <label>Default Languages (comma separated)</label>
+                    <input type="text" className="form-control" value={Array.isArray(formData.default_languages) ? formData.default_languages.join(', ') : (formData.default_languages || '')} onChange={e => setFormData({...formData, default_languages: e.target.value})} />
+                  </div>
+                  <div className="input-group" style={{ marginBottom: 0 }}>
+                    <label>Default Status</label>
+                    <select className="form-control" value={formData.default_status || ''} onChange={e => setFormData({...formData, default_status: e.target.value})}>
+                      <option value="Draft">Draft</option>
+                      <option value="Published">Published</option>
+                    </select>
+                  </div>
+                  <div className="input-group" style={{ marginBottom: 0 }}>
+                    <label>Season 0 Handling</label>
+                    <input type="text" className="form-control" value={formData.season_0_handling || ''} onChange={e => setFormData({...formData, season_0_handling: e.target.value})} />
+                  </div>
+                  <div className="input-group" style={{ marginBottom: 0, gridColumn: '1 / -1' }}>
+                    <label>Content Grouping</label>
+                    <input type="text" className="form-control" value={formData.content_grouping || ''} onChange={e => setFormData({...formData, content_grouping: e.target.value})} />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '8px' }}>Default Status</div>
-                <span style={{ backgroundColor: '#ffedd5', color: '#c2410c', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600 }}>{settings.default_status}</span>
-              </div>
-              <div style={{ gridColumn: '1 / -1', height: '1px', backgroundColor: 'var(--border)' }}></div>
-              <div style={{ gridColumn: '1 / 2' }}>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Season 0 Handling</div>
-                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{settings.season_0_handling}</div>
-              </div>
-              <div style={{ gridColumn: '2 / -1' }}>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Content Grouping</div>
-                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{settings.content_grouping}</div>
-              </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '8px' }}>Default Section</div>
+                    <span style={{ backgroundColor: '#f3e8ff', color: '#7e22ce', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600 }}>{dbSettings.default_section}</span>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '8px' }}>Default Languages</div>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      {(dbSettings.default_languages || []).map(lang => (
+                        <span key={lang} style={{ backgroundColor: '#dcfce7', color: '#166534', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600 }}>{lang}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '8px' }}>Default Status</div>
+                    <span style={{ backgroundColor: '#ffedd5', color: '#c2410c', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600 }}>{dbSettings.default_status}</span>
+                  </div>
+                  <div style={{ gridColumn: '1 / -1', height: '1px', backgroundColor: 'var(--border)' }}></div>
+                  <div style={{ gridColumn: '1 / 2' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Season 0 Handling</div>
+                    <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{dbSettings.season_0_handling}</div>
+                  </div>
+                  <div style={{ gridColumn: '2 / -1' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Content Grouping</div>
+                    <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{dbSettings.content_grouping}</div>
+                  </div>
+                </div>
+              )}
             </div>
+            {editSection === 'content' && (
+              <div style={{ padding: '16px 24px', backgroundColor: '#f8fafc', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                <button onClick={handleCancel} className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '13px' }}>Cancel</button>
+                <button onClick={() => handleSave('content')} className="btn btn-primary" style={{ padding: '8px 24px', fontSize: '13px', borderRadius: '8px' }} disabled={isSaving}>
+                  {updateContentMutation.isPending ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Card 3: Publishing Preferences */}
-          <div className="card" style={{ padding: '24px', position: 'relative' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: '#f3e8ff', color: '#7e22ce', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Edit3 size={20} />
+          <div className="card" style={{ padding: 0, position: 'relative', marginBottom: 0, overflow: 'hidden' }}>
+            <div style={{ padding: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: '#f3e8ff', color: '#7e22ce', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Edit3 size={20} />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--navy-900)' }}>Publishing Preferences</h3>
+                    <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Control how publishing and catalogue generation works.</div>
+                  </div>
                 </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--navy-900)' }}>Publishing Preferences</h3>
-                  <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Control how publishing and catalogue generation works.</div>
-                </div>
+                {editSection !== 'publishing' && (
+                  <button 
+                    onClick={() => handleEdit('publishing')}
+                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '8px', border: '1px solid #e9d5ff', backgroundColor: '#fff', color: '#7e22ce', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    <Edit3 size={14} /> Edit
+                  </button>
+                )}
               </div>
-              <button 
-                onClick={() => handleEdit('publishing')}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '8px', border: '1px solid #e9d5ff', backgroundColor: '#fff', color: '#7e22ce', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
-              >
-                <Edit3 size={14} /> Edit
-              </button>
-            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
-              <div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Auto Publish</div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>{settings.auto_publish ? 'Enabled' : 'Disabled'}</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{settings.auto_publish ? 'Publishes on change' : 'Manual publish only'}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Generate Backup</div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>{settings.generate_backup ? 'Enabled' : 'Disabled'}</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{settings.generate_backup ? 'Backup previous catalogue before publish' : 'No backups'}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Catalogue Format</div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>{settings.catalogue_format}</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>catalogue.{settings.catalogue_format.toLowerCase()}</div>
-              </div>
-              <div style={{ gridColumn: '1 / -1', height: '1px', backgroundColor: 'var(--border)' }}></div>
-              <div style={{ gridColumn: '1 / -1' }}>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Atomic Publish</div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>{settings.atomic_publish ? 'Enabled' : 'Disabled'}</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{settings.atomic_publish ? 'Ensure safe and atomic publishing' : 'Standard publish'}</div>
-              </div>
+              {editSection === 'publishing' ? (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>
+                    <input type="checkbox" checked={formData.auto_publish || false} onChange={e => setFormData({...formData, auto_publish: e.target.checked})} style={{ width: '18px', height: '18px' }}/>
+                    Auto Publish
+                  </label>
+                  
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>
+                    <input type="checkbox" checked={formData.generate_backup || false} onChange={e => setFormData({...formData, generate_backup: e.target.checked})} style={{ width: '18px', height: '18px' }}/>
+                    Generate Backup
+                  </label>
+
+                  <div className="input-group" style={{ marginBottom: 0 }}>
+                    <label>Catalogue Format</label>
+                    <select className="form-control" value={formData.catalogue_format || ''} onChange={e => setFormData({...formData, catalogue_format: e.target.value})}>
+                      <option value="JSON">JSON</option>
+                      <option value="XML">XML</option>
+                    </select>
+                  </div>
+
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>
+                    <input type="checkbox" checked={formData.atomic_publish || false} onChange={e => setFormData({...formData, atomic_publish: e.target.checked})} style={{ width: '18px', height: '18px' }}/>
+                    Atomic Publish
+                  </label>
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Auto Publish</div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>{dbSettings.auto_publish ? 'Enabled' : 'Disabled'}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{dbSettings.auto_publish ? 'Publishes on change' : 'Manual publish only'}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Generate Backup</div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>{dbSettings.generate_backup ? 'Enabled' : 'Disabled'}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{dbSettings.generate_backup ? 'Backup previous catalogue before publish' : 'No backups'}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Catalogue Format</div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>{dbSettings.catalogue_format}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>catalogue.{dbSettings.catalogue_format?.toLowerCase() || 'json'}</div>
+                  </div>
+                  <div style={{ gridColumn: '1 / -1', height: '1px', backgroundColor: 'var(--border)' }}></div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Atomic Publish</div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>{dbSettings.atomic_publish ? 'Enabled' : 'Disabled'}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{dbSettings.atomic_publish ? 'Ensure safe and atomic publishing' : 'Standard publish'}</div>
+                  </div>
+                </div>
+              )}
             </div>
+            {editSection === 'publishing' && (
+              <div style={{ padding: '16px 24px', backgroundColor: '#f8fafc', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                <button onClick={handleCancel} className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '13px' }}>Cancel</button>
+                <button onClick={() => handleSave('publishing')} className="btn btn-primary" style={{ padding: '8px 24px', fontSize: '13px', borderRadius: '8px' }} disabled={isSaving}>
+                  {updatePublishingMutation.isPending ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            )}
           </div>
           
         </div>
@@ -279,7 +411,7 @@ const Settings = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {/* Card 4: Storage Connection */}
-          <div className="card" style={{ padding: '24px' }}>
+          <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '24px' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: '#f3e8ff', color: '#7e22ce', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Cloud size={20} />
@@ -294,38 +426,41 @@ const Settings = () => {
               <div>
                 <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Provider</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Local Storage</div>
+                  <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>{systemInfo.storage_provider || 'Unknown'}</div>
                   <span style={{ backgroundColor: '#dcfce7', color: '#166534', padding: '4px 12px', borderRadius: '16px', fontSize: '11px', fontWeight: 700 }}>Connected</span>
                 </div>
               </div>
               <div style={{ height: '1px', backgroundColor: 'var(--border)' }}></div>
               <div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Base Path</div>
-                <div style={{ fontSize: '14px', color: 'var(--purple-700)' }}>/uploads</div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Data Path</div>
+                <div style={{ fontSize: '14px', color: 'var(--purple-700)' }}>{systemInfo.data_path || 'data/'}</div>
               </div>
               <div style={{ height: '1px', backgroundColor: 'var(--border)' }}></div>
               <div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Public URL</div>
-                <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>http://localhost:8000/uploads</div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Assets Path</div>
+                <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>{systemInfo.assets_path || '/assets'}</div>
               </div>
             </div>
             
             <button 
               onClick={() => { setTestStorageStatus({ loading: true }); testStorageMutation.mutate(); }}
               disabled={testStorageStatus?.loading}
-              style={{ width: '100%', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', borderRadius: '8px', border: '1px solid #e9d5ff', backgroundColor: '#fcfaff', color: 'var(--purple-700)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', outline: 'none' }}
+              style={{ width: '100%', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', borderRadius: '8px', border: '1px solid #e9d5ff', backgroundColor: '#fcfaff', color: 'var(--purple-700)', fontSize: '14px', fontWeight: 600, cursor: testStorageStatus?.loading ? 'not-allowed' : 'pointer', outline: 'none' }}
             >
               {testStorageStatus?.loading ? 'Testing...' : <><Cloud size={16} /> Test Connection</>}
             </button>
             {testStorageStatus && !testStorageStatus.loading && (
-              <div style={{ marginTop: '12px', fontSize: '13px', color: testStorageStatus.success ? '#16a34a' : '#dc2626', display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
-                {testStorageStatus.success ? <CheckCircle size={14} /> : <XCircle size={14} />} {testStorageStatus.message}
+              <div style={{ marginTop: '12px', fontSize: '13px', color: testStorageStatus.success ? '#16a34a' : '#dc2626', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+                <div style={{ marginTop: '2px' }}>
+                  {testStorageStatus.success ? <CheckCircle size={14} /> : <XCircle size={14} />}
+                </div>
+                <div>{testStorageStatus.message}</div>
               </div>
             )}
           </div>
 
           {/* Card 5: Artwork Specifications */}
-          <div className="card" style={{ padding: '24px' }}>
+          <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '24px' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: '#f3e8ff', color: '#7e22ce', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <ImageIcon size={20} />
@@ -337,37 +472,9 @@ const Settings = () => {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#f8fafc', color: 'var(--purple-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)' }}>
-                  <ImageIcon size={14} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--navy-900)' }}>Poster</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>2:3 • 600 × 900 px • Max 200 KB</div>
-                </div>
-              </div>
-              <div style={{ height: '1px', backgroundColor: 'var(--border)' }}></div>
-              
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#f8fafc', color: 'var(--purple-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)' }}>
-                  <ImageIcon size={14} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--navy-900)' }}>Banner</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>16:9 • 1280 × 720 px • Max 200 KB</div>
-                </div>
-              </div>
-              <div style={{ height: '1px', backgroundColor: 'var(--border)' }}></div>
-              
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#f8fafc', color: 'var(--purple-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)' }}>
-                  <ImageIcon size={14} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--navy-900)' }}>Thumbnail</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>16:9 • 640 × 360 px • Max 200 KB</div>
-                </div>
-              </div>
+              {renderSpec('Poster', artworkSpecs.poster)}
+              {renderSpec('Banner', artworkSpecs.banner)}
+              {renderSpec('Thumbnail', artworkSpecs.thumbnail)}
             </div>
 
             <button style={{ width: '100%', background: 'none', border: 'none', color: 'var(--purple-700)', fontSize: '13px', fontWeight: 700, cursor: 'pointer', padding: '8px 0', outline: 'none' }}>
@@ -383,94 +490,6 @@ const Settings = () => {
         <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#cbd5e1' }}></span>
         <span>CMS v1.0.0</span>
       </div>
-
-      {/* Edit Modal */}
-      {editModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }} onClick={() => setEditModal(null)}>
-          <div className="card" onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '500px', display: 'flex', flexDirection: 'column', padding: 0 }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>
-                {editModal === 'site' && 'Edit Site Information'}
-                {editModal === 'content' && 'Edit Default Content Settings'}
-                {editModal === 'publishing' && 'Edit Publishing Preferences'}
-              </h3>
-              <button onClick={() => setEditModal(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X size={20}/></button>
-            </div>
-            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              
-              {editModal === 'site' && (
-                <>
-                  <label className="form-label">Site Name</label>
-                  <input type="text" className="form-input" value={formData.site_name} onChange={e => setFormData({...formData, site_name: e.target.value})} />
-                  
-                  <label className="form-label">Admin Email</label>
-                  <input type="email" className="form-input" value={formData.admin_email} onChange={e => setFormData({...formData, admin_email: e.target.value})} />
-                  
-                  <label className="form-label">Site URL</label>
-                  <input type="url" className="form-input" value={formData.site_url} onChange={e => setFormData({...formData, site_url: e.target.value})} />
-                  
-                  <label className="form-label">Timezone</label>
-                  <input type="text" className="form-input" value={formData.timezone} onChange={e => setFormData({...formData, timezone: e.target.value})} />
-                </>
-              )}
-
-              {editModal === 'content' && (
-                <>
-                  <label className="form-label">Default Section</label>
-                  <input type="text" className="form-input" value={formData.default_section} onChange={e => setFormData({...formData, default_section: e.target.value})} />
-                  
-                  <label className="form-label">Default Languages (comma separated)</label>
-                  <input type="text" className="form-input" value={Array.isArray(formData.default_languages) ? formData.default_languages.join(', ') : formData.default_languages} onChange={e => setFormData({...formData, default_languages: e.target.value})} />
-                  
-                  <label className="form-label">Default Status</label>
-                  <select className="form-input" value={formData.default_status} onChange={e => setFormData({...formData, default_status: e.target.value})}>
-                    <option value="Draft">Draft</option>
-                    <option value="Published">Published</option>
-                  </select>
-
-                  <label className="form-label">Season 0 Handling</label>
-                  <input type="text" className="form-input" value={formData.season_0_handling} onChange={e => setFormData({...formData, season_0_handling: e.target.value})} />
-
-                  <label className="form-label">Content Grouping</label>
-                  <input type="text" className="form-input" value={formData.content_grouping} onChange={e => setFormData({...formData, content_grouping: e.target.value})} />
-                </>
-              )}
-
-              {editModal === 'publishing' && (
-                <>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600 }}>
-                    <input type="checkbox" checked={formData.auto_publish} onChange={e => setFormData({...formData, auto_publish: e.target.checked})} />
-                    Auto Publish
-                  </label>
-                  
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600 }}>
-                    <input type="checkbox" checked={formData.generate_backup} onChange={e => setFormData({...formData, generate_backup: e.target.checked})} />
-                    Generate Backup
-                  </label>
-                  
-                  <label className="form-label">Catalogue Format</label>
-                  <select className="form-input" value={formData.catalogue_format} onChange={e => setFormData({...formData, catalogue_format: e.target.value})}>
-                    <option value="JSON">JSON</option>
-                    <option value="XML">XML</option>
-                  </select>
-
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600 }}>
-                    <input type="checkbox" checked={formData.atomic_publish} onChange={e => setFormData({...formData, atomic_publish: e.target.checked})} />
-                    Atomic Publish
-                  </label>
-                </>
-              )}
-
-            </div>
-            <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end', gap: '12px', backgroundColor: '#f8fafc' }}>
-              <button onClick={() => setEditModal(null)} className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '14px' }}>Cancel</button>
-              <button onClick={handleSave} className="btn btn-primary" style={{ padding: '8px 24px', fontSize: '14px', backgroundColor: '#6D28D9', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }} disabled={isSaving}>
-                {isSaving ? 'Saving...' : 'Save Changes'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );

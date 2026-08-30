@@ -1,12 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, HttpUrl
-from typing import List
+from pydantic import BaseModel
+from typing import List, Any, Dict
+import json
+import os
 
 from app.core.database import get_db
 from app.api.auth import get_current_admin
 from app.models.models import SystemSettings
 from app.services.storage import asset_storage, storage
+from app.core.config import settings as app_settings
 
 router = APIRouter(
     prefix="/admin/settings",
@@ -47,13 +50,38 @@ def get_settings(db: Session) -> SystemSettings:
         db.refresh(settings_obj)
     return settings_obj
 
+def get_system_info() -> dict:
+    try:
+        # Load reference.json
+        ref_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs", "challenge", "reference.json")
+        with open(ref_path, "r") as f:
+            reference_data = json.load(f)
+            
+        artwork_specs = reference_data.get("artwork_specs", {})
+    except Exception as e:
+        artwork_specs = {}
+
+    # Define public URL depending on how the backend serves assets. 
+    # Usually the backend mounts /assets or similar.
+    # We will just expose the base path.
+    return {
+        "storage_provider": "LocalStorageProvider",
+        "data_path": app_settings.DATA_DIR,
+        "assets_path": app_settings.ASSETS_DIR,
+        "artwork_specs": artwork_specs
+    }
+
 @router.get("")
 def read_settings(
     db: Session = Depends(get_db),
     admin_user: dict = Depends(get_current_admin)
 ):
     settings_obj = get_settings(db)
-    return settings_obj
+    system_info = get_system_info()
+    return {
+        "db_settings": settings_obj,
+        "system_info": system_info
+    }
 
 @router.put("/site")
 def update_site_settings(
@@ -106,15 +134,21 @@ def test_storage_connection(
     admin_user: dict = Depends(get_current_admin)
 ):
     try:
-        # Write a temporary test file to ensure local storage works
+        # Test BOTH storage and asset_storage
         test_filename = ".connection_test"
-        storage.write(test_filename, "test")
         
-        # Verify it can be read
+        # Test main data storage
+        storage.write(test_filename, "test")
         content = storage.read(test_filename)
         if content != "test":
-            raise Exception("Read value did not match written value.")
+            raise Exception("Data storage read value did not match written value.")
             
-        return StorageTestResponse(success=True, message="Storage connection successful. Base path is writable.")
+        # Test asset storage
+        asset_storage.write(test_filename, "test_asset")
+        asset_content = asset_storage.read(test_filename)
+        if asset_content != "test_asset":
+            raise Exception("Asset storage read value did not match written value.")
+            
+        return StorageTestResponse(success=True, message="Storage connection successful. Base path and assets path are writable.")
     except Exception as e:
         return StorageTestResponse(success=False, message=str(e))
