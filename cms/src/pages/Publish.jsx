@@ -199,7 +199,7 @@ const Publish = () => {
     return (
       <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '60px' }}>
         <div style={{ height: '40px', width: '300px', backgroundColor: '#f1f5f9', borderRadius: '8px', margin: '8px 0 32px' }} />
-        <div style={{ display: 'grid', gridTemplateColumns: '7fr 3fr', gap: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '7fr 3fr', gap: '16px' }}>
           <div>
             <div style={{ height: '150px', backgroundColor: '#f1f5f9', borderRadius: '16px', marginBottom: '24px' }} />
             <div style={{ height: '400px', backgroundColor: '#f1f5f9', borderRadius: '16px' }} />
@@ -311,12 +311,12 @@ const Publish = () => {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '7fr 3fr', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '7fr 3fr', gap: '16px' }}>
         {/* Left Content */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', minWidth: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
           
           {/* Summary Card */}
-          <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
+          <div className="card" style={{ padding: '24px' }}>
              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--navy-900)' }}>Catalogue Summary</h3>
                <button 
@@ -372,11 +372,11 @@ const Publish = () => {
           </div>
 
           {/* Data Tables */}
-          <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
+          <div className="card" style={{ padding: '24px' }}>
              <h3 style={{ fontSize: '16px', fontWeight: 800, marginBottom: '24px', color: 'var(--navy-900)' }}>Content to be Published</h3>
              
              {/* Tabs */}
-             <div style={{ display: 'flex', gap: '24px', borderBottom: '1px solid var(--border)', marginBottom: '24px' }}>
+             <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid var(--border)', marginBottom: '24px' }}>
                <button 
                  onClick={() => { setActiveTab('shows'); setCurrentPage(1); }}
                  style={{ 
@@ -619,10 +619,10 @@ const Publish = () => {
         </div>
 
         {/* Right Sidebar */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           
           {/* Publish Readiness */}
-          <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
+          <div className="card" style={{ padding: '24px' }}>
             <h3 style={{ fontSize: '15px', fontWeight: 800, marginBottom: '16px', color: 'var(--navy-900)' }}>Publish Readiness</h3>
             
             {isBlocked ? (
@@ -678,13 +678,13 @@ const Publish = () => {
           </div>
 
           {/* Last Publish Run */}
-          <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
+          <div className="card" style={{ padding: '24px' }}>
             <h3 style={{ fontSize: '15px', fontWeight: 800, marginBottom: '16px', color: 'var(--navy-900)' }}>Last Publish Run</h3>
             
             {!lastRun ? (
               <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: 0 }}>No publish run yet.</p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div style={{ backgroundColor: lastRun.status === 'success' ? '#f0fdf4' : '#fee2e2', border: lastRun.status === 'success' ? '1px solid #dcfce7' : '1px solid #fecaca', borderRadius: '8px', padding: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#fff', border: lastRun.status === 'success' ? '2px solid #10b981' : '2px solid #ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', color: lastRun.status === 'success' ? '#10b981' : '#ef4444', flexShrink: 0 }}>
                     {lastRun.status === 'success' ? <Check size={14} strokeWidth={3} /> : <XCircle size={14} strokeWidth={3} />}

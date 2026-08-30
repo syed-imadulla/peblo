@@ -281,13 +281,13 @@ const Validation = () => {
 
   // Queries
   const { data: report, isLoading: rLoading, error: rError, refetch: rRefetch } =
-    useQuery({ queryKey: ['valReport'], queryFn: api.report, staleTime: 30_000 });
+    useQuery({ queryKey: ['valReport'], queryFn: api.report, staleTime: 30_000, refetchInterval: 5000 });
 
   const { data: shows } =
-    useQuery({ queryKey: ['adminShows'], queryFn: api.shows, staleTime: 60_000 });
+    useQuery({ queryKey: ['adminShows'], queryFn: api.shows, staleTime: 60_000, refetchInterval: 5000 });
 
   const { data: history, isLoading: hLoading } =
-    useQuery({ queryKey: ['pubHistory'], queryFn: api.history, staleTime: 30_000 });
+    useQuery({ queryKey: ['pubHistory'], queryFn: api.history, staleTime: 30_000, refetchInterval: 5000 });
 
   // Run mutation
   const runMut = useMutation({
@@ -350,7 +350,7 @@ const Validation = () => {
         @keyframes fin { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:none} }
         .vr-row:hover td { background:#FAFAFF !important; }
         .vr-act:hover { background:#F5F3FF !important; border-color:#C4B5FD !important; color:#6D28D9 !important; }
-        .val-grid { display:grid; grid-template-columns:1fr 268px; gap:18px; align-items:start; }
+        .val-grid { display:grid; grid-template-columns:1fr 268px; gap:16px; align-items:start; }
         @media(max-width:1080px){ .val-grid { grid-template-columns:1fr; } }
       `}</style>
 
@@ -385,7 +385,7 @@ const Validation = () => {
       <div className="val-grid">
 
         {/* ════ LEFT ════ */}
-        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
           {/* Summary cards */}
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -592,7 +592,7 @@ const Validation = () => {
         </div>
 
         {/* ════ RIGHT SIDEBAR ════ */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
           {/* Issues by Severity */}
           <div style={{ background: '#FFF', borderRadius: '14px', border: '1px solid #E2E8F0', padding: '16px', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>

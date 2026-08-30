@@ -250,6 +250,7 @@ const ShowsList = () => {
   const { data: shows, isLoading, error } = useQuery({
     queryKey: ['shows'],
     queryFn: fetchShows,
+    refetchInterval: 5000,
   });
 
   const deleteMutation = useMutation({

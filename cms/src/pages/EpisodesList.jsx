@@ -203,11 +203,13 @@ const EpisodesList = () => {
   const { data: shows, isLoading: isLoadingShows, error: errorShows } = useQuery({
     queryKey: ['shows'],
     queryFn: fetchShows,
+    refetchInterval: 5000,
   });
 
   const { data: validationReport, isLoading: isLoadingValidation } = useQuery({
     queryKey: ['validationReport'],
     queryFn: fetchValidationReport,
+    refetchInterval: 5000,
   });
 
   const deleteMutation = useMutation({

@@ -22,6 +22,7 @@ const Settings = () => {
   const { data: response, isLoading, error } = useQuery({
     queryKey: ['settings'],
     queryFn: fetchSettings,
+    refetchInterval: 5000,
   });
 
   const [editSection, setEditSection] = useState(null); // 'site', 'content', 'publishing', null
@@ -156,10 +157,10 @@ const Settings = () => {
       <div className="show-form-layout">
         
         {/* LEFT COLUMN */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           
           {/* Card 1: Site Information */}
-          <div className="card" style={{ padding: 0, position: 'relative', marginBottom: 0, overflow: 'hidden' }}>
+          <div className="card" style={{ padding: 0, position: 'relative', overflow: 'hidden' }}>
             <div style={{ padding: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -182,26 +183,26 @@ const Settings = () => {
               </div>
 
               {editSection === 'site' ? (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                  <div className="input-group" style={{ marginBottom: 0 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div className="input-group">
                     <label>Site Name</label>
                     <input type="text" className="form-control" value={formData.site_name || ''} onChange={e => setFormData({...formData, site_name: e.target.value})} />
                   </div>
-                  <div className="input-group" style={{ marginBottom: 0 }}>
+                  <div className="input-group">
                     <label>Admin Email</label>
                     <input type="email" className="form-control" value={formData.admin_email || ''} onChange={e => setFormData({...formData, admin_email: e.target.value})} />
                   </div>
-                  <div className="input-group" style={{ marginBottom: 0 }}>
+                  <div className="input-group">
                     <label>Site URL</label>
                     <input type="url" className="form-control" value={formData.site_url || ''} onChange={e => setFormData({...formData, site_url: e.target.value})} />
                   </div>
-                  <div className="input-group" style={{ marginBottom: 0 }}>
+                  <div className="input-group">
                     <label>Timezone</label>
                     <input type="text" className="form-control" value={formData.timezone || ''} onChange={e => setFormData({...formData, timezone: e.target.value})} />
                   </div>
                 </div>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div>
                     <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Site Name</div>
                     <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>{dbSettings.site_name}</div>
@@ -233,7 +234,7 @@ const Settings = () => {
           </div>
 
           {/* Card 2: Default Content Settings */}
-          <div className="card" style={{ padding: 0, position: 'relative', marginBottom: 0, overflow: 'hidden' }}>
+          <div className="card" style={{ padding: 0, position: 'relative', overflow: 'hidden' }}>
             <div style={{ padding: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -256,33 +257,33 @@ const Settings = () => {
               </div>
 
               {editSection === 'content' ? (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                  <div className="input-group" style={{ marginBottom: 0 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div className="input-group">
                     <label>Default Section</label>
                     <input type="text" className="form-control" value={formData.default_section || ''} onChange={e => setFormData({...formData, default_section: e.target.value})} />
                   </div>
-                  <div className="input-group" style={{ marginBottom: 0 }}>
+                  <div className="input-group">
                     <label>Default Languages (comma separated)</label>
                     <input type="text" className="form-control" value={Array.isArray(formData.default_languages) ? formData.default_languages.join(', ') : (formData.default_languages || '')} onChange={e => setFormData({...formData, default_languages: e.target.value})} />
                   </div>
-                  <div className="input-group" style={{ marginBottom: 0 }}>
+                  <div className="input-group">
                     <label>Default Status</label>
                     <select className="form-control" value={formData.default_status || ''} onChange={e => setFormData({...formData, default_status: e.target.value})}>
                       <option value="Draft">Draft</option>
                       <option value="Published">Published</option>
                     </select>
                   </div>
-                  <div className="input-group" style={{ marginBottom: 0 }}>
+                  <div className="input-group">
                     <label>Season 0 Handling</label>
                     <input type="text" className="form-control" value={formData.season_0_handling || ''} onChange={e => setFormData({...formData, season_0_handling: e.target.value})} />
                   </div>
-                  <div className="input-group" style={{ marginBottom: 0, gridColumn: '1 / -1' }}>
+                  <div className="input-group" style={{ gridColumn: '1 / -1' }}>
                     <label>Content Grouping</label>
                     <input type="text" className="form-control" value={formData.content_grouping || ''} onChange={e => setFormData({...formData, content_grouping: e.target.value})} />
                   </div>
                 </div>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
                   <div>
                     <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '8px' }}>Default Section</div>
                     <span style={{ backgroundColor: '#f3e8ff', color: '#7e22ce', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600 }}>{dbSettings.default_section}</span>
@@ -322,7 +323,7 @@ const Settings = () => {
           </div>
 
           {/* Card 3: Publishing Preferences */}
-          <div className="card" style={{ padding: 0, position: 'relative', marginBottom: 0, overflow: 'hidden' }}>
+          <div className="card" style={{ padding: 0, position: 'relative', overflow: 'hidden' }}>
             <div style={{ padding: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -345,7 +346,7 @@ const Settings = () => {
               </div>
 
               {editSection === 'publishing' ? (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>
                     <input type="checkbox" checked={formData.auto_publish || false} onChange={e => setFormData({...formData, auto_publish: e.target.checked})} style={{ width: '18px', height: '18px' }}/>
                     Auto Publish
@@ -370,7 +371,7 @@ const Settings = () => {
                   </label>
                 </div>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
                   <div>
                     <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--navy-900)', marginBottom: '4px' }}>Auto Publish</div>
                     <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>{dbSettings.auto_publish ? 'Enabled' : 'Disabled'}</div>
@@ -408,10 +409,10 @@ const Settings = () => {
         </div>
 
         {/* RIGHT COLUMN */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           
           {/* Card 4: Storage Connection */}
-          <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
+          <div className="card" style={{ padding: '24px' }}>
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '24px' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: '#f3e8ff', color: '#7e22ce', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Cloud size={20} />
