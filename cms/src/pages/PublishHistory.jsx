@@ -41,6 +41,22 @@ const formatDuration = (seconds) => {
   return s > 0 ? `${m}m ${s}s` : `${m}m`;
 };
 
+const getPaginationWindow = (current, total) => {
+  if (total <= 7) {
+    return Array.from({length: total}, (_, i) => i + 1);
+  }
+  
+  if (current <= 4) {
+    return [1, 2, 3, 4, 5, 'ellipsis-1', total];
+  }
+  
+  if (current >= total - 3) {
+    return [1, 'ellipsis-1', total - 4, total - 3, total - 2, total - 1, total];
+  }
+  
+  return [1, 'ellipsis-1', current - 1, current, current + 1, 'ellipsis-2', total];
+};
+
 const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix, placement = 'bottom', height = '42px', padding = '0 12px 0 16px' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -362,6 +378,7 @@ const PublishHistory = () => {
               else setStatusFilter('failed');
             }} 
             options={['All Statuses', 'Success', 'Failed']} 
+            minWidth="160px"
           />
           <Dropdown 
             label="Date Range" 
@@ -373,6 +390,7 @@ const PublishHistory = () => {
               else setDateFilter('30d');
             }} 
             options={['All Time', 'Last 24 Hours', 'Last 7 Days', 'Last 30 Days']} 
+            minWidth="160px"
           />
           <button 
             onClick={() => { setSearchTerm(''); setStatusFilter('all'); setDateFilter('all'); }}
@@ -385,21 +403,21 @@ const PublishHistory = () => {
         </div>
       </div>
 
-      <div className="show-form-layout" style={{ alignItems: 'start' }}>
+      <div className="dashboard-layout" style={{ alignItems: 'start' }}>
         
         {/* Main Table */}
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
           <div style={{ overflowX: 'auto', padding: '0 24px' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  <th style={{ padding: '16px 24px 16px 0', fontWeight: 700 }}>RUN ID</th>
-                  <th style={{ padding: '16px 24px 16px 0', fontWeight: 700 }}>PUBLISHED BY</th>
-                  <th style={{ padding: '16px 24px 16px 0', fontWeight: 700 }}>STATUS</th>
-                  <th style={{ padding: '16px 24px 16px 0', fontWeight: 700 }}>CONTENT INCLUDED</th>
-                  <th style={{ padding: '16px 24px 16px 0', fontWeight: 700 }}>DURATION</th>
-                  <th style={{ padding: '16px 24px 16px 0', fontWeight: 700 }}>PUBLISHED AT</th>
-                  <th style={{ padding: '16px 0', fontWeight: 700, textAlign: 'right' }}>ACTIONS</th>
+                  <th style={{ padding: '20px 24px 20px 0', fontWeight: 700, whiteSpace: 'nowrap' }}>RUN ID</th>
+                  <th style={{ padding: '20px 24px 20px 0', fontWeight: 700, whiteSpace: 'nowrap' }}>PUBLISHED BY</th>
+                  <th style={{ padding: '20px 24px 20px 0', fontWeight: 700, whiteSpace: 'nowrap' }}>STATUS</th>
+                  <th style={{ padding: '20px 24px 20px 0', fontWeight: 700, width: '100%' }}>CONTENT INCLUDED</th>
+                  <th style={{ padding: '20px 24px 20px 0', fontWeight: 700, whiteSpace: 'nowrap' }}>DURATION</th>
+                  <th style={{ padding: '20px 24px 20px 0', fontWeight: 700, whiteSpace: 'nowrap' }}>PUBLISHED AT</th>
+                  <th style={{ padding: '20px 0', fontWeight: 700, whiteSpace: 'nowrap', textAlign: 'right' }}>ACTIONS</th>
                 </tr>
               </thead>
               <tbody style={{ fontSize: '13px' }}>
@@ -443,23 +461,19 @@ const PublishHistory = () => {
 
                     return (
                       <tr key={run.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                        <td style={{ padding: '16px 24px 16px 0' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: isSuccess ? '#F5F3FF' : '#fff1f2', color: isSuccess ? '#8b5cf6' : '#f43f5e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                              <Send size={16} />
-                            </div>
-                            <div>
-                              <div style={{ fontWeight: 700, color: 'var(--navy-900)' }}>pub_{run.id.substring(0, 8)}</div>
-                            </div>
+                        <td style={{ padding: '20px 24px 20px 0', whiteSpace: 'nowrap' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: isSuccess ? '#10b981' : '#f43f5e', flexShrink: 0 }} />
+                            <div style={{ fontWeight: 700, color: 'var(--navy-900)' }}>pub_{run.id.substring(0, 8)}</div>
                           </div>
                         </td>
-                        <td style={{ padding: '16px 24px 16px 0' }}>
+                        <td style={{ padding: '20px 24px 20px 0', whiteSpace: 'nowrap' }}>
                           <div style={{ fontWeight: 600, color: 'var(--navy-900)' }}>{displayRole}</div>
                           {displayEmail && (
                             <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{displayEmail}</div>
                           )}
                         </td>
-                        <td style={{ padding: '16px 24px 16px 0' }}>
+                        <td style={{ padding: '20px 24px 20px 0' }}>
                            <span style={{ 
                              backgroundColor: isSuccess ? '#dcfce7' : '#fee2e2', 
                              color: isSuccess ? '#166534' : '#991b1b', 
@@ -480,25 +494,29 @@ const PublishHistory = () => {
                              </div>
                            )}
                         </td>
-                        <td style={{ padding: '16px 24px 16px 0', fontSize: '12px', lineHeight: '1.4' }}>
+                        <td style={{ padding: '20px 24px 20px 0' }}>
                           {run.stats ? (
-                            <>
-                              <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{run.stats.shows}</span> Shows<br/>
-                              <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{run.stats.episodes}</span> Episodes<br/>
-                              <span style={{ color: 'var(--text-muted)' }}>{run.stats.languages} Languages • {run.stats.sections} Sections</span>
-                            </>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <div style={{ color: 'var(--navy-900)', fontSize: '13px', lineHeight: '1.4' }}>
+                                <span style={{ fontWeight: 600 }}>{run.stats.shows}</span> Shows<br/>
+                                <span style={{ fontWeight: 600 }}>{run.stats.episodes}</span> Episodes
+                              </div>
+                              <div style={{ color: 'var(--text-muted)', fontSize: '12px' }}>
+                                {run.stats.languages} Languages · {run.stats.sections} Sections
+                              </div>
+                            </div>
                           ) : (
                             <span style={{ color: 'var(--text-muted)' }}>—</span>
                           )}
                         </td>
-                        <td style={{ padding: '16px 24px 16px 0', color: 'var(--navy-900)', fontWeight: 500 }}>
+                        <td style={{ padding: '20px 24px 20px 0', color: 'var(--navy-900)', fontWeight: 500, whiteSpace: 'nowrap' }}>
                           {formatDuration(run.duration_seconds)}
                         </td>
-                        <td style={{ padding: '16px 24px 16px 0' }}>
+                        <td style={{ padding: '20px 24px 20px 0', whiteSpace: 'nowrap' }}>
                           <div style={{ fontWeight: 600, color: 'var(--navy-900)' }}>{formattedDate}</div>
                           <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{formattedTime}</div>
                         </td>
-                        <td style={{ padding: '16px 0', textAlign: 'right' }}>
+                        <td style={{ padding: '20px 0', textAlign: 'right', whiteSpace: 'nowrap' }}>
                           <button 
                             onClick={() => setSelectedRun(run)}
                             aria-label={`View details for run ${run.id.substring(0, 8)}`}
@@ -517,11 +535,12 @@ const PublishHistory = () => {
 
           {/* Pagination */}
           {filteredHistory.length > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', borderTop: '1px solid var(--border)', fontSize: '13px', color: 'var(--text-muted)', backgroundColor: '#fff' }}>
-              <span>
-                Showing <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, filteredHistory.length)}</span> of <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{filteredHistory.length}</span> runs
-              </span>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', borderTop: '1px solid var(--border)', fontSize: '13px', color: 'var(--text-muted)', backgroundColor: '#fff', flexWrap: 'wrap', gap: '16px' }}>
+              <div style={{ flex: 1, minWidth: '150px' }}>
+                Showing <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{(currentPage - 1) * pageSize + 1}</span> to <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{Math.min(currentPage * pageSize, filteredHistory.length)}</span> of <span style={{ fontWeight: 700, color: 'var(--navy-900)' }}>{filteredHistory.length}</span> runs
+              </div>
+              
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center', flex: 2, minWidth: '200px' }}>
                 <button 
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
@@ -529,12 +548,10 @@ const PublishHistory = () => {
                 >
                   <ChevronLeft size={16} />
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => {
-                  if (totalPages > 7) {
-                    if (p !== 1 && p !== totalPages && Math.abs(currentPage - p) > 1) {
-                      if (p === 2 || p === totalPages - 1) return <span key={`ellipsis-${p}`} style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}>…</span>;
-                      return null;
-                    }
+                
+                {getPaginationWindow(currentPage, totalPages).map((p) => {
+                  if (typeof p === 'string') {
+                    return <span key={p} style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)', padding: '0 4px' }}>…</span>;
                   }
                   return (
                     <button
@@ -552,13 +569,15 @@ const PublishHistory = () => {
                         color: currentPage === p ? '#fff' : 'var(--navy-900)', 
                         fontSize: '13px', 
                         fontWeight: 700,
-                        cursor: 'pointer' 
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
                       }}
                     >
                       {p}
                     </button>
                   );
                 })}
+
                 <button 
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
@@ -566,11 +585,12 @@ const PublishHistory = () => {
                 >
                   <ChevronRight size={16} />
                 </button>
-                <div style={{ marginLeft: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <select style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '4px 8px', fontSize: '13px', color: 'var(--navy-900)', outline: 'none' }} defaultValue={10}>
-                    <option value={10}>10 per page</option>
-                  </select>
-                </div>
+              </div>
+
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', minWidth: '120px' }}>
+                <select style={{ border: '1px solid var(--border)', borderRadius: '6px', padding: '6px 12px', fontSize: '13px', color: 'var(--navy-900)', outline: 'none', cursor: 'pointer', backgroundColor: '#fff' }} defaultValue={10}>
+                  <option value={10}>10 per page</option>
+                </select>
               </div>
             </div>
           )}
