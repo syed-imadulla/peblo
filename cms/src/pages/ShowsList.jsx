@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { Search, MoreHorizontal, ChevronLeft, ChevronRight, ChevronDown, Image as ImageIcon, X, Trash2, Check, AlertTriangle } from 'lucide-react';
+import { Search, MoreHorizontal, ChevronLeft, ChevronRight, ChevronDown, Image as ImageIcon, X, Trash2, Check, AlertTriangle, Edit2 } from 'lucide-react';
 
 const fetchShows = async () => {
   const { data } = await axios.get('/api/admin/shows');
