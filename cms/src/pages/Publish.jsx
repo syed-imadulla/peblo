@@ -20,7 +20,6 @@ import {
   Tv,
   Globe,
   Briefcase,
-  Bell,
   PlaySquare,
   ChevronLeft,
   ChevronRight
@@ -222,39 +221,7 @@ const Publish = () => {
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button style={{
-            width: '40px', 
-            height: '40px', 
-            borderRadius: '50%', 
-            backgroundColor: '#fff', 
-            border: '1px solid var(--border)', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            color: 'var(--purple-600)', 
-            position: 'relative',
-            cursor: 'pointer',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-          }}>
-            <Bell size={20} />
-            <span style={{
-              position: 'absolute', 
-              top: '-4px', 
-              right: '-4px', 
-              backgroundColor: 'var(--purple-600)', 
-              color: '#fff', 
-              fontSize: '11px', 
-              borderRadius: '50%', 
-              width: '18px', 
-              height: '18px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              fontWeight: 'bold',
-              border: '2px solid #f4f5f8'
-            }}>3</span>
-          </button>
-          
+
           <button 
             className="btn btn-primary" 
             onClick={() => publishMutation.mutate()}
