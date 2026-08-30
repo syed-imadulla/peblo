@@ -5,7 +5,7 @@ import time
 from typing import Dict, Any, List
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
-from app.models.models import Show, Season, Episode, PublishRun
+from app.models.models import Show, Season, Episode, PublishRun, SystemSettings
 from app.services.validation import ValidationService
 from app.services.storage import storage
 
@@ -42,11 +42,25 @@ class PublishService:
             catalogue = PublishService._generate_catalogue(valid_episodes)
             catalogue_json = json.dumps(catalogue, indent=2, sort_keys=True)
             
-            # Atomic publish
-            temp_name = f"catalogue_temp_{uuid.uuid4().hex}.json"
-            final_name = "catalogue.json"
-            storage.write(temp_name, catalogue_json)
-            storage.rename(temp_name, final_name)
+            settings = db.query(SystemSettings).first()
+            is_atomic = settings.atomic_publish if settings else True
+            gen_backup = settings.generate_backup if settings else False
+            ext = settings.catalogue_format.lower() if settings and settings.catalogue_format else "json"
+            if ext not in ["json"]:
+                ext = "json"
+
+            final_name = f"catalogue.{ext}"
+
+            if is_atomic:
+                temp_name = f"catalogue_temp_{uuid.uuid4().hex}.{ext}"
+                storage.write(temp_name, catalogue_json)
+                storage.rename(temp_name, final_name)
+            else:
+                storage.write(final_name, catalogue_json)
+                
+            if gen_backup:
+                backup_name = f"catalogue_backup_{int(time.time())}.{ext}"
+                storage.write(backup_name, catalogue_json)
             
             status = "success"
             

@@ -12,6 +12,9 @@ class StorageProvider:
     def rename(self, old_name: str, new_name: str):
         raise NotImplementedError
 
+    def delete(self, filename: str):
+        raise NotImplementedError
+
 class LocalStorageProvider(StorageProvider):
     def __init__(self, base_path: str = None):
         self.base_path = base_path or settings.DATA_DIR
@@ -37,6 +40,11 @@ class LocalStorageProvider(StorageProvider):
         new_path = os.path.join(self.base_path, new_name)
         # atomic rename on POSIX
         os.rename(old_path, new_path)
+
+    def delete(self, filename: str):
+        filepath = os.path.join(self.base_path, filename)
+        if os.path.exists(filepath):
+            os.remove(filepath)
 
 storage = LocalStorageProvider()
 asset_storage = LocalStorageProvider(base_path=settings.ASSETS_DIR)

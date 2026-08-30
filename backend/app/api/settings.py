@@ -148,6 +148,13 @@ def test_storage_connection(
         asset_content = asset_storage.read(test_filename)
         if asset_content != "test_asset":
             raise Exception("Asset storage read value did not match written value.")
+
+        # Clean up
+        try:
+            storage.delete(test_filename)
+            asset_storage.delete(test_filename)
+        except Exception:
+            pass
             
         return StorageTestResponse(success=True, message="Storage connection successful. Base path and assets path are writable.")
     except Exception as e:

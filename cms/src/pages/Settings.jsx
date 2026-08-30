@@ -461,7 +461,7 @@ const Settings = () => {
           </div>
 
           {/* Card 5: Artwork Specifications */}
-          <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
+          <div className="card" style={{ padding: '24px' }}>
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '24px' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '12px', backgroundColor: '#f3e8ff', color: '#7e22ce', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <ImageIcon size={20} />
