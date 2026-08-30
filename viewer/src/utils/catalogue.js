@@ -43,6 +43,8 @@ export const findShowBySlugOrId = (catalog, identifier) => {
   return null;
 };
 
+export const findShowBySlug = findShowBySlugOrId;
+
 export const findEpisodeByContentGroup = (catalog, contentGroup) => {
   if (!catalog || !contentGroup) return null;
   for (const shows of Object.values(catalog)) {

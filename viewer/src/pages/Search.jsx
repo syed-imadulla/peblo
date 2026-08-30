@@ -1,39 +1,51 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Search as SearchIcon, X, Sparkles, TrendingUp, Film, Tv } from 'lucide-react';
-import { searchCatalog, getCatalog } from '../api';
-import { EpisodeCard } from '../components/EpisodeCard';
+import {
+  Search as SearchIcon,
+  X,
+  Sparkles,
+  TrendingUp,
+  Tv,
+  Film,
+} from 'lucide-react';
+import { getCatalog, searchCatalog } from '../api';
 import { ShowCard } from '../components/ShowCard';
+import { EpisodeCard } from '../components/EpisodeCard';
 import { LoadingState, ErrorState, EmptyState } from '../components/States';
 import { getAllShows } from '../utils/catalogue';
 
-const POPULAR_SEARCHES = [
-  'Moti',
-  'Adventure',
-  'India',
-  'Learning',
-  'Music',
-  'Stories',
-  'Science',
-  'Nature',
-  'Friendship',
-];
+const POPULAR_SEARCHES = ['Moti', 'Adventure', 'Friendship', 'India', 'Animals', 'Tales', 'Music'];
 
 const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialUrlQuery = searchParams.get('q') || '';
-  const [inputValue, setInputValue] = useState(initialUrlQuery);
-  const [filterTab, setFilterTab] = useState('all'); // 'all' | 'shows' | 'episodes'
+  const initialQuery = searchParams.get('q') || '';
+  const [inputValue, setInputValue] = useState(initialQuery);
+  const [filterTab, setFilterTab] = useState('all'); // 'all', 'shows', 'episodes'
   const inputRef = useRef(null);
 
-  // Sync state if URL param changes via browser back/forward
+  // Sync state if URL query param changes externally (e.g. back button)
   useEffect(() => {
-    const urlQ = searchParams.get('q') || '';
-    setInputValue(urlQ);
+    const q = searchParams.get('q') || '';
+    if (q !== inputValue) {
+      setInputValue(q);
+    }
   }, [searchParams]);
 
-  // Global keyboard shortcuts: '/' focuses search input, 'Escape' blurs
+  // Debounced URL update on typing so direct linking/refreshing works seamlessly
+  useEffect(() => {
+    const trimmed = inputValue.trim();
+    const handler = setTimeout(() => {
+      if (trimmed) {
+        setSearchParams({ q: trimmed }, { replace: true });
+      } else {
+        setSearchParams({}, { replace: true });
+      }
+    }, 250);
+    return () => clearTimeout(handler);
+  }, [inputValue, setSearchParams]);
+
+  // Global keyboard shortcut '/' to focus search input, 'Esc' to clear/blur
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === '/' && document.activeElement !== inputRef.current) {
@@ -47,95 +59,115 @@ const Search = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Fetch full catalogue for 100% instant real-time search and initial "Popular on PeBlo" shelf
+  // Fetch complete catalogue for synchronous instant real-time in-memory search
   const { data: catalog, isLoading: isCatalogLoading } = useQuery({
     queryKey: ['catalog'],
     queryFn: getCatalog,
+    staleTime: 60000,
   });
 
-  // Call searchCatalog API for backend compatibility and test integration
+  // Query backend search API for server-side full text results
   const {
     data: apiSearchResults,
     isLoading: isApiSearchLoading,
     error: apiSearchError,
   } = useQuery({
-    queryKey: ['search', inputValue.trim()],
+    queryKey: ['catalogSearch', inputValue.trim()],
     queryFn: () => searchCatalog(inputValue.trim()),
-    enabled: !!inputValue.trim(),
+    enabled: inputValue.trim().length > 0,
+    staleTime: 30000,
   });
 
-  // Synchronize URL search params with debounced typing
-  useEffect(() => {
-    const trimmed = inputValue.trim();
-    const currentUrlQ = searchParams.get('q') || '';
-    if (trimmed === currentUrlQ) return;
-
-    const timer = setTimeout(() => {
-      if (trimmed) {
-        setSearchParams({ q: trimmed }, { replace: true });
-      } else {
-        setSearchParams({}, { replace: true });
-      }
-    }, 200);
-
-    return () => clearTimeout(timer);
-  }, [inputValue, searchParams, setSearchParams]);
-
-  // 100% Realtime search matcher running instantly on every keystroke
+  // Synchronous, Instant 0ms Full-Text Matching Engine
   const { matchedShows, matchedEpisodes, hasSearched, totalResultsCount } = useMemo(() => {
-    const q = inputValue.trim().toLowerCase();
-    if (!q) {
-      return { matchedShows: [], matchedEpisodes: [], hasSearched: false, totalResultsCount: 0 };
+    const query = inputValue.trim().toLowerCase();
+    if (!query) {
+      return {
+        matchedShows: [],
+        matchedEpisodes: [],
+        hasSearched: false,
+        totalResultsCount: 0,
+      };
     }
 
-    const allShows = catalog ? getAllShows(catalog) : [];
+    if (!catalog) {
+      return {
+        matchedShows: [],
+        matchedEpisodes: [],
+        hasSearched: true,
+        totalResultsCount: 0,
+      };
+    }
+
+    const allShowsList = getAllShows(catalog);
+    const tokens = query.split(/\s+/).filter(Boolean);
+
     const showSet = new Set();
     const episodeList = [];
-    const queryTokens = q.split(/\s+/).filter(Boolean);
+    const seenEpisodeGroups = new Set();
 
-    // 1. Full-text search across shows and all nested episodes/trailers
-    allShows.forEach((show) => {
+    allShowsList.forEach((show) => {
       const showTitle = (show.title || '').toLowerCase();
       const showSynopsis = (show.synopsis || '').toLowerCase();
+      const showCategories = (show.categories || []).map((c) => c.toLowerCase());
       const showSlug = (show.slug || '').toLowerCase();
-      const showType = (show.type || '').toLowerCase();
-      const showCats = (show.categories || []).map((c) => c.toLowerCase());
-      const showCombined = `${showTitle} ${showSynopsis} ${showSlug} ${showType} ${showCats.join(' ')}`;
+      const showLanguages = (show.languages || []).map((l) => l.toLowerCase());
 
-      // Check if all tokens match show
-      const showMatches = queryTokens.every((token) => showCombined.includes(token));
+      // Check if show matches all search tokens
+      const showMatches = tokens.every(
+        (token) =>
+          showTitle.includes(token) ||
+          showSynopsis.includes(token) ||
+          showSlug.includes(token) ||
+          showCategories.some((c) => c.includes(token)) ||
+          showLanguages.some((l) => l.includes(token))
+      );
+
       if (showMatches) {
         showSet.add(show);
       }
 
-      // Check episodes and trailers
-      const allEps = [
+      // Scan all episodes in the show
+      const allEpisodes = [
         ...(show.trailers || []),
         ...(show.seasons?.flatMap((s) => s.episodes || []) || []),
       ];
 
-      allEps.forEach((ep) => {
+      allEpisodes.forEach((ep) => {
+        if (!ep) return;
         const epTitle = (ep.title || '').toLowerCase();
         const epSynopsis = (ep.synopsis || '').toLowerCase();
-        const epLangs = (ep.languages || []).map((l) => l.toLowerCase());
+        const epLanguages = (ep.languages || []).map((l) => l.toLowerCase());
         const epGroup = (ep.content_group || '').toLowerCase();
-        const epCombined = `${epTitle} ${epSynopsis} ${epGroup} ${epLangs.join(' ')} ${showTitle} ${showCats.join(' ')}`;
 
-        const epMatches = queryTokens.every((token) => epCombined.includes(token));
+        const epMatches = tokens.every(
+          (token) =>
+            epTitle.includes(token) ||
+            epSynopsis.includes(token) ||
+            epGroup.includes(token) ||
+            epLanguages.some((l) => l.includes(token)) ||
+            showTitle.includes(token) ||
+            showCategories.some((c) => c.includes(token))
+        );
+
         if (epMatches) {
-          episodeList.push(ep);
-          showSet.add(show); // Also surface parent show in results
+          if (ep.content_group && !seenEpisodeGroups.has(ep.content_group)) {
+            seenEpisodeGroups.add(ep.content_group);
+            episodeList.push(ep);
+          }
+          showSet.add(show);
         }
       });
     });
 
-    // Merge backend API search results if available
-    if (Array.isArray(apiSearchResults)) {
-      apiSearchResults.forEach((res) => {
-        if (res.show_id && !Array.from(showSet).some((s) => s.show_id === res.show_id)) {
-          showSet.add(res);
-        } else if (res.content_group && !episodeList.some((e) => e.content_group === res.content_group)) {
-          episodeList.push(res);
+    // Also blend any backend API results if present
+    if (apiSearchResults && apiSearchResults.shows) {
+      apiSearchResults.shows.forEach((apiShow) => {
+        const found = allShowsList.find(
+          (s) => s.show_id === apiShow.show_id || s.slug === apiShow.slug
+        );
+        if (found) {
+          showSet.add(found);
         }
       });
     }
@@ -202,8 +234,8 @@ const Search = () => {
           backgroundColor: 'var(--surface)',
           padding: '1.5rem 1.75rem',
           borderRadius: '20px',
-          boxShadow: '0 4px 20px rgba(21, 27, 79, 0.04)',
-          border: '1px solid #ECE4F6',
+          boxShadow: 'var(--shadow-sm)',
+          border: '1px solid var(--border)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -235,24 +267,24 @@ const Search = () => {
               height: '52px',
               padding: '0 3.6rem 0 3.1rem',
               borderRadius: '18px',
-              border: '2px solid #E6DEF4',
-              backgroundColor: '#FAF9FE',
+              border: '2px solid var(--border)',
+              backgroundColor: '#080817',
               fontSize: '1rem',
               fontWeight: 600,
               outline: 'none',
-              color: 'var(--navy-900)',
+              color: 'var(--text-main)',
               transition: 'all 0.18s ease',
-              boxShadow: 'inset 0 1px 3px rgba(21, 27, 79, 0.02)',
+              boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.4)',
             }}
             onFocus={(e) => {
               e.target.style.borderColor = 'var(--purple-700)';
-              e.target.style.backgroundColor = '#ffffff';
-              e.target.style.boxShadow = '0 0 0 3px rgba(109, 53, 232, 0.12)';
+              e.target.style.backgroundColor = '#0D0D1F';
+              e.target.style.boxShadow = '0 0 0 3px rgba(124, 58, 237, 0.25)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = '#E6DEF4';
-              e.target.style.backgroundColor = '#FAF9FE';
-              e.target.style.boxShadow = 'inset 0 1px 3px rgba(21, 27, 79, 0.02)';
+              e.target.style.borderColor = 'var(--border)';
+              e.target.style.backgroundColor = '#080817';
+              e.target.style.boxShadow = 'inset 0 1px 3px rgba(0, 0, 0, 0.4)';
             }}
             aria-label="Search catalogue"
           />
@@ -264,7 +296,7 @@ const Search = () => {
               left: '16px',
               top: '50%',
               transform: 'translateY(-50%)',
-              color: 'var(--purple-700)',
+              color: 'var(--purple-500)',
               pointerEvents: 'none',
             }}
           />
@@ -281,8 +313,8 @@ const Search = () => {
                 width: '26px',
                 height: '26px',
                 borderRadius: '50%',
-                backgroundColor: '#EDE6FF',
-                color: 'var(--purple-700)',
+                backgroundColor: 'rgba(124, 58, 237, 0.2)',
+                color: 'var(--purple-500)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -301,8 +333,8 @@ const Search = () => {
                 transform: 'translateY(-50%)',
                 padding: '2px 7px',
                 borderRadius: '5px',
-                backgroundColor: '#EDE6FF',
-                color: 'var(--purple-700)',
+                backgroundColor: 'rgba(124, 58, 237, 0.2)',
+                color: 'var(--purple-500)',
                 fontSize: '0.72rem',
                 fontWeight: 800,
                 pointerEvents: 'none',
@@ -316,7 +348,7 @@ const Search = () => {
         {/* Suggestion Chips (Horizontally scrollable on mobile) */}
         <div className="chips-scroll-container hide-scrollbar">
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
-            <Sparkles size={13} color="var(--purple-700)" /> Try searching:
+            <Sparkles size={13} color="var(--purple-500)" /> Try searching:
           </span>
           {POPULAR_SEARCHES.map((term) => {
             const isActive = activeQuery.toLowerCase() === term.toLowerCase();
@@ -327,10 +359,10 @@ const Search = () => {
                 style={{
                   padding: '0.3rem 0.8rem',
                   borderRadius: 'var(--radius-pill)',
-                  backgroundColor: isActive ? 'var(--purple-700)' : '#F5F2FC',
+                  backgroundColor: isActive ? 'var(--purple-700)' : 'var(--bg-secondary)',
                   border: '1px solid',
-                  borderColor: isActive ? 'var(--purple-700)' : '#EAE4F6',
-                  color: isActive ? '#ffffff' : 'var(--navy-900)',
+                  borderColor: isActive ? 'var(--purple-700)' : 'var(--border)',
+                  color: isActive ? '#ffffff' : 'var(--text-nav)',
                   fontSize: '0.8rem',
                   fontWeight: 700,
                   whiteSpace: 'nowrap',
@@ -339,14 +371,14 @@ const Search = () => {
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'var(--purple-100)';
-                    e.currentTarget.style.color = 'var(--purple-700)';
+                    e.currentTarget.style.backgroundColor = 'rgba(124, 58, 237, 0.2)';
+                    e.currentTarget.style.color = 'var(--purple-500)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.backgroundColor = '#F5F2FC';
-                    e.currentTarget.style.color = 'var(--navy-900)';
+                    e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+                    e.currentTarget.style.color = 'var(--text-nav)';
                   }
                 }}
               >
@@ -365,7 +397,7 @@ const Search = () => {
       {!isLoading && !apiSearchError && hasSearched && totalResultsCount > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           {/* Results Header + Filter Tabs */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #ECE4F6', paddingBottom: '0.85rem', flexWrap: 'wrap', gap: '0.85rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '0.85rem', flexWrap: 'wrap', gap: '0.85rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <h2 style={{ color: 'var(--navy-900)', margin: 0, fontSize: '1.35rem', fontWeight: 800 }}>
                 Search results for "{activeQuery}"
@@ -373,8 +405,8 @@ const Search = () => {
               <span
                 style={{
                   fontSize: '0.8rem',
-                  color: 'var(--purple-700)',
-                  backgroundColor: 'var(--purple-100)',
+                  color: 'var(--purple-500)',
+                  backgroundColor: 'rgba(124, 58, 237, 0.15)',
                   fontWeight: 700,
                   padding: '3px 10px',
                   borderRadius: 'var(--radius-pill)',
@@ -385,7 +417,7 @@ const Search = () => {
             </div>
 
             {/* Filter Tabs: All / Shows / Episodes */}
-            <div style={{ display: 'flex', gap: '4px', backgroundColor: '#FAF8FE', padding: '3px', borderRadius: 'var(--radius-pill)', border: '1px solid #ECE4F6' }}>
+            <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-secondary)', padding: '3px', borderRadius: 'var(--radius-pill)', border: '1px solid var(--border)' }}>
               <button
                 onClick={() => setFilterTab('all')}
                 style={{
@@ -439,7 +471,7 @@ const Search = () => {
           {(filterTab === 'all' || filterTab === 'shows') && matchedShows.length > 0 && (
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                <Tv size={17} color="var(--purple-700)" />
+                <Tv size={17} color="var(--purple-500)" />
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--navy-900)', margin: 0 }}>
                   Shows ({matchedShows.length})
                 </h3>
@@ -462,7 +494,7 @@ const Search = () => {
           {(filterTab === 'all' || filterTab === 'episodes') && matchedEpisodes.length > 0 && (
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                <Film size={17} color="var(--purple-700)" />
+                <Film size={17} color="var(--purple-500)" />
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--navy-900)', margin: 0 }}>
                   Episodes & Clips ({matchedEpisodes.length})
                 </h3>
@@ -496,11 +528,11 @@ const Search = () => {
                 style={{
                   padding: '0.3rem 0.8rem',
                   borderRadius: 'var(--radius-pill)',
-                  backgroundColor: 'var(--purple-100)',
-                  color: 'var(--purple-700)',
+                  backgroundColor: 'rgba(124, 58, 237, 0.15)',
+                  color: 'var(--purple-500)',
                   fontSize: '0.82rem',
                   fontWeight: 700,
-                  border: '1px solid var(--purple-200)',
+                  border: '1px solid rgba(124, 58, 237, 0.3)',
                   transition: 'all 0.15s ease',
                 }}
               >
@@ -516,7 +548,7 @@ const Search = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-              <TrendingUp size={17} color="var(--purple-700)" />
+              <TrendingUp size={17} color="var(--purple-500)" />
               <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--navy-900)', margin: 0 }}>
                 Popular on PeBlo
               </h2>

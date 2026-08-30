@@ -110,7 +110,7 @@ const Browse = () => {
       {/* Page Header */}
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1rem' }}>
         <div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--purple-700)', fontSize: '0.85rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--purple-500)', fontSize: '0.85rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.35rem' }}>
             <Compass size={16} /> Explore Catalogue
           </div>
           <h1 style={{ margin: 0, fontSize: '2.2rem', color: 'var(--navy-900)' }}>
@@ -127,11 +127,11 @@ const Browse = () => {
               fontSize: '0.88rem',
               fontWeight: 700,
               backgroundColor: 'var(--surface)',
-              border: '1px solid #ECE4F6',
+              border: '1px solid var(--border)',
               padding: '0.45rem 1rem',
               borderRadius: 'var(--radius-pill)',
-              color: 'var(--navy-900)',
-              boxShadow: '0 2px 6px rgba(21, 27, 79, 0.03)',
+              color: 'var(--text-main)',
+              boxShadow: 'var(--shadow-sm)',
             }}
           >
             Showing {filteredShows.length} of {allShows.length} Shows
@@ -145,8 +145,8 @@ const Browse = () => {
           backgroundColor: 'var(--surface)',
           padding: '1.5rem 1.75rem',
           borderRadius: '24px',
-          boxShadow: '0 4px 18px rgba(21, 27, 79, 0.04)',
-          border: '1px solid #ECE4F6',
+          boxShadow: 'var(--shadow-sm)',
+          border: '1px solid var(--border)',
           display: 'flex',
           flexDirection: 'column',
           gap: '1.25rem',
@@ -164,10 +164,10 @@ const Browse = () => {
               borderRadius: 'var(--radius-pill)',
               fontSize: '0.88rem',
               fontWeight: 700,
-              backgroundColor: selectedSection === 'all' ? 'var(--purple-700)' : 'var(--background)',
-              color: selectedSection === 'all' ? '#ffffff' : 'var(--navy-900)',
+              backgroundColor: selectedSection === 'all' ? 'var(--purple-700)' : 'var(--bg-secondary)',
+              color: selectedSection === 'all' ? '#ffffff' : 'var(--text-nav)',
               border: '1px solid',
-              borderColor: selectedSection === 'all' ? 'var(--purple-700)' : '#ECE4F6',
+              borderColor: selectedSection === 'all' ? 'var(--purple-700)' : 'var(--border)',
               transition: 'all 0.15s ease',
             }}
           >
@@ -183,10 +183,10 @@ const Browse = () => {
                 fontSize: '0.88rem',
                 fontWeight: 700,
                 textTransform: 'capitalize',
-                backgroundColor: selectedSection === sec ? 'var(--purple-700)' : 'var(--background)',
-                color: selectedSection === sec ? '#ffffff' : 'var(--navy-900)',
+                backgroundColor: selectedSection === sec ? 'var(--purple-700)' : 'var(--bg-secondary)',
+                color: selectedSection === sec ? '#ffffff' : 'var(--text-nav)',
                 border: '1px solid',
-                borderColor: selectedSection === sec ? 'var(--purple-700)' : '#ECE4F6',
+                borderColor: selectedSection === sec ? 'var(--purple-700)' : 'var(--border)',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -204,7 +204,7 @@ const Browse = () => {
             gap: '1.25rem',
             flexWrap: 'wrap',
             paddingTop: '1rem',
-            borderTop: '1px solid #F0ECF8',
+            borderTop: '1px solid var(--border)',
           }}
         >
           {/* Categories Horizontal Scroll */}
@@ -220,8 +220,10 @@ const Browse = () => {
                 fontSize: '0.82rem',
                 fontWeight: 700,
                 flexShrink: 0,
-                backgroundColor: selectedCategory === 'all' ? 'var(--navy-900)' : '#F5F2FC',
+                backgroundColor: selectedCategory === 'all' ? 'var(--purple-700)' : 'var(--bg-secondary)',
                 color: selectedCategory === 'all' ? '#ffffff' : 'var(--text-muted)',
+                border: '1px solid',
+                borderColor: selectedCategory === 'all' ? 'var(--purple-700)' : 'var(--border)',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -238,8 +240,10 @@ const Browse = () => {
                   fontWeight: 700,
                   textTransform: 'capitalize',
                   flexShrink: 0,
-                  backgroundColor: selectedCategory === cat ? 'var(--navy-900)' : '#F5F2FC',
+                  backgroundColor: selectedCategory === cat ? 'var(--purple-700)' : 'var(--bg-secondary)',
                   color: selectedCategory === cat ? '#ffffff' : 'var(--text-muted)',
+                  border: '1px solid',
+                  borderColor: selectedCategory === cat ? 'var(--purple-700)' : 'var(--border)',
                   transition: 'all 0.15s ease',
                 }}
               >
@@ -259,9 +263,9 @@ const Browse = () => {
               style={{
                 padding: '0.45rem 0.9rem',
                 borderRadius: '10px',
-                border: '1px solid #ECE4F6',
-                backgroundColor: 'var(--surface)',
-                color: 'var(--navy-900)',
+                border: '1px solid var(--border)',
+                backgroundColor: 'var(--bg-secondary)',
+                color: 'var(--text-main)',
                 fontSize: '0.85rem',
                 fontWeight: 700,
                 outline: 'none',

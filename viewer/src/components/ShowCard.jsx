@@ -8,7 +8,7 @@ export const FallbackImage = ({ aspect = '16/9' }) => (
     style={{
       width: '100%',
       aspectRatio: aspect,
-      background: 'linear-gradient(140deg, #6C35E6 0%, #4D20A6 100%)',
+      background: 'linear-gradient(140deg, #2D1A54 0%, #150F2C 100%)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -30,7 +30,7 @@ export const FallbackImage = ({ aspect = '16/9' }) => (
         width: '110px',
         height: '110px',
         borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(255, 230, 160, 0.25) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(124, 58, 237, 0.25) 0%, transparent 70%)',
         pointerEvents: 'none',
       }}
     />
@@ -42,7 +42,7 @@ export const FallbackImage = ({ aspect = '16/9' }) => (
         width: '120px',
         height: '120px',
         borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(160, 120, 255, 0.3) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(124, 58, 237, 0.2) 0%, transparent 70%)',
         pointerEvents: 'none',
       }}
     />
@@ -52,15 +52,15 @@ export const FallbackImage = ({ aspect = '16/9' }) => (
         width: '40px',
         height: '40px',
         borderRadius: '50%',
-        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+        backgroundColor: 'rgba(255, 255, 255, 0.08)',
         backdropFilter: 'blur(6px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
       }}
     >
-      <Film size={18} color="#ffffff" opacity={0.9} />
+      <Film size={18} color="#A78BFA" opacity={0.9} />
     </div>
   </div>
 );
@@ -86,7 +86,7 @@ export const ShowCard = ({ show, width = '100%', typeLabel = 'Series' }) => {
       <div
         className="show-card-thumb"
         style={{
-          backgroundColor: '#EDE6FF',
+          backgroundColor: '#121225',
           aspectRatio: '16/9',
           borderRadius: '16px',
         }}

@@ -47,15 +47,15 @@ const Layout = () => {
             pointerEvents: 'auto',
             width: 'calc(100% - 40px)',
             maxWidth: '1440px',
-            backgroundColor: scrolled ? 'rgba(255, 255, 255, 0.90)' : 'rgba(255, 255, 255, 0.82)',
+            backgroundColor: scrolled ? 'rgba(18, 18, 37, 0.92)' : 'rgba(18, 18, 37, 0.82)',
             backdropFilter: 'blur(24px) saturate(180%)',
             WebkitBackdropFilter: 'blur(24px) saturate(180%)',
             borderRadius: '0 0 22px 22px',
-            border: '1px solid rgba(230, 222, 246, 0.8)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
             borderTop: 'none',
             boxShadow: scrolled
-              ? '0 8px 24px rgba(21, 27, 79, 0.06), 0 2px 6px rgba(109, 53, 232, 0.03), inset 0 -1px 0 rgba(255, 255, 255, 0.9)'
-              : '0 4px 18px rgba(21, 27, 79, 0.04), inset 0 -1px 0 rgba(255, 255, 255, 0.9)',
+              ? '0 8px 28px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(124, 58, 237, 0.1), inset 0 -1px 0 rgba(255, 255, 255, 0.05)'
+              : '0 4px 20px rgba(0, 0, 0, 0.45), inset 0 -1px 0 rgba(255, 255, 255, 0.05)',
             padding: '0.5rem 1.75rem',
             display: 'flex',
             alignItems: 'center',
@@ -96,7 +96,7 @@ const Layout = () => {
                 display: 'none',
                 fontSize: '1.45rem',
                 fontWeight: 900,
-                color: 'var(--purple-700)',
+                color: 'var(--purple-500)',
                 letterSpacing: '-0.75px',
               }}
             >
@@ -104,8 +104,8 @@ const Layout = () => {
             </span>
             <span
               style={{
-                backgroundColor: 'rgba(109, 53, 232, 0.12)',
-                color: 'var(--purple-700)',
+                backgroundColor: 'rgba(124, 58, 237, 0.2)',
+                color: 'var(--purple-500)',
                 fontSize: '0.7rem',
                 fontWeight: 800,
                 padding: '2px 6px',
@@ -113,6 +113,7 @@ const Layout = () => {
                 letterSpacing: '0.5px',
                 lineHeight: 1.2,
                 backdropFilter: 'blur(4px)',
+                border: '1px solid rgba(124, 58, 237, 0.3)',
               }}
             >
               TV
@@ -125,10 +126,10 @@ const Layout = () => {
               display: 'flex',
               alignItems: 'center',
               gap: '0.35rem',
-              backgroundColor: 'rgba(241, 236, 255, 0.45)',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
               padding: '3px',
               borderRadius: '999px',
-              border: '1px solid rgba(230, 222, 246, 0.65)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               backdropFilter: 'blur(12px)',
             }}
             className="desktop-nav"
@@ -146,12 +147,12 @@ const Layout = () => {
                   borderRadius: 'var(--radius-pill)',
                   fontSize: '0.9rem',
                   fontWeight: isActive ? 700 : 600,
-                  color: isActive ? '#ffffff' : 'var(--navy-900)',
+                  color: isActive ? '#ffffff' : 'var(--text-nav)',
                   background: isActive
-                    ? 'linear-gradient(180deg, #7E45F2 0%, #632BD9 100%)'
+                    ? 'linear-gradient(180deg, #8B5CF6 0%, #7C3AED 100%)'
                     : 'transparent',
                   boxShadow: isActive
-                    ? '0 2px 10px rgba(109, 53, 232, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.3)'
+                    ? '0 2px 12px rgba(124, 58, 237, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3)'
                     : 'none',
                   transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                   textDecoration: 'none',
@@ -175,19 +176,19 @@ const Layout = () => {
                   gap: '5px',
                   padding: '0.35rem 0.8rem',
                   borderRadius: 'var(--radius-pill)',
-                  border: '1px solid rgba(230, 222, 246, 0.8)',
-                  backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.06)',
                   backdropFilter: 'blur(8px)',
-                  color: 'var(--navy-900)',
+                  color: 'var(--text-main)',
                   fontSize: '0.82rem',
                   fontWeight: 700,
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
-                  boxShadow: '0 2px 6px rgba(21, 27, 79, 0.03)',
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
                 }}
                 aria-label="Select Language"
               >
-                <Globe size={13} color="var(--purple-700)" />
+                <Globe size={13} color="var(--purple-500)" />
                 <span>{selectedLang}</span>
                 <ChevronDown size={12} color="var(--text-muted)" />
               </button>
@@ -198,12 +199,12 @@ const Layout = () => {
                     position: 'absolute',
                     top: 'calc(100% + 8px)',
                     right: 0,
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backgroundColor: '#121225',
                     backdropFilter: 'blur(20px)',
                     WebkitBackdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(230, 222, 246, 0.9)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
                     borderRadius: '14px',
-                    boxShadow: '0 8px 24px rgba(21, 27, 79, 0.1)',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
                     padding: '5px',
                     minWidth: '125px',
                     zIndex: 110,
@@ -222,8 +223,8 @@ const Layout = () => {
                       borderRadius: '8px',
                       fontSize: '0.82rem',
                       fontWeight: selectedLang === 'EN' ? 700 : 500,
-                      color: selectedLang === 'EN' ? 'var(--purple-700)' : 'var(--navy-900)',
-                      backgroundColor: selectedLang === 'EN' ? 'rgba(109, 53, 232, 0.1)' : 'transparent',
+                      color: selectedLang === 'EN' ? 'var(--purple-500)' : 'var(--text-main)',
+                      backgroundColor: selectedLang === 'EN' ? 'rgba(124, 58, 237, 0.2)' : 'transparent',
                       textAlign: 'left',
                       cursor: 'pointer',
                     }}
@@ -240,8 +241,8 @@ const Layout = () => {
                       borderRadius: '8px',
                       fontSize: '0.82rem',
                       fontWeight: selectedLang === 'HI' ? 700 : 500,
-                      color: selectedLang === 'HI' ? 'var(--purple-700)' : 'var(--navy-900)',
-                      backgroundColor: selectedLang === 'HI' ? 'rgba(109, 53, 232, 0.1)' : 'transparent',
+                      color: selectedLang === 'HI' ? 'var(--purple-500)' : 'var(--text-main)',
+                      backgroundColor: selectedLang === 'HI' ? 'rgba(124, 58, 237, 0.2)' : 'transparent',
                       textAlign: 'left',
                       cursor: 'pointer',
                     }}
@@ -260,12 +261,12 @@ const Layout = () => {
                 height: '34px',
                 borderRadius: '50%',
                 overflow: 'hidden',
-                border: '2px solid rgba(230, 222, 246, 0.9)',
-                backgroundColor: '#FFE9D6',
+                border: '2px solid rgba(124, 58, 237, 0.4)',
+                backgroundColor: '#191933',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 2px 6px rgba(21, 27, 79, 0.06)',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
                 flexShrink: 0,
                 transition: 'transform 0.15s ease',
               }}
@@ -274,14 +275,14 @@ const Layout = () => {
               aria-label="Viewer Profile"
             >
               <svg width="24" height="24" viewBox="0 0 36 36" fill="none">
-                <circle cx="18" cy="18" r="16" fill="#FFDFC6" />
-                <path d="M10 14C10 9.58 13.58 6 18 6C22.42 6 26 9.58 26 14C26 15 25 15.5 24 14C23 12.5 21 11 18 11C15 11 13 12.5 12 14C11 15.5 10 15 10 14Z" fill="#5A3921" />
-                <circle cx="14" cy="18" r="2" fill="#2A1B12" />
-                <circle cx="22" cy="18" r="2" fill="#2A1B12" />
-                <path d="M15 22C15.8 23.5 20.2 23.5 21 22" stroke="#D9534F" strokeWidth="2" strokeLinecap="round" />
-                <circle cx="11.5" cy="20" r="1.5" fill="#FFAAA6" />
-                <circle cx="24.5" cy="20" r="1.5" fill="#FFAAA6" />
-                <path d="M9 32C9 28 13 26 18 26C23 26 27 28 27 32" fill="#6D35E8" />
+                <circle cx="18" cy="18" r="16" fill="#2D2048" />
+                <path d="M10 14C10 9.58 13.58 6 18 6C22.42 6 26 9.58 26 14C26 15 25 15.5 24 14C23 12.5 21 11 18 11C15 11 13 12.5 12 14C11 15.5 10 15 10 14Z" fill="#7C3AED" />
+                <circle cx="14" cy="18" r="2" fill="#FAF7FF" />
+                <circle cx="22" cy="18" r="2" fill="#FAF7FF" />
+                <path d="M15 22C15.8 23.5 20.2 23.5 21 22" stroke="#F472B6" strokeWidth="2" strokeLinecap="round" />
+                <circle cx="11.5" cy="20" r="1.5" fill="#F472B6" />
+                <circle cx="24.5" cy="20" r="1.5" fill="#F472B6" />
+                <path d="M9 32C9 28 13 26 18 26C23 26 27 28 27 32" fill="#7C3AED" />
               </svg>
             </Link>
 
@@ -293,9 +294,9 @@ const Layout = () => {
                 display: 'none',
                 padding: '5px',
                 borderRadius: '8px',
-                backgroundColor: 'rgba(241, 236, 255, 0.6)',
-                border: '1px solid rgba(230, 222, 246, 0.8)',
-                color: 'var(--navy-900)',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                color: 'var(--text-main)',
               }}
               aria-label="Toggle Navigation"
             >
@@ -313,12 +314,12 @@ const Layout = () => {
               width: 'calc(100% - 40px)',
               maxWidth: '1440px',
               padding: '0.75rem 1.25rem',
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              backgroundColor: 'rgba(18, 18, 37, 0.96)',
               backdropFilter: 'blur(20px)',
               borderRadius: '0 0 20px 20px',
-              border: '1px solid rgba(230, 222, 246, 0.9)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               borderTop: 'none',
-              boxShadow: '0 8px 24px rgba(21, 27, 79, 0.1)',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
               display: 'flex',
               flexDirection: 'column',
               gap: '0.35rem',
@@ -339,8 +340,8 @@ const Layout = () => {
                   borderRadius: 'var(--radius-md)',
                   fontSize: '0.92rem',
                   fontWeight: 700,
-                  color: isActive ? 'var(--purple-700)' : 'var(--navy-900)',
-                  backgroundColor: isActive ? 'var(--purple-100)' : 'transparent',
+                  color: isActive ? '#ffffff' : 'var(--text-main)',
+                  backgroundColor: isActive ? 'var(--purple-700)' : 'transparent',
                   textDecoration: 'none',
                 })}
               >

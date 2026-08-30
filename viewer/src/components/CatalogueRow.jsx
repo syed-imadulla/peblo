@@ -40,8 +40,8 @@ export const CatalogueRow = ({ title, count, children }) => {
               style={{
                 fontSize: '0.78rem',
                 fontWeight: 700,
-                color: 'var(--purple-700)',
-                backgroundColor: 'var(--purple-100)',
+                color: 'var(--purple-500)',
+                backgroundColor: 'rgba(124, 58, 237, 0.15)',
                 padding: '2px 8px',
                 borderRadius: 'var(--radius-pill)',
               }}
@@ -59,17 +59,17 @@ export const CatalogueRow = ({ title, count, children }) => {
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              backgroundColor: '#ffffff',
-              border: '1px solid #ECE4F6',
+              backgroundColor: '#121225',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--navy-900)',
-              boxShadow: '0 2px 6px rgba(21, 27, 79, 0.04)',
+              color: 'var(--text-main)',
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
               transition: 'background-color 0.15s ease',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--purple-100)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface-hover)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#121225')}
           >
             <ChevronLeft size={17} />
           </button>
@@ -80,17 +80,17 @@ export const CatalogueRow = ({ title, count, children }) => {
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              backgroundColor: '#ffffff',
-              border: '1px solid #ECE4F6',
+              backgroundColor: '#121225',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--navy-900)',
-              boxShadow: '0 2px 6px rgba(21, 27, 79, 0.04)',
+              color: 'var(--text-main)',
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
               transition: 'background-color 0.15s ease',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--purple-100)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface-hover)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#121225')}
           >
             <ChevronRight size={17} />
           </button>

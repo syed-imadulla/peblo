@@ -77,9 +77,10 @@ const Home = () => {
           position: 'relative',
           borderRadius: '26px',
           overflow: 'hidden',
-          backgroundColor: '#F3EFFE',
+          backgroundColor: '#0D0D1F',
           minHeight: '380px',
-          boxShadow: '0 6px 28px rgba(109, 53, 232, 0.07)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -117,12 +118,12 @@ const Home = () => {
             </div>
           )}
 
-          {/* Smooth left-to-right fade overlay into the lavender card */}
+          {/* Smooth left-to-right fade overlay into the dark card */}
           <div
             style={{
               position: 'absolute',
               inset: 0,
-              background: 'linear-gradient(90deg, #F3EFFE 0%, rgba(243, 239, 254, 0.95) 18%, rgba(243, 239, 254, 0) 60%)',
+              background: 'linear-gradient(90deg, #0D0D1F 0%, rgba(13, 13, 31, 0.95) 24%, rgba(13, 13, 31, 0) 65%)',
             }}
           />
         </div>
@@ -146,16 +147,17 @@ const Home = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                backgroundColor: '#EDE6FF',
-                color: 'var(--purple-700)',
+                backgroundColor: 'rgba(124, 58, 237, 0.2)',
+                color: 'var(--purple-500)',
                 fontSize: '0.78rem',
                 fontWeight: 800,
                 padding: '5px 14px',
                 borderRadius: 'var(--radius-pill)',
                 letterSpacing: '0.3px',
+                border: '1px solid rgba(124, 58, 237, 0.3)',
               }}
             >
-              <Sparkles size={14} fill="var(--purple-700)" /> Premiere
+              <Sparkles size={14} fill="var(--purple-500)" /> Premiere
             </span>
           </div>
 
@@ -191,13 +193,14 @@ const Home = () => {
               <span
                 key={cat}
                 style={{
-                  backgroundColor: idx === 0 ? '#EDE8FA' : idx === 1 ? '#E6F7F0' : '#FFF0E8',
-                  color: idx === 0 ? 'var(--purple-700)' : idx === 1 ? '#1B7F53' : '#B8531D',
+                  backgroundColor: idx === 0 ? 'rgba(124, 58, 237, 0.18)' : idx === 1 ? 'rgba(52, 211, 153, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                  color: idx === 0 ? 'var(--purple-500)' : idx === 1 ? '#34D399' : '#FBBF24',
                   fontSize: '0.8rem',
                   fontWeight: 700,
                   padding: '4px 13px',
                   borderRadius: 'var(--radius-pill)',
                   textTransform: 'capitalize',
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
                 }}
               >
                 {cat}
@@ -230,7 +233,7 @@ const Home = () => {
               className="btn btn-secondary"
               style={{ padding: '0.8rem 1.5rem', fontSize: '1rem' }}
             >
-              <Info size={17} color="var(--navy-900)" /> More Info
+              <Info size={17} color="var(--text-main)" /> More Info
             </Link>
           </div>
 
@@ -244,7 +247,7 @@ const Home = () => {
                   width: idx === currentHeroIndex ? '18px' : '7px',
                   height: '7px',
                   borderRadius: '999px',
-                  backgroundColor: idx === currentHeroIndex ? 'var(--purple-700)' : '#D8CEF6',
+                  backgroundColor: idx === currentHeroIndex ? 'var(--purple-700)' : 'rgba(255, 255, 255, 0.15)',
                   transition: 'all 0.2s ease',
                   padding: 0,
                 }}
@@ -273,12 +276,13 @@ const Home = () => {
                 width: '38px',
                 height: '38px',
                 borderRadius: '50%',
-                backgroundColor: '#ffffff',
+                backgroundColor: '#121225',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 3px 10px rgba(21, 27, 79, 0.12)',
-                color: 'var(--navy-900)',
+                boxShadow: '0 3px 10px rgba(0, 0, 0, 0.4)',
+                color: 'var(--text-main)',
                 transition: 'transform 0.15s ease',
               }}
               onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.06)')}
@@ -293,12 +297,13 @@ const Home = () => {
                 width: '38px',
                 height: '38px',
                 borderRadius: '50%',
-                backgroundColor: '#ffffff',
+                backgroundColor: '#121225',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 3px 10px rgba(21, 27, 79, 0.12)',
-                color: 'var(--navy-900)',
+                boxShadow: '0 3px 10px rgba(0, 0, 0, 0.4)',
+                color: 'var(--text-main)',
                 transition: 'transform 0.15s ease',
               }}
               onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.06)')}
@@ -327,8 +332,8 @@ const Home = () => {
                   style={{
                     fontSize: '0.78rem',
                     fontWeight: 700,
-                    color: 'var(--purple-700)',
-                    backgroundColor: 'var(--purple-100)',
+                    color: 'var(--purple-500)',
+                    backgroundColor: 'rgba(124, 58, 237, 0.15)',
                     padding: '2px 9px',
                     borderRadius: 'var(--radius-pill)',
                   }}
@@ -353,17 +358,17 @@ const Home = () => {
                         width: '32px',
                         height: '32px',
                         borderRadius: '50%',
-                        backgroundColor: '#ffffff',
-                        border: '1px solid #ECE4F6',
+                        backgroundColor: '#121225',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: 'var(--navy-900)',
-                        boxShadow: '0 2px 6px rgba(21, 27, 79, 0.04)',
+                        color: 'var(--text-main)',
+                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
                         transition: 'background-color 0.15s ease',
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--purple-100)')}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface-hover)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#121225')}
                       aria-label={`Scroll ${section} left`}
                     >
                       <ChevronLeft size={17} />
@@ -374,17 +379,17 @@ const Home = () => {
                         width: '32px',
                         height: '32px',
                         borderRadius: '50%',
-                        backgroundColor: '#ffffff',
-                        border: '1px solid #ECE4F6',
+                        backgroundColor: '#121225',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: 'var(--navy-900)',
-                        boxShadow: '0 2px 6px rgba(21, 27, 79, 0.04)',
+                        color: 'var(--text-main)',
+                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)',
                         transition: 'background-color 0.15s ease',
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--purple-100)')}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface-hover)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#121225')}
                       aria-label={`Scroll ${section} right`}
                     >
                       <ChevronRight size={17} />

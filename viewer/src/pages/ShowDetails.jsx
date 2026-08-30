@@ -1,19 +1,18 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Play, Film, Clock, Globe, Sparkles } from 'lucide-react';
+import { Play, Sparkles, Globe, ArrowLeft, Tv, Film } from 'lucide-react';
 import { getCatalog } from '../api';
 import { CatalogueRow } from '../components/CatalogueRow';
 import { EpisodeCard } from '../components/EpisodeCard';
 import { LoadingState, ErrorState, EmptyState } from '../components/States';
 import { FallbackImage } from '../components/ShowCard';
 import {
-  findShowBySlugOrId,
-  getShowBanner,
+  findShowBySlug,
   getShowPoster,
+  getShowBanner,
   getShowLanguages,
   getShowTotalEpisodes,
-  formatDuration,
 } from '../utils/catalogue';
 
 const ShowDetails = () => {
@@ -25,35 +24,40 @@ const ShowDetails = () => {
   });
 
   if (isLoading) return <LoadingState message="Loading show details..." />;
-  if (error) return <ErrorState message="Could not load show details." />;
+  if (error) return <ErrorState message="Could not load the show. Is the backend running?" />;
 
-  const show = findShowBySlugOrId(catalog, slug);
-  if (!show) return <EmptyState message="Show not found in catalogue." />;
+  const show = findShowBySlug(catalog, slug);
 
-  const banner = getShowBanner(show);
+  if (!show) {
+    return (
+      <EmptyState
+        message={`We couldn't find a show with the identifier "${slug}". It might not be published yet.`}
+      />
+    );
+  }
+
   const poster = getShowPoster(show);
+  const banner = getShowBanner(show);
   const languages = getShowLanguages(show);
   const totalEpisodes = getShowTotalEpisodes(show);
 
-  // Find first playable episode
   const firstPlayableEp =
-    show.seasons?.[0]?.episodes?.[0] ||
-    show.trailers?.[0];
+    show.seasons?.[0]?.episodes?.[0] || show.trailers?.[0];
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-      {/* Hero Showcase Container */}
+      {/* ─── Modern Show Details Hero with Integrated Back Button ───────────── */}
       <div
         style={{
           position: 'relative',
           borderRadius: '26px',
           overflow: 'hidden',
-          backgroundColor: 'var(--surface)',
-          boxShadow: '0 8px 30px rgba(21, 27, 79, 0.06)',
-          border: '1px solid #ECE4F6',
+          backgroundColor: '#0D0D1F',
+          boxShadow: 'var(--shadow-sm)',
+          border: '1px solid var(--border)',
         }}
       >
-        {/* Floating Frosted Glass Back Button */}
+        {/* Floating Frosted Back Button */}
         <Link
           to="/browse"
           style={{
@@ -69,20 +73,20 @@ const ShowDetails = () => {
             fontSize: '0.88rem',
             padding: '0.45rem 1.05rem',
             borderRadius: 'var(--radius-pill)',
-            backgroundColor: 'rgba(21, 27, 79, 0.5)',
+            backgroundColor: 'rgba(8, 8, 23, 0.65)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255, 255, 255, 0.25)',
-            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.3)',
             transition: 'all 0.2s ease',
             textDecoration: 'none',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(21, 27, 79, 0.75)';
+            e.currentTarget.style.backgroundColor = 'rgba(8, 8, 23, 0.85)';
             e.currentTarget.style.transform = 'translateX(-2px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(21, 27, 79, 0.5)';
+            e.currentTarget.style.backgroundColor = 'rgba(8, 8, 23, 0.65)';
             e.currentTarget.style.transform = 'none';
           }}
           aria-label="Back to Browse"
@@ -113,7 +117,7 @@ const ShowDetails = () => {
             style={{
               position: 'absolute',
               inset: 0,
-              background: 'linear-gradient(180deg, rgba(20, 9, 41, 0.2) 0%, rgba(20, 9, 41, 0.75) 100%)',
+              background: 'linear-gradient(180deg, rgba(8, 8, 23, 0.2) 0%, rgba(8, 8, 23, 0.85) 100%)',
             }}
           />
         </div>
@@ -137,10 +141,10 @@ const ShowDetails = () => {
               aspectRatio: '2/3',
               borderRadius: '22px',
               overflow: 'hidden',
-              boxShadow: '0 16px 36px rgba(21, 27, 79, 0.18)',
+              boxShadow: '0 16px 36px rgba(0, 0, 0, 0.5)',
               backgroundColor: 'var(--surface)',
               flexShrink: 0,
-              border: '4px solid #ffffff',
+              border: '4px solid #191933',
             }}
           >
             {poster ? (
@@ -167,13 +171,14 @@ const ShowDetails = () => {
                 <span
                   key={cat}
                   style={{
-                    backgroundColor: 'var(--purple-100)',
-                    color: 'var(--purple-700)',
+                    backgroundColor: 'rgba(124, 58, 237, 0.18)',
+                    color: 'var(--purple-500)',
                     padding: '4px 12px',
                     borderRadius: 'var(--radius-pill)',
                     fontSize: '0.82rem',
                     fontWeight: 700,
                     textTransform: 'capitalize',
+                    border: '1px solid rgba(124, 58, 237, 0.25)',
                   }}
                 >
                   {cat}
@@ -186,9 +191,9 @@ const ShowDetails = () => {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '5px',
-                    backgroundColor: '#FAF8FE',
+                    backgroundColor: 'var(--bg-secondary)',
                     color: 'var(--text-muted)',
-                    border: '1px solid #ECE4F6',
+                    border: '1px solid var(--border)',
                     padding: '4px 12px',
                     borderRadius: 'var(--radius-pill)',
                     fontSize: '0.82rem',
@@ -196,7 +201,7 @@ const ShowDetails = () => {
                     textTransform: 'uppercase',
                   }}
                 >
-                  <Globe size={13} color="var(--purple-600)" /> {languages.join(', ')}
+                  <Globe size={13} color="var(--purple-500)" /> {languages.join(', ')}
                 </span>
               )}
             </div>

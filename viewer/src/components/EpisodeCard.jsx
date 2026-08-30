@@ -24,7 +24,7 @@ export const EpisodeCard = ({ episode, width = '100%' }) => {
         className="episode-card-thumb"
         style={{
           aspectRatio: '16/9',
-          backgroundColor: '#EDE6FF',
+          backgroundColor: '#121225',
           borderRadius: '16px',
         }}
       >
@@ -65,9 +65,9 @@ export const EpisodeCard = ({ episode, width = '100%' }) => {
               position: 'absolute',
               bottom: '8px',
               right: '8px',
-              backgroundColor: 'rgba(16, 20, 58, 0.85)',
+              backgroundColor: 'rgba(8, 8, 23, 0.85)',
               backdropFilter: 'blur(4px)',
-              color: '#ffffff',
+              color: '#F8F7FF',
               fontSize: '0.7rem',
               fontWeight: 700,
               padding: '2px 7px',
@@ -76,6 +76,7 @@ export const EpisodeCard = ({ episode, width = '100%' }) => {
               alignItems: 'center',
               gap: '4px',
               zIndex: 2,
+              border: '1px solid rgba(255, 255, 255, 0.1)',
             }}
           >
             <Clock size={10} />
