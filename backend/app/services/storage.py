@@ -6,6 +6,9 @@ class StorageProvider:
     def write(self, filename: str, content: str):
         raise NotImplementedError
 
+    def write_binary(self, filename: str, content: bytes):
+        raise NotImplementedError
+
     def rename(self, old_name: str, new_name: str):
         raise NotImplementedError
 
@@ -16,6 +19,10 @@ class LocalStorageProvider(StorageProvider):
 
     def write(self, filename: str, content: str):
         with open(os.path.join(self.base_path, filename), "w") as f:
+            f.write(content)
+
+    def write_binary(self, filename: str, content: bytes):
+        with open(os.path.join(self.base_path, filename), "wb") as f:
             f.write(content)
 
     def read(self, filename: str) -> str:
@@ -32,3 +39,4 @@ class LocalStorageProvider(StorageProvider):
         os.rename(old_path, new_path)
 
 storage = LocalStorageProvider()
+asset_storage = LocalStorageProvider(base_path=settings.ASSETS_DIR)

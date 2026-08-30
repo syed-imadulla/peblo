@@ -10,7 +10,7 @@ from app.core.database import get_db
 from app.core.config import settings
 from app.models.models import Artwork, Show, Season, Episode
 from app.api.auth import get_current_user
-from app.services.storage import storage
+from app.services.storage import storage, asset_storage
 
 router = APIRouter(prefix="/admin", dependencies=[Depends(get_current_user)])
 
@@ -74,15 +74,8 @@ async def upload_artwork(
     ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
     filename = f"artwork_{uuid.uuid4().hex[:8]}.{ext}"
     
-    # Store using the existing storage provider (which writes to DATA_DIR)
-    # The storage provider expects strings, we will just write binary directly using python if needed
-    # But storage provider write() takes string... wait, let's write as binary directly
-    # Wait, storage provider doesn't have a binary write method. We might need to add one.
-    
-    # Save to ASSETS_DIR so it is served from the /assets static mount
-    filepath = os.path.join(settings.ASSETS_DIR, filename)
-    with open(filepath, "wb") as f:
-        f.write(contents)
+    # Store using the existing storage provider configured for assets
+    asset_storage.write_binary(filename, contents)
         
     # Remove existing artwork of this type for this entity
     existing = db.query(Artwork).filter(

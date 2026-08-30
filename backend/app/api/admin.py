@@ -273,7 +273,7 @@ def publish_catalog(
     admin_user: dict = Depends(get_current_admin),
 ):
     try:
-        run = PublishService.publish_catalogue(db)
+        run = PublishService.publish_catalogue(db, triggered_by=admin_user.get("sub"))
         if run.status == "failed":
             raise HTTPException(status_code=500, detail="Publish failed — no valid records")
         return {

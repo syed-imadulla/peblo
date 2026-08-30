@@ -5,6 +5,9 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from typing import Optional
+from sqlalchemy.orm import Session
+from app.core.database import get_db
+from app.models.models import User
 
 router = APIRouter(prefix="/auth")
 security = HTTPBearer()
@@ -28,16 +31,29 @@ def create_access_token(data: dict):
     return encoded_jwt
 
 @router.post("/login", response_model=TokenResponse)
-def login(req: LoginRequest):
-    # Dummy auth logic
+def login(req: LoginRequest, db: Session = Depends(get_db)):
     if req.username == "admin" and req.password == "admin":
+        user = db.query(User).filter(User.email == "admin@peblo.tv").first()
+        if not user:
+            user = User(email="admin@peblo.tv", role="admin")
+            db.add(user)
+            db.commit()
+            db.refresh(user)
         role = "admin"
+        sub = str(user.id)
     elif req.username == "editor" and req.password == "editor":
+        user = db.query(User).filter(User.email == "editor@peblo.tv").first()
+        if not user:
+            user = User(email="editor@peblo.tv", role="editor")
+            db.add(user)
+            db.commit()
+            db.refresh(user)
         role = "editor"
+        sub = str(user.id)
     else:
         raise HTTPException(status_code=401, detail="Invalid credentials")
         
-    token = create_access_token({"sub": req.username, "role": role})
+    token = create_access_token({"sub": sub, "role": role})
     return {"access_token": token, "role": role}
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
