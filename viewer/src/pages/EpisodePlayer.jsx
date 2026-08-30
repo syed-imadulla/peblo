@@ -23,11 +23,13 @@ import { EpisodeCard } from '../components/EpisodeCard';
 import { CustomDropdown } from '../components/CustomDropdown';
 import { LoadingState, ErrorState, EmptyState } from '../components/States';
 import { FallbackImage } from '../components/ShowCard';
+import { useLanguage } from '../context/LanguageContext';
 import { findEpisodeByContentGroup, formatDuration, resolveAssetUrl } from '../utils/catalogue';
 
 const EpisodePlayer = () => {
   const { contentGroup } = useParams();
   const navigate = useNavigate();
+  const { currentLang } = useLanguage();
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -43,15 +45,17 @@ const EpisodePlayer = () => {
 
   const episodeData = findEpisodeByContentGroup(catalog, contentGroup);
 
-  // Set default language from available languages
+  // Set default language from preferred language or available languages
   useEffect(() => {
     if (episodeData?.episode?.languages?.length) {
-      setSelectedLanguage(episodeData.episode.languages[0]);
+      const langs = episodeData.episode.languages;
+      const match = langs.find((l) => l.toLowerCase() === (currentLang || 'en').toLowerCase());
+      setSelectedLanguage(match || langs[0]);
     }
     // Reset playback position on episode change
     setCurrentTime(0);
     setIsPlaying(false);
-  }, [contentGroup, episodeData]);
+  }, [contentGroup, episodeData, currentLang]);
 
   // Simulated playback timer
   useEffect(() => {

@@ -8,18 +8,22 @@ import EpisodePlayer from './pages/EpisodePlayer';
 import Search from './pages/Search';
 import Profile from './pages/Profile';
 
+import { LanguageProvider } from './context/LanguageContext';
+
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="browse" element={<Browse />} />
-        <Route path="show/:slug" element={<ShowDetails />} />
-        <Route path="episode/:contentGroup" element={<EpisodePlayer />} />
-        <Route path="search" element={<Search />} />
-        <Route path="profile" element={<Profile />} />
-      </Route>
-    </Routes>
+    <LanguageProvider>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="browse" element={<Browse />} />
+          <Route path="show/:slug" element={<ShowDetails />} />
+          <Route path="episode/:contentGroup" element={<EpisodePlayer />} />
+          <Route path="search" element={<Search />} />
+          <Route path="profile" element={<Profile />} />
+        </Route>
+      </Routes>
+    </LanguageProvider>
   );
 }
 

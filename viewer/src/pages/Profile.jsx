@@ -3,12 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { User, Volume2, Play, CheckCircle, Info, Sparkles, Sliders, Shield } from 'lucide-react';
 import { getCatalog } from '../api';
 import { CustomDropdown } from '../components/CustomDropdown';
+import { useLanguage } from '../context/LanguageContext';
 import { getAllShows, getShowTotalEpisodes } from '../utils/catalogue';
 
 const Profile = () => {
-  const [preferredLang, setPreferredLang] = useState(() => {
-    return localStorage.getItem('peblo_pref_lang') || 'en';
-  });
+  const { currentLang, setLanguage } = useLanguage();
+  const [preferredLang, setPreferredLang] = useState(currentLang || 'en');
   const [autoplayNext, setAutoplayNext] = useState(() => {
     return localStorage.getItem('peblo_autoplay') !== 'false';
   });
@@ -16,6 +16,12 @@ const Profile = () => {
     return localStorage.getItem('peblo_quality') || 'auto';
   });
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  useEffect(() => {
+    if (currentLang) {
+      setPreferredLang(currentLang);
+    }
+  }, [currentLang]);
 
   const { data: catalog } = useQuery({
     queryKey: ['catalog'],
@@ -26,7 +32,7 @@ const Profile = () => {
   const totalEpisodes = allShows.reduce((acc, show) => acc + getShowTotalEpisodes(show), 0);
 
   const handleSave = () => {
-    localStorage.setItem('peblo_pref_lang', preferredLang);
+    setLanguage(preferredLang);
     localStorage.setItem('peblo_autoplay', String(autoplayNext));
     localStorage.setItem('peblo_quality', videoQuality);
     setSavedSuccess(true);

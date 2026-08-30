@@ -6,12 +6,14 @@ import { getCatalog } from '../api';
 import { ShowCard } from '../components/ShowCard';
 import { CustomDropdown } from '../components/CustomDropdown';
 import { LoadingState, ErrorState, EmptyState } from '../components/States';
+import { useLanguage } from '../context/LanguageContext';
 import { getAllShows } from '../utils/catalogue';
 
 const Browse = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get('category') || 'all';
   const initialSection = searchParams.get('section') || 'all';
+  const { currentLang, setLanguage } = useLanguage();
 
   const [selectedSection, setSelectedSection] = useState(initialSection);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);

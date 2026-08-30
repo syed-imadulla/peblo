@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
 import { Home, LayoutGrid, Search, Globe, ChevronDown, Check, Menu, X } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 const Layout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedLang, setSelectedLang] = useState('EN');
+  const { currentLang, setLanguage } = useLanguage();
+  const selectedLang = (currentLang || 'en').toUpperCase();
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const langRef = useRef(null);
@@ -245,7 +247,7 @@ const Layout = () => {
                       <button
                         key={lang.code}
                         onClick={() => {
-                          setSelectedLang(lang.code);
+                          setLanguage(lang.code.toLowerCase());
                           setLangDropdownOpen(false);
                         }}
                         style={{
