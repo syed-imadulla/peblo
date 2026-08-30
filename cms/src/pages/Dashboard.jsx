@@ -64,9 +64,9 @@ const DashboardEmptyState = ({ icon: Icon, title, subtitle }) => (
 );
 
 const Dashboard = () => {
-  const { data: shows, isLoading: showsLoading } = useQuery({ queryKey: ['adminShows'], queryFn: fetchShows });
-  const { data: validation, isLoading: valLoading } = useQuery({ queryKey: ['adminValidation'], queryFn: fetchValidation });
-  const { data: history, isLoading: histLoading } = useQuery({ queryKey: ['adminHistory'], queryFn: fetchPublishHistory });
+  const { data: shows, isLoading: showsLoading } = useQuery({ queryKey: ['adminShows'], queryFn: fetchShows, refetchInterval: 5000 });
+  const { data: validation, isLoading: valLoading } = useQuery({ queryKey: ['adminValidation'], queryFn: fetchValidation, refetchInterval: 5000 });
+  const { data: history, isLoading: histLoading } = useQuery({ queryKey: ['adminHistory'], queryFn: fetchPublishHistory, refetchInterval: 5000 });
 
   if (showsLoading || valLoading || histLoading) {
     return (
@@ -147,7 +147,7 @@ const Dashboard = () => {
 
   // --- Components ---
   const StatCard = ({ value, title, subtitle, icon: Icon, color, bgColor }) => (
-    <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px', marginBottom: 0, flex: 1, minWidth: '200px' }}>
+    <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px', flex: 1, minWidth: '200px' }}>
       <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: bgColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         <Icon size={20} color={color} strokeWidth={2.5} />
       </div>
@@ -193,9 +193,9 @@ const Dashboard = () => {
     <div>
       <style>{`
         .hover-scale:hover { transform: translateY(-2px); }
-        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 24px; }
-        .main-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
-        .bottom-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
+        .main-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+        .bottom-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
         
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .card-title { margin: 0; font-size: 18px; font-weight: 600; color: var(--navy-900); }
@@ -224,7 +224,7 @@ const Dashboard = () => {
       {/* Main 3 Columns */}
       <div className="main-grid">
         {/* 1. Realtime Overview */}
-        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', marginBottom: 0 }}>
+        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <h3 className="card-title" style={{ marginBottom: '24px' }}>Realtime Overview</h3>
           
           <div style={{ flex: 1 }}>
@@ -241,7 +241,7 @@ const Dashboard = () => {
         </div>
 
         {/* 2. Recent Shows */}
-        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', marginBottom: 0 }}>
+        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <div className="card-header">
             <h3 className="card-title">Recent Shows</h3>
             <Link to="/shows" className="view-all">View All</Link>
@@ -286,7 +286,7 @@ const Dashboard = () => {
         </div>
 
         {/* 3. Recent Activity */}
-        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', marginBottom: 0 }}>
+        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <div className="card-header">
             <h3 className="card-title">Recent Activity</h3>
           </div>
@@ -315,7 +315,7 @@ const Dashboard = () => {
       {/* Bottom Grid */}
       <div className="bottom-grid">
         {/* Quick Actions */}
-        <div className="card" style={{ padding: '24px', marginBottom: 0 }}>
+        <div className="card" style={{ padding: '24px' }}>
           <h3 className="card-title" style={{ marginBottom: '24px' }}>Quick Actions</h3>
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             <QuickAction title="Create New Show" desc="Add a new show to the library" icon={Tv} color="var(--purple-700)" bgColor="var(--purple-50)" linkTo="/shows" />
@@ -326,7 +326,7 @@ const Dashboard = () => {
         </div>
 
         {/* Last Publish */}
-        <div className="card" style={{ padding: '24px', marginBottom: 0, display: 'flex', flexDirection: 'column' }}>
+        <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <div className="card-header">
             <h3 className="card-title">Last Publish</h3>
             {lastPublish ? (
