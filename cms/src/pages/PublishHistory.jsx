@@ -725,18 +725,6 @@ const PublishHistory = () => {
               </div>
             </Link>
           </div>
-
-          {/* About Publish History */}
-          <div className="card" style={{ padding: '24px', marginBottom: 0, backgroundColor: '#f5f3ff', border: '1px solid #e9d5ff' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: '#6D28D9' }}>
-              <Info size={18} />
-              <h3 style={{ fontSize: '15px', fontWeight: 800, margin: 0, color: '#4B27B5' }}>About Publish History</h3>
-            </div>
-             <p style={{ fontSize: '13px', color: '#5b21b6', lineHeight: '1.6', margin: 0 }}>
-               Each publish run generates a new <code style={{backgroundColor:'rgba(255,255,255,0.5)', color:'#5b21b6', padding:'2px 4px', borderRadius:'4px', fontWeight: 600}}>catalogue.json</code> file with the latest content and metadata.
-             </p>
-          </div>
-
         </div>
       </div>
 

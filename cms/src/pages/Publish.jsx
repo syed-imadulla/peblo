@@ -772,20 +772,6 @@ const Publish = () => {
               </div>
             )}
           </div>
-
-          {/* About Publishing */}
-          <div className="card" style={{ padding: '24px', marginBottom: 0, backgroundColor: 'var(--purple-50)', border: '1px solid #e9d5ff' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: 'var(--purple-700)' }}>
-              <Info size={18} />
-              <h3 style={{ fontSize: '15px', fontWeight: 800, margin: 0 }}>About Publishing</h3>
-            </div>
-             <p style={{ fontSize: '13px', color: 'var(--purple-800)', lineHeight: '1.6', margin: 0 }}>
-               Publishing will generate the <code style={{backgroundColor:'rgba(255,255,255,0.5)', color:'var(--purple-800)', padding:'2px 4px', borderRadius:'4px', fontWeight: 600}}>catalogue.json</code> file that powers the viewer experience. 
-               <br /><br />
-               The process is atomic and safe. Viewers will not see partial updates.
-             </p>
-          </div>
-
         </div>
       </div>
 
