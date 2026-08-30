@@ -50,20 +50,34 @@ def get_settings(db: Session) -> SystemSettings:
         db.refresh(settings_obj)
     return settings_obj
 
-def get_system_info() -> dict:
-    try:
-        # Load reference.json
-        ref_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs", "challenge", "reference.json")
-        with open(ref_path, "r") as f:
-            reference_data = json.load(f)
-            
-        artwork_specs = reference_data.get("artwork_specs", {})
-    except Exception as e:
-        artwork_specs = {}
+DEFAULT_ARTWORK_SPECS = {
+    "poster": { "aspect": "2:3", "target_px": [600, 900], "max_kb": 200 },
+    "banner": { "aspect": "16:9", "target_px": [1280, 720], "max_kb": 200 },
+    "thumbnail": { "aspect": "16:9", "target_px": [640, 360], "max_kb": 200 }
+}
 
-    # Define public URL depending on how the backend serves assets. 
-    # Usually the backend mounts /assets or similar.
-    # We will just expose the base path.
+def get_system_info() -> dict:
+    artwork_specs = DEFAULT_ARTWORK_SPECS
+    candidate_paths = [
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", "docs", "challenge", "reference.json"),
+        os.path.join(os.path.dirname(__file__), "..", "..", "docs", "challenge", "reference.json"),
+        "/app/docs/challenge/reference.json",
+        "/docs/challenge/reference.json",
+        os.path.abspath(os.path.join(os.getcwd(), "docs", "challenge", "reference.json")),
+        os.path.abspath(os.path.join(os.getcwd(), "..", "docs", "challenge", "reference.json")),
+    ]
+    for path in candidate_paths:
+        if os.path.exists(path):
+            try:
+                with open(path, "r") as f:
+                    reference_data = json.load(f)
+                specs = reference_data.get("artwork_specs")
+                if specs:
+                    artwork_specs = specs
+                    break
+            except Exception:
+                pass
+
     return {
         "storage_provider": "LocalStorageProvider",
         "data_path": app_settings.DATA_DIR,

@@ -22,6 +22,9 @@ services:
       context: ./backend
     environment:
       - DATABASE_URL=postgresql://peblo_user:peblo_password@db/peblo_db
+      - POSTGRES_USER=peblo_user
+      - POSTGRES_PASSWORD=peblo_password
+      - POSTGRES_DB=peblo_db
       - JWT_SECRET=super_secret_for_development_only_123
       - DATA_DIR=/app/data
       - ASSETS_DIR=/app/assets

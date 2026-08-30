@@ -1,0 +1,26 @@
+{
+  "name": "peblo-tv-mini",
+  "version": "1.0.0",
+  "description": "A miniature Netflix-style content platform featuring an internal CMS, a backend API with publishing pipeline, and a viewer-facing frontend.",
+  "main": "test-render.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/syed-imadulla/peblo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/syed-imadulla/peblo/issues"
+  },
+  "homepage": "https://github.com/syed-imadulla/peblo#readme",
+  "dependencies": {
+    "playwright": "^1.62.1"
+  }
+}
