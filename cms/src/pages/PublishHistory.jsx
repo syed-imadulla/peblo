@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -9,11 +9,12 @@ import {
   Search,
   Filter,
   MoreHorizontal,
-  Bell,
   Clock,
   Info,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  Check,
   Send,
   FileJson,
   X,
@@ -38,6 +39,119 @@ const formatDuration = (seconds) => {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return s > 0 ? `${m}m ${s}s` : `${m}m`;
+};
+
+const Dropdown = ({ label, options, value, onChange, minWidth = '140px', prefix, placement = 'bottom', height = '42px', padding = '0 12px 0 16px' }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [dynamicPlacement, setDynamicPlacement] = useState(placement);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (isOpen && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      // Dropdown max-height is 280px + search box ~45px = ~325px.
+      // If we don't have 325px below, but have more space above, open upwards.
+      if (spaceBelow < 325 && spaceAbove > spaceBelow) {
+        setDynamicPlacement('top');
+      } else {
+        setDynamicPlacement('bottom');
+      }
+    } else {
+      setSearchQuery(''); // reset search when closed
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setIsOpen(false);
+    };
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
+
+  const filteredOptions = options.filter(opt => 
+    opt.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div ref={ref} style={{ position: 'relative', minWidth, flexShrink: 0 }}>
+      {label && <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--navy-900)', paddingLeft: '4px', marginBottom: '6px', display: 'block' }}>{label}</label>}
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        style={{ 
+          height, padding, display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+          backgroundColor: isOpen ? '#F5F3FF' : '#FFFFFF', 
+          border: isOpen ? '1px solid #A78BFA' : '1px solid #E2E8F0', 
+          borderRadius: '20px', cursor: 'pointer', color: isOpen ? '#6D28D9' : '#334155', 
+          fontSize: '13px', transition: 'all 0.2s ease', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+        }}
+      >
+        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: '8px', fontWeight: value.startsWith('All') ? '400' : '500' }}>
+          {prefix && <span style={{ color: 'var(--text-muted)', fontWeight: '400', marginRight: '4px' }}>{prefix}</span>}
+          {value}
+        </span>
+        <ChevronDown size={14} style={{ flexShrink: 0, color: isOpen ? 'var(--purple-700)' : 'var(--text-muted)', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
+      </div>
+      {isOpen && (
+        <div style={{ 
+          position: 'absolute', 
+          ...(dynamicPlacement === 'top' ? { bottom: 'calc(100% + 6px)' } : { top: 'calc(100% + 6px)' }), 
+          left: 0, 
+          minWidth: '100%', 
+          backgroundColor: '#FFFFFF', 
+          border: '1px solid #E2E8F0', 
+          borderRadius: '16px', 
+          boxShadow: '0 10px 40px -10px rgba(109, 40, 217, 0.15)', 
+          zIndex: 50,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
+        }}>
+          {options.length > 10 && (
+            <div style={{ padding: '8px', borderBottom: '1px solid #F1F5F9', backgroundColor: '#F8FAFC' }}>
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #E2E8F0', fontSize: '13px', outline: 'none', boxSizing: 'border-box' }}
+              />
+            </div>
+          )}
+          <div style={{ maxHeight: '280px', overflowY: 'auto', padding: '6px' }} className="custom-scrollbar">
+            {filteredOptions.length > 0 ? filteredOptions.map(opt => (
+              <div 
+                key={opt}
+                title={opt}
+                onClick={() => { onChange(opt); setIsOpen(false); }}
+                style={{ padding: '8px 12px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', backgroundColor: value === opt ? 'var(--purple-50)' : 'transparent', color: value === opt ? 'var(--purple-700)' : 'var(--navy-900)', fontWeight: value === opt ? '600' : '400', display: 'flex', alignItems: 'center', justifyContent: 'space-between', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                onMouseOver={e => { if (value !== opt) e.currentTarget.style.backgroundColor = 'var(--gray-50)' }}
+                onMouseOut={e => { if (value !== opt) e.currentTarget.style.backgroundColor = 'transparent' }}
+              >
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: '8px' }}>{opt}</span>
+                {value === opt && <Check size={14} style={{ flexShrink: 0 }} />}
+              </div>
+            )) : (
+              <div style={{ padding: '12px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
+                No results found
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 const PublishHistory = () => {
@@ -186,14 +300,6 @@ const PublishHistory = () => {
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ position: 'relative' }}>
-            <button
-              aria-label="Notifications"
-              style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid var(--border)', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', cursor: 'pointer', outline: 'none' }}
-            >
-              <Bell size={18} />
-            </button>
-          </div>
           <Link 
             to="/publish"
             className="btn btn-primary" 
@@ -221,9 +327,9 @@ const PublishHistory = () => {
       </div>
 
       {/* Filter Bar */}
-      <div className="card" style={{ padding: '16px 24px', marginBottom: '24px', display: 'flex', gap: '24px', alignItems: 'center' }}>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <Search size={18} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+      <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', marginBottom: '24px', flexWrap: 'wrap', position: 'relative', zIndex: 100 }}>
+        <div style={{ flex: 1, position: 'relative', minWidth: '200px' }}>
+          <Search size={16} style={{ position: 'absolute', left: '16px', top: '13px', color: 'var(--text-muted)' }} />
           <input 
             type="text" 
             placeholder="Search by run ID, user, or date..." 
@@ -231,50 +337,48 @@ const PublishHistory = () => {
             onChange={e => setSearchTerm(e.target.value)}
             style={{ 
               width: '100%', 
-              height: '44px', 
-              paddingLeft: '44px', 
-              paddingRight: '16px', 
-              borderRadius: '22px', 
-              border: '1px solid var(--border)', 
-              backgroundColor: '#f8fafc',
+              padding: '10px 16px 10px 42px', 
+              borderRadius: '20px', 
+              border: '1px solid #E2E8F0',
+              backgroundColor: '#FFFFFF',
+              color: '#334155',
               fontSize: '14px',
               outline: 'none',
-              color: 'var(--navy-900)'
+              height: '42px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+              transition: 'all 0.2s ease',
+              boxSizing: 'border-box'
             }}
           />
         </div>
         
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)' }}>Status</span>
-            <select 
-              value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
-              style={{ height: '40px', padding: '0 32px 0 16px', borderRadius: '8px', border: '1px solid var(--border)', backgroundColor: '#fff', fontSize: '14px', color: 'var(--navy-900)', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpath d=\'m6 9 6 6 6-6\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', outline: 'none', cursor: 'pointer' }}
-            >
-              <option value="all">All Statuses</option>
-              <option value="success">Success</option>
-              <option value="failed">Failed</option>
-            </select>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)' }}>Date Range</span>
-            <select 
-              value={dateFilter}
-              onChange={e => setDateFilter(e.target.value)}
-              style={{ height: '40px', padding: '0 32px 0 16px', borderRadius: '8px', border: '1px solid var(--border)', backgroundColor: '#fff', fontSize: '14px', color: 'var(--navy-900)', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpath d=\'m6 9 6 6 6-6\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', outline: 'none', cursor: 'pointer' }}
-            >
-              <option value="all">All Time</option>
-              <option value="24h">Last 24 Hours</option>
-              <option value="7d">Last 7 Days</option>
-              <option value="30d">Last 30 Days</option>
-            </select>
-          </div>
-
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+          <Dropdown 
+            label="Status" 
+            value={statusFilter === 'all' ? 'All Statuses' : statusFilter === 'success' ? 'Success' : 'Failed'}
+            onChange={(val) => {
+              if (val === 'All Statuses') setStatusFilter('all');
+              else if (val === 'Success') setStatusFilter('success');
+              else setStatusFilter('failed');
+            }} 
+            options={['All Statuses', 'Success', 'Failed']} 
+          />
+          <Dropdown 
+            label="Date Range" 
+            value={dateFilter === 'all' ? 'All Time' : dateFilter === '24h' ? 'Last 24 Hours' : dateFilter === '7d' ? 'Last 7 Days' : 'Last 30 Days'}
+            onChange={(val) => {
+              if (val === 'All Time') setDateFilter('all');
+              else if (val === 'Last 24 Hours') setDateFilter('24h');
+              else if (val === 'Last 7 Days') setDateFilter('7d');
+              else setDateFilter('30d');
+            }} 
+            options={['All Time', 'Last 24 Hours', 'Last 7 Days', 'Last 30 Days']} 
+          />
           <button 
             onClick={() => { setSearchTerm(''); setStatusFilter('all'); setDateFilter('all'); }}
-            style={{ height: '40px', padding: '0 16px', marginTop: '18px', display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '8px', border: '1px solid var(--border)', backgroundColor: '#fff', fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)', cursor: 'pointer' }}
+            style={{ height: '42px', padding: '0 16px', display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '20px', border: '1px solid #E2E8F0', backgroundColor: '#FFFFFF', fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s ease', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}
+            onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--gray-50)'}
+            onMouseOut={e => e.currentTarget.style.backgroundColor = '#FFFFFF'}
           >
             <Filter size={14} /> Clear Filters
           </button>
