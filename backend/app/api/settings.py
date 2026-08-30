@@ -85,10 +85,12 @@ def get_system_info() -> dict:
         "artwork_specs": artwork_specs
     }
 
+from app.api.auth import get_current_admin, get_current_user
+
 @router.get("")
 def read_settings(
     db: Session = Depends(get_db),
-    admin_user: dict = Depends(get_current_admin)
+    user: dict = Depends(get_current_user)
 ):
     settings_obj = get_settings(db)
     system_info = get_system_info()

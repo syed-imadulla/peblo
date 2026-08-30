@@ -41,11 +41,18 @@ def test_get_settings_as_admin(client):
         assert "max_kb" in spec
 
 
-def test_get_settings_as_editor_is_forbidden(client):
-    """Non-admins must not access settings."""
+def test_get_settings_as_editor_is_allowed(client):
+    """Editors can view settings read-only."""
     token = editor_token(client)
     res = client.get("/admin/settings", headers={"Authorization": f"Bearer {token}"})
-    assert res.status_code == 403
+    assert res.status_code == 200
+    assert "db_settings" in res.json()
+
+
+def test_unauthenticated_cannot_access_settings(client):
+    """Unauthenticated requests must be rejected."""
+    res = client.get("/admin/settings")
+    assert res.status_code == 401
 
 
 def test_update_site_settings(client):

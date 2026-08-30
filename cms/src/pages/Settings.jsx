@@ -530,7 +530,12 @@ const Settings = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
               <div>
                 <FieldLabel>Provider</FieldLabel>
-                <FieldValue color="var(--text-muted)">{systemInfo.storage_provider || 'Unavailable'}</FieldValue>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <FieldValue color="var(--text-muted)">{systemInfo.storage_provider || 'Unavailable'}</FieldValue>
+                  <span style={{ backgroundColor: '#dcfce7', color: '#166534', padding: '3px 10px', borderRadius: '14px', fontSize: '11px', fontWeight: 700 }}>
+                    Connected
+                  </span>
+                </div>
               </div>
               <Divider />
               <div>
