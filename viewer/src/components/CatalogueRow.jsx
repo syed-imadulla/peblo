@@ -6,19 +6,19 @@ export const CatalogueRow = ({ title, count, children }) => {
 
   const scroll = (direction) => {
     if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -400 : 400;
+      const scrollAmount = direction === 'left' ? -420 : 420;
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
   return (
-    <section style={{ marginBottom: '2.75rem', position: 'relative' }}>
+    <section className="catalogue-row" style={{ marginBottom: '2.5rem', position: 'relative' }}>
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: '1rem',
+          marginBottom: '0.85rem',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -27,8 +27,8 @@ export const CatalogueRow = ({ title, count, children }) => {
               style={{
                 color: 'var(--navy-900)',
                 textTransform: 'capitalize',
-                fontSize: '1.4rem',
-                fontWeight: 700,
+                fontSize: '1.35rem',
+                fontWeight: 800,
                 margin: 0,
               }}
             >
@@ -38,9 +38,9 @@ export const CatalogueRow = ({ title, count, children }) => {
           {typeof count === 'number' && (
             <span
               style={{
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                color: 'var(--text-muted)',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: 'var(--purple-700)',
                 backgroundColor: 'var(--purple-100)',
                 padding: '2px 8px',
                 borderRadius: 'var(--radius-pill)',
@@ -59,18 +59,19 @@ export const CatalogueRow = ({ title, count, children }) => {
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              backgroundColor: 'var(--surface)',
-              border: '1px solid var(--border)',
+              backgroundColor: '#ffffff',
+              border: '1px solid #ECE4F6',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'var(--navy-900)',
-              transition: 'background-color 0.2s',
+              boxShadow: '0 2px 6px rgba(21, 27, 79, 0.04)',
+              transition: 'background-color 0.15s ease',
             }}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--purple-100)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={17} />
           </button>
           <button
             onClick={() => scroll('right')}
@@ -79,18 +80,19 @@ export const CatalogueRow = ({ title, count, children }) => {
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              backgroundColor: 'var(--surface)',
-              border: '1px solid var(--border)',
+              backgroundColor: '#ffffff',
+              border: '1px solid #ECE4F6',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'var(--navy-900)',
-              transition: 'background-color 0.2s',
+              boxShadow: '0 2px 6px rgba(21, 27, 79, 0.04)',
+              transition: 'background-color 0.15s ease',
             }}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--purple-100)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#ffffff')}
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={17} />
           </button>
         </div>
       </div>
@@ -100,9 +102,10 @@ export const CatalogueRow = ({ title, count, children }) => {
         className="hide-scrollbar"
         style={{
           display: 'flex',
-          gap: '1.25rem',
+          gap: '18px',
           overflowX: 'auto',
-          paddingBottom: '0.75rem',
+          padding: '12px 6px 16px 6px',
+          margin: '-12px -6px 0 -6px',
           scrollSnapType: 'x proximity',
         }}
       >

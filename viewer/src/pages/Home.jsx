@@ -317,8 +317,8 @@ const Home = () => {
         if (!shows || shows.length === 0) return null;
 
         return (
-          <section key={section} style={{ position: 'relative' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+          <section key={section} className="catalogue-section" style={{ position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--navy-900)', margin: 0, textTransform: 'capitalize' }}>
                   {section}
@@ -340,15 +340,7 @@ const Home = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                 <Link
                   to={`/browse?section=${section}`}
-                  style={{
-                    color: 'var(--purple-700)',
-                    fontSize: '0.88rem',
-                    fontWeight: 700,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    transition: 'gap 0.15s ease',
-                  }}
+                  className="row-view-all"
                 >
                   View all →
                 </Link>
@@ -410,7 +402,8 @@ const Home = () => {
                   display: 'flex',
                   gap: '18px',
                   overflowX: 'auto',
-                  paddingBottom: '10px',
+                  padding: '12px 6px 16px 6px',
+                  margin: '-12px -6px 0 -6px',
                   scrollSnapType: 'x proximity',
                 }}
               >
