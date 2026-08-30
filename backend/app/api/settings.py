@@ -129,33 +129,61 @@ def update_publishing_settings(
     db.refresh(settings_obj)
     return settings_obj
 
+import uuid as _uuid
+
 @router.post("/storage/test")
 def test_storage_connection(
     admin_user: dict = Depends(get_current_admin)
 ):
-    try:
-        # Test BOTH storage and asset_storage
-        test_filename = ".connection_test"
-        
-        # Test main data storage
-        storage.write(test_filename, "test")
-        content = storage.read(test_filename)
-        if content != "test":
-            raise Exception("Data storage read value did not match written value.")
-            
-        # Test asset storage
-        asset_storage.write(test_filename, "test_asset")
-        asset_content = asset_storage.read(test_filename)
-        if asset_content != "test_asset":
-            raise Exception("Asset storage read value did not match written value.")
+    """
+    Write a small unique temp file to both data storage and asset storage,
+    read it back, verify the content, then unconditionally clean up.
+    Never leaves a permanent file behind.
+    """
+    # Use a unique name per request to avoid race conditions or stale files.
+    test_id = _uuid.uuid4().hex
+    test_filename = f".conn_test_{test_id}"
+    test_content = f"peblo_conn_test_{test_id}"
 
-        # Clean up
-        try:
-            storage.delete(test_filename)
-            asset_storage.delete(test_filename)
-        except Exception:
-            pass
-            
-        return StorageTestResponse(success=True, message="Storage connection successful. Base path and assets path are writable.")
+    data_ok = False
+    asset_ok = False
+    error_detail = None
+
+    try:
+        # Test main data storage
+        storage.write(test_filename, test_content)
+        read_back = storage.read(test_filename)
+        if read_back != test_content:
+            raise Exception("Data storage: read value did not match written value.")
+        data_ok = True
+
+        # Test asset storage
+        asset_storage.write(test_filename, test_content)
+        asset_read = asset_storage.read(test_filename)
+        if asset_read != test_content:
+            raise Exception("Asset storage: read value did not match written value.")
+        asset_ok = True
+
     except Exception as e:
-        return StorageTestResponse(success=False, message=str(e))
+        error_detail = str(e)
+    finally:
+        # Unconditional cleanup - never leave the test file behind
+        if data_ok:
+            try:
+                storage.delete(test_filename)
+            except Exception:
+                pass
+        if asset_ok:
+            try:
+                asset_storage.delete(test_filename)
+            except Exception:
+                pass
+
+    if error_detail:
+        return StorageTestResponse(success=False, message=error_detail)
+
+    return StorageTestResponse(
+        success=True,
+        message="Storage connection successful. Data path and assets path are readable and writable."
+    )
+

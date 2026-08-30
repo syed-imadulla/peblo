@@ -12,6 +12,7 @@ import Validation from './pages/Validation';
 import Publish from './pages/Publish';
 import PublishHistory from './pages/PublishHistory';
 import Settings from './pages/Settings';
+import ArtworkGuidelines from './pages/ArtworkGuidelines';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -38,6 +39,7 @@ const AppRoutes = () => {
         <Route path="publish" element={<Publish />} />
         <Route path="publish-history" element={<PublishHistory />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="settings/artwork-guidelines" element={<ArtworkGuidelines />} />
       </Route>
     </Routes>
   );

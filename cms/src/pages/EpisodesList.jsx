@@ -469,13 +469,45 @@ const EpisodesList = () => {
                     <tr key={ep.id} style={{ transition: 'background-color 0.15s ease' }} onMouseOver={e => e.currentTarget.style.backgroundColor = '#FAFAFF'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
                       <td style={{ padding: '16px 24px', borderBottom: idx === paginatedEpisodes.length - 1 ? 'none' : '1px solid #F1F5F9' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
-                          <div style={{ width: '64px', height: '36px', borderRadius: '8px', backgroundColor: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A78BFA', flexShrink: 0, overflow: 'hidden' }}>
-                            {ep.artwork && ep.artwork.length > 0 ? (
-                              <img src={ep.artwork[0].url} alt="thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                              <ImageIcon size={18} />
-                            )}
-                          </div>
+                          {(() => {
+                            const groupGradients = {
+                              songs: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
+                              series: 'linear-gradient(135deg, #0891b2 0%, #06b6d4 100%)',
+                              minisodes: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                              shorts: 'linear-gradient(135deg, #be185d 0%, #ec4899 100%)',
+                              featured: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+                            };
+                            const grad = groupGradients[ep.content_group?.toLowerCase()] || 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)';
+                            const initials = (ep.episode_title || 'E').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                            const thumb = ep.artwork?.find(a => a.type === 'thumbnail' || a.type === 'Thumbnail')?.url
+                              || ep.artwork?.find(a => a.type === 'poster' || a.type === 'Poster')?.url
+                              || ep.artwork?.[0]?.url;
+                            if (thumb) {
+                              return (
+                                <div style={{ width: '56px', height: '42px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}>
+                                  <img
+                                    src={thumb}
+                                    alt={ep.episode_title}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                    onError={e => {
+                                      e.target.onerror = null;
+                                      e.target.style.display = 'none';
+                                      e.target.parentNode.style.background = grad;
+                                      e.target.parentNode.style.display = 'flex';
+                                      e.target.parentNode.style.alignItems = 'center';
+                                      e.target.parentNode.style.justifyContent = 'center';
+                                      e.target.parentNode.innerHTML = `<span style="font-size:14px;font-weight:800;color:rgba(255,255,255,0.92);letter-spacing:0.5px">${initials}</span>`;
+                                    }}
+                                  />
+                                </div>
+                              );
+                            }
+                            return (
+                              <div style={{ width: '56px', height: '42px', borderRadius: '10px', background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}>
+                                <span style={{ fontSize: '14px', fontWeight: '800', color: 'rgba(255,255,255,0.92)', letterSpacing: '0.5px' }}>{initials}</span>
+                              </div>
+                            );
+                          })()}
                           <div style={{ overflow: 'hidden', minWidth: 0 }}>
                             <div style={{ fontWeight: '700', color: '#0F172A', fontSize: '14px', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               {ep.episode_title}

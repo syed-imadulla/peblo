@@ -479,24 +479,38 @@ const ShowsList = () => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                           {(() => {
                             const artworkUrl = getShowArtwork(show);
+                            const sectionGradients = {
+                              featured: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+                              songs: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
+                              series: 'linear-gradient(135deg, #0891b2 0%, #06b6d4 100%)',
+                              minisodes: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                              shorts: 'linear-gradient(135deg, #be185d 0%, #ec4899 100%)',
+                            };
+                            const grad = sectionGradients[show.section?.toLowerCase()] || 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)';
+                            const initials = (show.title || 'S').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
                             if (artworkUrl) {
                               return (
-                                <div style={{ width: '64px', height: '36px', borderRadius: '8px', backgroundColor: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A78BFA', flexShrink: 0, overflow: 'hidden' }}>
-                                  <img 
-                                    src={artworkUrl} 
-                                    alt={show.title} 
-                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                                    onError={(e) => {
+                                <div style={{ width: '56px', height: '42px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}>
+                                  <img
+                                    src={artworkUrl}
+                                    alt={show.title}
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                    onError={e => {
                                       e.target.onerror = null;
-                                      e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='36' viewBox='0 0 64 36'%3E%3Crect width='64' height='36' fill='%23f5f3ff'/%3E%3Cpath d='M22 18l4 4 8-8' stroke='%23a78bfa' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+                                      e.target.style.display = 'none';
+                                      e.target.parentNode.style.background = grad;
+                                      e.target.parentNode.style.display = 'flex';
+                                      e.target.parentNode.style.alignItems = 'center';
+                                      e.target.parentNode.style.justifyContent = 'center';
+                                      e.target.parentNode.innerHTML = `<span style="font-size:14px;font-weight:800;color:rgba(255,255,255,0.92);letter-spacing:0.5px">${initials}</span>`;
                                     }}
                                   />
                                 </div>
                               );
                             } else {
                               return (
-                                <div style={{ width: '64px', height: '36px', borderRadius: '8px', backgroundColor: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A78BFA', flexShrink: 0, overflow: 'hidden' }}>
-                                  <ImageIcon size={18} />
+                                <div style={{ width: '56px', height: '42px', borderRadius: '10px', background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}>
+                                  <span style={{ fontSize: '14px', fontWeight: '800', color: 'rgba(255,255,255,0.92)', letterSpacing: '0.5px' }}>{initials}</span>
                                 </div>
                               );
                             }

@@ -254,16 +254,63 @@ const Dashboard = () => {
               {recentShows.map((show) => {
                 const epCount = show.seasons?.reduce((acc, s) => acc + (s.episodes?.length || 0), 0) || 0;
                 const hasPublished = show.seasons?.some(s => s.episodes?.some(ep => ep.status === 'published'));
-                const thumbnailObj = show.artwork?.find(a => a.type === 'Thumbnail' || a.type === 'thumbnail' || a.type === 'poster' || a.type === 'Poster');
-                const thumbnail = thumbnailObj?.url || null;
-                
+
+                // Traverse: show artwork → season artwork → episode artwork (prefer 'thumbnail' type)
+                const findArtwork = (show) => {
+                  const preferred = ['thumbnail', 'Thumbnail', 'poster', 'Poster', 'banner', 'Banner'];
+                  // show-level
+                  for (const t of preferred) {
+                    const a = show.artwork?.find(x => x.type === t);
+                    if (a?.url) return a.url;
+                  }
+                  // season-level
+                  for (const season of show.seasons || []) {
+                    for (const t of preferred) {
+                      const a = season.artwork?.find(x => x.type === t);
+                      if (a?.url) return a.url;
+                    }
+                    // episode-level
+                    for (const ep of season.episodes || []) {
+                      for (const t of preferred) {
+                        const a = ep.artwork?.find(x => x.type === t);
+                        if (a?.url) return a.url;
+                      }
+                    }
+                  }
+                  return null;
+                };
+
+                const sectionGradients = {
+                  featured: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+                  songs: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
+                  series: 'linear-gradient(135deg, #0891b2 0%, #06b6d4 100%)',
+                  minisodes: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+                  shorts: 'linear-gradient(135deg, #be185d 0%, #ec4899 100%)',
+                };
+                const grad = sectionGradients[show.section?.toLowerCase()] || 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)';
+
+                const thumbnail = findArtwork(show);
+                const initials = (show.title || 'S').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
                 return (
                   <div key={show.id} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     {thumbnail ? (
-                      <img src={thumbnail} alt="" style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover' }} />
+                      <div style={{ width: '52px', height: '52px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}>
+                        <img
+                          src={thumbnail}
+                          alt={show.title}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                          onError={e => {
+                            e.target.onerror = null;
+                            e.target.style.display = 'none';
+                            e.target.parentNode.style.background = grad;
+                            e.target.parentNode.innerHTML = `<span style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:rgba(255,255,255,0.9);letter-spacing:0.5px">${initials}</span>`;
+                          }}
+                        />
+                      </div>
                     ) : (
-                      <div style={{ width: '48px', height: '48px', borderRadius: '8px', backgroundColor: 'var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Tv size={20} color="var(--text-muted)" />
+                      <div style={{ width: '52px', height: '52px', borderRadius: '10px', background: grad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}>
+                        <span style={{ fontSize: '16px', fontWeight: '800', color: 'rgba(255,255,255,0.9)', letterSpacing: '0.5px' }}>{initials}</span>
                       </div>
                     )}
                     <div style={{ flex: 1, minWidth: 0 }}>
