@@ -20,13 +20,17 @@ def validate_dimensions(img: Image.Image, expected_type: str):
     width, height = img.size
     
     if expected_type == "poster":
-        # Expect 2:3 aspect ratio
-        if abs(width / height - 2/3) > 0.1:
-            raise HTTPException(status_code=400, detail="Poster must have a 2:3 aspect ratio")
-    elif expected_type in ["banner", "thumbnail"]:
-        # Expect 16:9 aspect ratio
-        if abs(width / height - 16/9) > 0.1:
-            raise HTTPException(status_code=400, detail=f"{expected_type.capitalize()} must have a 16:9 aspect ratio")
+        # Expect 2:3 aspect ratio and exactly 600x900
+        if abs(width / height - 2/3) > 0.1 or width != 600 or height != 900:
+            raise HTTPException(status_code=400, detail="Poster must have a 2:3 aspect ratio and be exactly 600x900 pixels")
+    elif expected_type == "banner":
+        # Expect 16:9 aspect ratio and exactly 1280x720
+        if abs(width / height - 16/9) > 0.1 or width != 1280 or height != 720:
+            raise HTTPException(status_code=400, detail="Banner must have a 16:9 aspect ratio and be exactly 1280x720 pixels")
+    elif expected_type == "thumbnail":
+        # Expect 16:9 aspect ratio and exactly 640x360
+        if abs(width / height - 16/9) > 0.1 or width != 640 or height != 360:
+            raise HTTPException(status_code=400, detail="Thumbnail must have a 16:9 aspect ratio and be exactly 640x360 pixels")
     else:
         raise HTTPException(status_code=400, detail="Invalid artwork type")
 

@@ -65,7 +65,7 @@ export const FallbackImage = ({ aspect = '16/9' }) => (
 );
 
 export const ShowCard = ({ show, width = '100%', typeLabel = 'Series' }) => {
-  const image = getShowBanner(show) || getShowPoster(show);
+  const image = getShowPoster(show);
   const languages = getShowLanguages(show);
   const category = show.categories && show.categories.length > 0 ? show.categories[0] : 'Adventure';
   const totalEpisodes = getShowTotalEpisodes(show);
