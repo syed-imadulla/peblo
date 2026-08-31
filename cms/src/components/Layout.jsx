@@ -9,15 +9,17 @@ const Layout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const navItems = [
+  const allNavItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Shows', path: '/shows', icon: Film },
     { name: 'Episodes', path: '/episodes', icon: PlaySquare },
     { name: 'Validation', path: '/validation', icon: FileText },
-    { name: 'Publish', path: '/publish', icon: UploadCloud },
+    { name: 'Publish', path: '/publish', icon: UploadCloud, adminOnly: true },
     { name: 'Publish History', path: '/publish-history', icon: History },
-    { name: 'Settings', path: '/settings', icon: Settings },
+    { name: 'Settings', path: '/settings', icon: Settings, adminOnly: true },
   ];
+
+  const navItems = allNavItems.filter(item => !item.adminOnly || user?.role === 'admin');
 
   const activeStyle = {
     backgroundColor: '#F5F3FF',

@@ -22,6 +22,14 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const AdminRoute = ({ children }) => {
+  const { user } = useAuth();
+  if (!user || user.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return children;
+};
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -36,10 +44,10 @@ const AppRoutes = () => {
         <Route path="episodes/new" element={<EpisodeForm />} />
         <Route path="episodes/:id/edit" element={<EpisodeForm />} />
         <Route path="validation" element={<Validation />} />
-        <Route path="publish" element={<Publish />} />
+        <Route path="publish" element={<AdminRoute><Publish /></AdminRoute>} />
         <Route path="publish-history" element={<PublishHistory />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="settings/artwork-guidelines" element={<ArtworkGuidelines />} />
+        <Route path="settings" element={<AdminRoute><Settings /></AdminRoute>} />
+        <Route path="settings/artwork-guidelines" element={<AdminRoute><ArtworkGuidelines /></AdminRoute>} />
       </Route>
     </Routes>
   );
