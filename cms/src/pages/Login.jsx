@@ -40,26 +40,21 @@ const Login = () => {
       alignItems: 'center',
       justifyContent: 'center',
       padding: '24px 16px',
+      background: 'linear-gradient(180deg, #EBE0FF 0%, #F3EDFF 50%, #F8F9FF 100%)',
+      fontFamily: 'var(--font-sans, "Inter", system-ui, sans-serif)',
       position: 'relative',
       overflow: 'hidden',
-      backgroundColor: '#0c0a17',
-      backgroundImage: `
-        radial-gradient(circle at 50% -20%, rgba(142, 81, 255, 0.25), transparent 70%),
-        radial-gradient(circle at 100% 100%, rgba(75, 39, 181, 0.18), transparent 50%),
-        radial-gradient(circle at 0% 100%, rgba(109, 40, 217, 0.15), transparent 50%)
-      `,
-      fontFamily: 'var(--font-sans, "Inter", system-ui, sans-serif)',
     }}>
-      {/* Ambient background glow elements */}
+      {/* Subtle decorative background glow */}
       <div style={{
         position: 'absolute',
-        top: '15%',
+        top: '20%',
         left: '50%',
         transform: 'translateX(-50%)',
-        width: '500px',
-        height: '350px',
-        background: 'radial-gradient(ellipse, rgba(142, 81, 255, 0.15) 0%, rgba(75, 39, 181, 0.05) 50%, transparent 80%)',
-        filter: 'blur(60px)',
+        width: '600px',
+        height: '400px',
+        background: 'radial-gradient(ellipse, rgba(142, 81, 255, 0.18) 0%, rgba(235, 224, 255, 0.05) 70%, transparent 80%)',
+        filter: 'blur(70px)',
         pointerEvents: 'none',
         zIndex: 0,
       }} />
@@ -70,14 +65,11 @@ const Login = () => {
         zIndex: 1,
         width: '100%',
         maxWidth: '420px',
-        backgroundColor: 'rgba(23, 20, 43, 0.85)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(142, 81, 255, 0.08)',
+        backgroundColor: '#FFFFFF',
         borderRadius: '24px',
         padding: '40px 32px',
-        color: '#FFFFFF',
+        boxShadow: '0 12px 36px rgba(75, 39, 181, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)',
+        border: '1px solid rgba(241, 243, 245, 0.9)',
       }}>
         {/* Brand Header */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
@@ -88,8 +80,8 @@ const Login = () => {
             marginBottom: '16px',
             padding: '6px 14px',
             borderRadius: '9999px',
-            backgroundColor: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
+            backgroundColor: 'var(--purple-50, #F3EDFF)',
+            border: '1px solid var(--purple-100, #EBE0FF)',
           }}>
             <img 
               src="/peblo-logo.avif" 
@@ -101,8 +93,8 @@ const Login = () => {
               fontWeight: '700',
               letterSpacing: '1.2px',
               textTransform: 'uppercase',
-              color: '#A78BFA',
-              borderLeft: '1px solid rgba(255, 255, 255, 0.15)',
+              color: 'var(--purple-700, #4B27B5)',
+              borderLeft: '1px solid rgba(75, 39, 181, 0.2)',
               paddingLeft: '10px',
             }}>
               TV CMS
@@ -112,8 +104,8 @@ const Login = () => {
           <h1 style={{
             margin: '0 0 8px 0',
             fontSize: '24px',
-            fontWeight: '700',
-            color: '#FFFFFF',
+            fontWeight: '800',
+            color: 'var(--navy-900, #1B1833)',
             letterSpacing: '-0.4px',
           }}>
             Welcome back
@@ -121,7 +113,7 @@ const Login = () => {
           <p style={{
             margin: 0,
             fontSize: '14px',
-            color: '#94A3B8',
+            color: 'var(--text-muted, #83859C)',
             lineHeight: 1.5,
           }}>
             Sign in to manage your Peblo TV content.
@@ -138,15 +130,16 @@ const Login = () => {
               gap: '10px',
               padding: '12px 14px',
               borderRadius: '12px',
-              backgroundColor: 'rgba(239, 68, 68, 0.12)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              color: '#FCA5A5',
+              backgroundColor: 'var(--red-50, #FFEBEB)',
+              border: '1px solid var(--red-100, #FFD6D6)',
+              color: 'var(--red-500, #EF4444)',
               fontSize: '13px',
               lineHeight: 1.4,
               marginBottom: '20px',
+              fontWeight: '500',
             }}
           >
-            <AlertCircle size={16} style={{ flexShrink: 0, color: '#EF4444' }} />
+            <AlertCircle size={16} style={{ flexShrink: 0, color: 'var(--red-500, #EF4444)' }} />
             <span>{error}</span>
           </div>
         )}
@@ -161,7 +154,7 @@ const Login = () => {
                 display: 'block',
                 fontSize: '13px',
                 fontWeight: '600',
-                color: '#CBD5E1',
+                color: 'var(--navy-900, #1B1833)',
                 marginBottom: '8px',
               }}
             >
@@ -173,7 +166,7 @@ const Login = () => {
                 left: '14px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                color: '#64748B',
+                color: 'var(--text-muted, #83859C)',
                 display: 'flex',
                 alignItems: 'center',
                 pointerEvents: 'none',
@@ -194,24 +187,22 @@ const Login = () => {
                   width: '100%',
                   height: '46px',
                   padding: '0 16px 0 42px',
-                  backgroundColor: 'rgba(15, 13, 29, 0.6)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E2E8F0',
                   borderRadius: '12px',
-                  color: '#FFFFFF',
+                  color: 'var(--text-main, #3B3C4A)',
                   fontSize: '14px',
                   outline: 'none',
                   transition: 'all 0.2s ease',
                   boxSizing: 'border-box',
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = '#8E51FF';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(142, 81, 255, 0.25)';
-                  e.target.style.backgroundColor = 'rgba(15, 13, 29, 0.9)';
+                  e.target.style.borderColor = 'var(--purple-500, #8E51FF)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(142, 81, 255, 0.15)';
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                  e.target.style.borderColor = '#E2E8F0';
                   e.target.style.boxShadow = 'none';
-                  e.target.style.backgroundColor = 'rgba(15, 13, 29, 0.6)';
                 }}
               />
             </div>
@@ -225,7 +216,7 @@ const Login = () => {
                 display: 'block',
                 fontSize: '13px',
                 fontWeight: '600',
-                color: '#CBD5E1',
+                color: 'var(--navy-900, #1B1833)',
                 marginBottom: '8px',
               }}
             >
@@ -237,7 +228,7 @@ const Login = () => {
                 left: '14px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                color: '#64748B',
+                color: 'var(--text-muted, #83859C)',
                 display: 'flex',
                 alignItems: 'center',
                 pointerEvents: 'none',
@@ -258,24 +249,22 @@ const Login = () => {
                   width: '100%',
                   height: '46px',
                   padding: '0 46px 0 42px',
-                  backgroundColor: 'rgba(15, 13, 29, 0.6)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E2E8F0',
                   borderRadius: '12px',
-                  color: '#FFFFFF',
+                  color: 'var(--text-main, #3B3C4A)',
                   fontSize: '14px',
                   outline: 'none',
                   transition: 'all 0.2s ease',
                   boxSizing: 'border-box',
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = '#8E51FF';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(142, 81, 255, 0.25)';
-                  e.target.style.backgroundColor = 'rgba(15, 13, 29, 0.9)';
+                  e.target.style.borderColor = 'var(--purple-500, #8E51FF)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(142, 81, 255, 0.15)';
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                  e.target.style.borderColor = '#E2E8F0';
                   e.target.style.boxShadow = 'none';
-                  e.target.style.backgroundColor = 'rgba(15, 13, 29, 0.6)';
                 }}
               />
               <button
@@ -291,7 +280,7 @@ const Login = () => {
                   transform: 'translateY(-50%)',
                   background: 'transparent',
                   border: 'none',
-                  color: '#94A3B8',
+                  color: 'var(--text-muted, #83859C)',
                   cursor: 'pointer',
                   padding: '6px',
                   display: 'flex',
@@ -300,8 +289,8 @@ const Login = () => {
                   borderRadius: '6px',
                   transition: 'color 0.2s',
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.color = '#FFFFFF'}
-                onMouseLeave={(e) => e.currentTarget.style.color = '#94A3B8'}
+                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--navy-900, #1B1833)'}
+                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted, #83859C)'}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -319,29 +308,29 @@ const Login = () => {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              background: loading 
-                ? 'rgba(109, 40, 217, 0.5)' 
-                : 'linear-gradient(135deg, #8E51FF 0%, #6D28D9 100%)',
+              backgroundColor: loading ? '#94A3B8' : 'var(--purple-700, #4B27B5)',
               color: '#FFFFFF',
               border: 'none',
               borderRadius: '12px',
               fontSize: '15px',
               fontWeight: '600',
               cursor: loading ? 'not-allowed' : 'pointer',
-              boxShadow: loading ? 'none' : '0 4px 20px rgba(142, 81, 255, 0.35)',
+              boxShadow: loading ? 'none' : '0 4px 16px rgba(75, 39, 181, 0.25)',
               transition: 'all 0.2s ease',
               outline: 'none',
             }}
             onMouseEnter={(e) => {
               if (!loading) {
+                e.currentTarget.style.backgroundColor = '#3D1F99';
                 e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 6px 24px rgba(142, 81, 255, 0.5)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(75, 39, 181, 0.35)';
               }
             }}
             onMouseLeave={(e) => {
               if (!loading) {
+                e.currentTarget.style.backgroundColor = 'var(--purple-700, #4B27B5)';
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 20px rgba(142, 81, 255, 0.35)';
+                e.currentTarget.style.boxShadow = '0 4px 16px rgba(75, 39, 181, 0.25)';
               }
             }}
             onMouseDown={(e) => {
@@ -353,20 +342,20 @@ const Login = () => {
             {loading ? (
               <>
                 <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
-                <span>Signing in...</span>
+                <span>Logging in...</span>
               </>
             ) : (
-              <span>Sign in</span>
+              <span>Login</span>
             )}
           </button>
         </form>
 
-        {/* Subtle footer info */}
+        {/* Footer info */}
         <div style={{
           marginTop: '28px',
           textAlign: 'center',
           fontSize: '12px',
-          color: '#64748B',
+          color: 'var(--text-muted, #83859C)',
         }}>
           Peblo TV Management Console &bull; Internal Access Only
         </div>
