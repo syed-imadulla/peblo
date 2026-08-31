@@ -90,7 +90,12 @@ const Layout = () => {
       >
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '32px', padding: '0 24px' }}>
           <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, flexDirection: 'column' }}>
-            <img src="/assets/eoEf12a30xBVz5Q1VMqOk8gbgs.avif" alt="Peblo Logo" style={{ width: '80px', objectFit: 'contain' }} />
+            <img 
+              src="/eoEf12a30xBVz5Q1VMqOk8gbgs.avif" 
+              alt="Peblo Logo" 
+              style={{ width: '80px', objectFit: 'contain' }} 
+              onError={(e) => { e.target.src = '/assets/eoEf12a30xBVz5Q1VMqOk8gbgs.avif'; }}
+            />
             <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600', letterSpacing: '1px' }}>CMS</span>
           </h2>
           <button className="mobile-only" onClick={() => setSidebarOpen(false)} style={{ color: 'var(--text-muted)', position: 'absolute', right: '16px', top: '24px' }}>

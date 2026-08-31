@@ -75,7 +75,7 @@ const Layout = () => {
             aria-label="Peblo TV Home"
           >
             <img
-              src="/peblo-logo.avif"
+              src="/eoEf12a30xBVz5Q1VMqOk8gbgs.avif"
               alt="PeBlo"
               style={{
                 height: '28px',
@@ -84,9 +84,7 @@ const Layout = () => {
                 objectFit: 'contain',
               }}
               onError={(e) => {
-                e.target.style.display = 'none';
-                const textFallback = e.target.nextElementSibling;
-                if (textFallback) textFallback.style.display = 'inline-block';
+                e.target.src = '/peblo-logo.avif';
               }}
             />
             <span
