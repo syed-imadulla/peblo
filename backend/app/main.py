@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, Response, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -9,6 +10,15 @@ from app.api import admin, catalog, auth, crud, artwork, settings as settings_ap
 import os
 
 app = FastAPI(title="Peblo TV Mini Backend")
+
+# Enable CORS for CMS and Viewer frontends
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Ensure DATA_DIR and ASSETS_DIR exist
 os.makedirs(settings.DATA_DIR, exist_ok=True)

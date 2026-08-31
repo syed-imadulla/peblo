@@ -116,5 +116,20 @@ def seed_db(seed_file_path: str):
         db.close()
 
 if __name__ == "__main__":
-    seed_file = "/home/syed-imadulla/Desktop/peblo-tv-mini/docs/challenge/seed_shows.json"
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    seed_file_candidates = [
+        os.path.join(base_dir, "docs/challenge/seed_shows.json"),
+        os.path.join(base_dir, "../docs/challenge/seed_shows.json"),
+        os.path.join(os.getcwd(), "docs/challenge/seed_shows.json"),
+        os.path.join(os.getcwd(), "../docs/challenge/seed_shows.json"),
+        "/app/docs/challenge/seed_shows.json",
+        "/home/syed-imadulla/Desktop/peblo-tv-mini/docs/challenge/seed_shows.json"
+    ]
+    seed_file = None
+    for candidate in seed_file_candidates:
+        if os.path.exists(candidate):
+            seed_file = candidate
+            break
+    if not seed_file:
+        raise FileNotFoundError("Could not find seed_shows.json in any expected location.")
     seed_db(seed_file)

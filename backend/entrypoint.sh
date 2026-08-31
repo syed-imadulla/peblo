@@ -15,8 +15,10 @@ echo "Seeding database..."
 export PYTHONPATH=.
 python app/scripts/seed.py
 
-# Ensure seed assets are available in DATA_DIR
-cp ../docs/challenge/assets/* /app/data/ || true
+# Ensure initial catalogue is present in DATA_DIR if not already published
+if [ -f "/app/docs/challenge/assets/catalogue.json" ] && [ ! -f "/app/data/catalogue.json" ]; then
+  cp /app/docs/challenge/assets/catalogue.json /app/data/ || true
+fi
 
 echo "Starting server..."
 exec uvicorn app.main:app --host 0.0.0.0 --port 8000
