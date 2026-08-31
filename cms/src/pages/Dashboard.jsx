@@ -145,47 +145,46 @@ const Dashboard = () => {
   // Sort all true timestamp events and take top 5
   const recentActivity = allEvents.sort((a,b) => b.timestamp - a.timestamp).slice(0, 5);
 
-  // --- Components ---
   const StatCard = ({ value, title, subtitle, icon: Icon, color, bgColor }) => (
-    <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px', flex: 1, minWidth: '200px' }}>
+    <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px', flex: 1, minWidth: 0 }}>
       <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: bgColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         <Icon size={20} color={color} strokeWidth={2.5} />
       </div>
-      <div>
+      <div style={{ minWidth: 0, flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
           <div style={{ fontSize: '28px', fontWeight: '800', color: 'var(--navy-900)', lineHeight: '1.2' }}>{value}</div>
         </div>
-        <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--navy-900)' }}>{title}</div>
-        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{subtitle}</div>
+        <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--navy-900)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
+        <div style={{ fontSize: '12px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{subtitle}</div>
       </div>
     </div>
   );
 
   const QuickAction = ({ title, desc, icon: Icon, color, linkTo, bgColor }) => (
-    <Link to={linkTo} style={{ display: 'flex', alignItems: 'center', gap: '16px', backgroundColor: bgColor, borderRadius: '12px', padding: '16px', transition: 'transform 0.2s, box-shadow 0.2s', textDecoration: 'none', flex: '1 1 calc(50% - 16px)', minWidth: '200px' }} className="hover-scale">
-      <div style={{ color: color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <Link to={linkTo} style={{ display: 'flex', alignItems: 'center', gap: '16px', backgroundColor: bgColor, borderRadius: '12px', padding: '16px', transition: 'transform 0.2s, box-shadow 0.2s', textDecoration: 'none', flex: '1 1 calc(50% - 16px)', minWidth: '180px' }} className="hover-scale">
+      <div style={{ color: color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         <Icon size={24} strokeWidth={2} />
       </div>
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: '600', color: 'var(--navy-900)', fontSize: '14px', marginBottom: '2px' }}>{title}</div>
         <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{desc}</div>
       </div>
-      <div style={{ color: color }}>
+      <div style={{ color: color, flexShrink: 0 }}>
         <ChevronRight size={18} strokeWidth={2} />
       </div>
     </Link>
   );
 
   const RealtimeRow = ({ title, subtitle, value, icon: Icon, color }) => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <Icon size={18} color={color} />
-        <div>
-          <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--navy-900)' }}>{title}</div>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{subtitle}</div>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border)', gap: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+        <Icon size={18} color={color} style={{ flexShrink: 0 }} />
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--navy-900)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{subtitle}</div>
         </div>
       </div>
-      <div style={{ fontSize: '18px', fontWeight: '700', color }}>{value}</div>
+      <div style={{ fontSize: '18px', fontWeight: '700', color, flexShrink: 0 }}>{value}</div>
     </div>
   );
 
@@ -193,21 +192,24 @@ const Dashboard = () => {
     <div>
       <style>{`
         .hover-scale:hover { transform: translateY(-2px); }
-        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
-        .main-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
-        .bottom-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+        .kpi-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; width: 100%; }
+        .main-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; width: 100%; }
+        .bottom-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; width: 100%; }
         
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 12px; }
         .card-title { margin: 0; font-size: 18px; font-weight: 600; color: var(--navy-900); }
-        .view-all { font-size: 13px; font-weight: 600; color: var(--purple-700); text-decoration: none; }
+        .view-all { font-size: 13px; font-weight: 600; color: var(--purple-700); text-decoration: none; flex-shrink: 0; }
         
         @media (max-width: 1200px) {
-          .main-grid { grid-template-columns: 1fr 1fr; }
+          .kpi-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .main-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .bottom-grid { grid-template-columns: 1fr; }
         }
-        @media (max-width: 768px) {
+        @media (max-width: 860px) {
           .main-grid { grid-template-columns: 1fr; }
-          .kpi-row { flex-direction: column; }
+        }
+        @media (max-width: 580px) {
+          .kpi-row { grid-template-columns: 1fr; }
         }
       `}</style>
 

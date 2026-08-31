@@ -411,13 +411,13 @@ const ShowForm = () => {
       
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '12px' }}>
           <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseOver={e => e.target.style.color='var(--navy-900)'} onMouseOut={e => e.target.style.color='var(--text-muted)'} onClick={() => navigate('/shows')}>Shows</span>
             <span style={{ color: 'var(--purple-300)' }}>&gt;</span>
             <span style={{ color: 'var(--purple-700)' }}>{isEditMode ? 'Edit Show' : 'Create New Show'}</span>
           </div>
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <button type="button" onClick={() => {
                 if (isDirty && !window.confirm("You have unsaved changes. Are you sure you want to leave?")) return;
                 navigate('/shows');

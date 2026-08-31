@@ -566,9 +566,9 @@ const PublishHistory = () => {
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
           backgroundColor: 'rgba(15, 23, 42, 0.7)', zIndex: 1000,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          backdropFilter: 'blur(4px)'
+          backdropFilter: 'blur(4px)', padding: '16px', boxSizing: 'border-box'
         }} onClick={handleCloseModal}>
-          <div className="card" onClick={e => e.stopPropagation()} style={{ width: '90%', maxWidth: '600px', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', overflow: 'hidden', padding: 0 }} role="dialog" aria-modal="true" aria-label="Publish Run Details">
+          <div className="card" onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '600px', maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', overflow: 'hidden', padding: 0 }} role="dialog" aria-modal="true" aria-label="Publish Run Details">
             <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc' }}>
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>Publish Run Details</h3>
               <button onClick={handleCloseModal} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', outline: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -576,8 +576,8 @@ const PublishHistory = () => {
               </button>
             </div>
             
-            <div style={{ padding: '24px', overflowY: 'auto', maxHeight: '70vh' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+            <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '24px' }}>
                 <div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>RUN ID</div>
                   <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy-900)' }}>pub_{selectedRunCache.id}</div>
@@ -623,7 +623,7 @@ const PublishHistory = () => {
               {selectedRunCache.stats && (
                 <div style={{ marginBottom: '24px' }}>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '8px' }}>CONTENT STATISTICS</div>
-                  <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', textAlign: 'center' }}>
+                  <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '16px', textAlign: 'center' }}>
                     <div>
                       <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--navy-900)' }}>{selectedRunCache.stats.shows}</div>
                       <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Shows</div>
