@@ -2,7 +2,6 @@
   "name": "peblo-tv-mini",
   "version": "1.0.0",
   "description": "A miniature Netflix-style content platform featuring an internal CMS, a backend API with publishing pipeline, and a viewer-facing frontend.",
-  "main": "test-render.js",
   "directories": {
     "doc": "docs"
   },

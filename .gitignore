@@ -10,6 +10,11 @@ backend/.pytest_cache/
 htmlcov/
 dist/
 build/
+.pytest_cache/
+*.log
+.env
+!.env.example
+!backend/.env.example
 
 # Node
 node_modules/
