@@ -161,8 +161,8 @@ const ActionMenu = ({ episode, onEditClick, onDeleteClick }) => {
 const DeleteModal = ({ episode, onClose, onConfirm, isDeleting }) => {
   if (!episode) return null;
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)', padding: '16px', boxSizing: 'border-box' }}>
-      <div className="modal-card">
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }}>
+      <div style={{ backgroundColor: '#FFFFFF', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '400px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
         <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#FEF2F2', color: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
           <AlertTriangle size={24} />
         </div>
@@ -170,7 +170,7 @@ const DeleteModal = ({ episode, onClose, onConfirm, isDeleting }) => {
         <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
           Are you sure you want to delete <strong>{episode.episode_title}</strong>? This action cannot be undone.
         </p>
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
           <button onClick={onClose} disabled={isDeleting} style={{ padding: '10px 16px', borderRadius: '10px', border: '1px solid var(--border)', backgroundColor: '#FFFFFF', color: 'var(--navy-900)', fontSize: '14px', fontWeight: '600', cursor: isDeleting ? 'not-allowed' : 'pointer' }}>Cancel</button>
           <button onClick={onConfirm} disabled={isDeleting} style={{ padding: '10px 16px', borderRadius: '10px', border: 'none', backgroundColor: '#DC2626', color: 'white', fontSize: '14px', fontWeight: '600', cursor: isDeleting ? 'not-allowed' : 'pointer', opacity: isDeleting ? 0.7 : 1 }}>
             {isDeleting ? 'Deleting...' : 'Delete Episode'}

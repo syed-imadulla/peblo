@@ -311,13 +311,13 @@ const Publish = () => {
         </div>
       )}
 
-      <div className="publish-layout">
+      <div style={{ display: 'grid', gridTemplateColumns: '7fr 3fr', gap: '16px' }}>
         {/* Left Content */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
           
           {/* Summary Card */}
           <div className="card" style={{ padding: '24px' }}>
-             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                <h3 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--navy-900)' }}>Catalogue Summary</h3>
                <button 
                  className="btn btn-outline" 
@@ -328,42 +328,42 @@ const Publish = () => {
                </button>
              </div>
              
-             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '16px', alignItems: 'center' }}>
-               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
-                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#f3e8ff', color: '#7e22ce', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#f3e8ff', color: '#7e22ce', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                    <Tv size={24} />
                  </div>
-                 <div style={{ minWidth: 0 }}>
+                 <div>
                    <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1' }}>{allShows.length}</div>
                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>Shows</div>
                  </div>
                </div>
 
-               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
-                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#e0e7ff', color: '#4338ca', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#e0e7ff', color: '#4338ca', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                    <PlaySquare size={24} />
                  </div>
-                 <div style={{ minWidth: 0 }}>
+                 <div>
                    <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1' }}>{allEpisodes.length}</div>
                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>Episodes</div>
                  </div>
                </div>
 
-               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
-                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#dcfce7', color: '#15803d', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#dcfce7', color: '#15803d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                    <Globe size={24} />
                  </div>
-                 <div style={{ minWidth: 0 }}>
+                 <div>
                    <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1' }}>{allLanguages.length}</div>
                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>Languages</div>
                  </div>
                </div>
 
-               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0 }}>
-                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#ffedd5', color: '#c2410c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#ffedd5', color: '#c2410c', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                    <Briefcase size={24} />
                  </div>
-                 <div style={{ minWidth: 0 }}>
+                 <div>
                    <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--navy-900)', lineHeight: '1' }}>{sectionsList.length}</div>
                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>Sections</div>
                  </div>
@@ -749,17 +749,17 @@ const Publish = () => {
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
           backgroundColor: 'rgba(15, 23, 42, 0.7)', zIndex: 1000,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          backdropFilter: 'blur(4px)', padding: '16px', boxSizing: 'border-box'
+          backdropFilter: 'blur(4px)'
         }}>
-          <div className="card" style={{ width: '100%', maxWidth: '900px', height: '85vh', maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', padding: 0, overflow: 'hidden' }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <div className="card" style={{ width: '80%', maxWidth: '900px', height: '80vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <div style={{ padding: '24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px', fontWeight: 800 }}>
                  <FileJson size={22} style={{ color: 'var(--purple-600)' }}/>
                  Catalogue JSON Preview
                </h3>
                <button className="btn btn-outline" onClick={() => setShowPreviewModal(false)} style={{ padding: '8px 16px', fontWeight: 600 }}>Close Preview</button>
             </div>
-            <div style={{ flex: 1, overflowY: 'auto', backgroundColor: '#0f172a', padding: '20px 24px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', backgroundColor: '#0f172a', padding: '24px', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px' }}>
                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', color: '#e2e8f0', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', fontSize: '13px', lineHeight: '1.5' }}>
                  {JSON.stringify(previewData, null, 2)}
                </pre>
