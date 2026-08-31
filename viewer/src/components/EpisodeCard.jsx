@@ -9,15 +9,15 @@ export const EpisodeCard = ({ episode, width = '100%' }) => {
   const thumbnail = resolveAssetUrl(rawThumbnail);
 
   return (
-    <div
-      style={{
-        width: width,
-        flexShrink: 0,
-      }}
-      className="ott-card-slot"
-    >
-      <Link
-        to={`/episode/${episode.content_group}`}
+    <div style={{ width: width, flexShrink: 0, scrollSnapAlign: 'start' }}>
+      <div
+        style={{
+          width: '100%',
+        }}
+        className="ott-card-slot"
+      >
+        <Link
+          to={`/episode/${episode.content_group}`}
         className="ott-floating-card episode-card"
         aria-label={`Play ${episode.title}`}
       >
@@ -111,6 +111,7 @@ export const EpisodeCard = ({ episode, width = '100%' }) => {
           </div>
         </div>
       </Link>
+      </div>
     </div>
   );
 };
